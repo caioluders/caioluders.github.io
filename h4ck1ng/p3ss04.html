@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+</head>
+
+<body><h1>P3ss04 — Utilizando Cadeias de Markov e Algoritmo Genético para a geração de poemas generativos</h1>
+<p>1560556800</p>
+<p>Eu escrevo poemas. Alguns bons, alguns ruins. Alguns tristes, alguns felizes. Poemas expurgam minhas emoções ao mesmo tempo que as…</p>
+<p><img alt="Criado com art.pixlab.io" src="img/1__VeKOw62q7V39hEgOqT7tEQ.png" />
+Criado com <a href="https://art.pixlab.io/">art.pixlab.io</a></p>
+<p>Eu escrevo poemas. Alguns bons, alguns ruins. Alguns tristes, alguns felizes. Poemas expurgam minhas emoções ao mesmo tempo que as transmitem ao leitor. Poemas podem ser complexos, com métricas bem definidas, rimas ricas, alegorias profundas. Podem ser simples, leves, sem rimas, sem métrica, banal, sobre as paixões, sobre o dia a dia.<br />
+Por mais abstrato que um poema seja, por mais “difícil” seu entendimento seja, por mais intrincado. Ele tem um propósito, algum cérebro o escreveu para algum fim, mesmo em um contexto pós-modernista.</p>
+<blockquote>
+<p>Para dar fim aos seus grunhidos abissais<br />
+A embebedo de querosene destilada de todos os processos-pensamentos do seu cluster de humanos-máquina .<br />
+Uma máquina ciente de todos os nossos erros, arrependimentos e culpas</p>
+</blockquote>
+<p>Teria um poema gerado por um computador algum propósito? Um propósito além de o de ser gerado por um computador? Seriam as emoções transmitidas por ele reais? A randomicidade inerente à maquina tornaria a arte gerada por ela, a <a href="https://en.wikipedia.org/wiki/Generative_art">arte generativa,</a> inferior ou menos sagrada?</p>
+<p>O que o poema acima lhe fez pensar? O que você sentiu?</p>
+<h3>P3ss04</h3>
+<p>O poema supracitado fora gerado por um gerador de poemas, o P3ss04, criado a partir de uma cadeia de Markov e evoluído computacionalmente com um algoritmo genético, nomes complexos para ideias simples, alimentado com todos os meus poemas já publicados aqui.<br />
+Imagine um computador extraindo o estilo de um poeta, melhorando esse estilo e, quase que em uma simbiose, criando novos poemas a partir dele.</p>
+<h4><a href="http://setosa.io/ev/markov-chains/">Cadeias de Markov</a></h4>
+<p>Um simples sistema matemático que representa uma cadeia de estados, onde cada estado <em>X</em> tem uma probabilidade de mudar para um outro estado <em>Y</em>.<br />
+Vamos modelar a Cadeia de Markov que representa as ações de um peixe: O peixe nada, se alimenta e defeca. Porém, para que cada ação aconteça depende de <em>N</em> variáveis diferentes, como ele estar com fome ou ter vontade de nadar. Como essas variáveis são extremamente difíceis de simular tentaremos simplificar. Digamos que o dia normal de um peixe seja <strong>Nadar</strong>-&gt;<strong>Comer</strong>-&gt;<strong>Nadar</strong>-&gt;<strong>Nadar</strong>-&gt;<strong>Nadar</strong>-&gt;<strong>Defecar</strong>-&gt;<strong>Nadar</strong>.<br />
+Note padrões como o peixe só <strong>Come</strong> depois de <strong>Nadar</strong> e só <strong>Defeca</strong> depois de <strong>Comer</strong> e de <strong>Nadar</strong> bastante. Esses padrões, baseados nas <em>variáveis complexas demais para serem simuladas</em>, podem ser capturados com a probabilidade de mudança de cada estado <em>X</em> para outro estado <em>Y</em>. No exemplo do peixe, a probabilidade de <strong>Nadar</strong> depois de <strong>Nadar</strong> é alta, enquanto a probabilidade de <strong>Defecar</strong> antes de <strong>Comer</strong> é baixa.</p>
+<p>Transportemos essa ideia para um verso. De novo, dezenas de centenas de “<em>variáveis complexas demais para serem simuladas</em>” como propósito, sentimentos, rimas, etc e etc. Cada palavra é um estado e todas as variáveis são traduzidas na probabilidade de pularmos de uma palavra <em>X</em> para outra palavra <em>Y</em>, assim conseguimos extrair o “estilo” de um autor e criar novas peças inéditas. Por sorte já temos tudo isso implementado em <a href="https://github.com/jsvine/markovify">github.com/jsvine/markovify</a>. Mas isso não é o bastante, visto que estamos apenas reproduzindo um estilo já definido, sem adicionar nada de novo e apenas rearranjando peças antigas.</p>
+<h4><a href="https://pt.wikipedia.org/wiki/Algoritmo_gen%C3%A9tico">Algoritmos genéticos</a></h4>
+<p>Diversas técnicas de arte generativa são extraídas do rumo natural das cousas — O mistério das cousas? Sei lá o que é mistério! — o livro <a href="https://natureofcode.com/book/">The Nature of Code</a> é uma ótima introdução à essas técnicas. No nosso caso, vamos traduzir a seleção natural de Darwin e as mutações dos genes para um algoritmo. O objetivo aqui é evoluir a nossa Cadeia de Markov, gerada anteriormente com os poemas, para uma versão melhorada dela mesma.</p>
+<p>A base da seleção natural de Darwin tem 3 etapas principais : Hereditariedade, Variação e Seleção. Voltemos ao peixe: o peixe herda genes dos seus pais, esses genes definem aspectos importantes do peixe, mas não o peixe totalmente. Além de herdar genes, há uma certa probabilidade que seus genes se modifiquem e sofram uma mutação. Por fim, o peixe tenta se reproduzir e depois de centenas de gerações as características que favorecem a reprodução são passadas a diante. No final, apenas as “melhores” características restam e temos o “peixe perfeito”.</p>
+<p>Vamos agora aplicar a mesma ideia para melhorarmos o nosso modelo de Cadeia de Markov. Como estamos na primeira geração de Modelos, vamos pular a Hereditariedade por hora. Temos primeiro que diferenciar cada modelo randomicamente para que tenhamos uma população inicial. Como as cadeias são, basicamente, os estados e as suas probabilidades, essas são as únicas coisas passíveis de mutação, então cada elemento que define um modelo tem uma probabilidade <em>X</em> de sofrer uma mutação a cada geração, aumentando ou diminuindo a Probabilidade de mudar de um Estado X para outro Estado Y ou alterando completamente um Estado/palavra. O <em>X</em> você pode definir empiricamente dependendo do seu experimento e também fica à sua escolha a quantidade de Modelos por geração. Na natureza a Seleção se dá por quem sucede em se reproduzir, precisamos definir como iremos selecionar o grande “vencedor” de cada geração, normalmente é necessário estipular uma maneira automatizada de escolher o “vencedor”, como um sistema de pontuação e ranking e ideias adjacentes, porém poesias são coisas extremamente subjetivas e não encontrei nenhuma solução automatizada que não envolvesse redes neurais para definir um poema “bom”, então decidi fazer um sistema manual onde o usuário define qual modelo se saiu melhor na geração atual através de um sistema eliminatório, o famoso mata-mata. Ao final desse processo e de ter escolhido o melhor Modelo da geração atual você começa tudo de novo e cria novos <em>N</em> modelos à partir do Modelo vencedor.</p>
+<p><img alt="" src="img/1__0JGkno8om0VVcMzWgBxECQ.png" /></p>
+<h4>Repositório</h4>
+<p>Tudo aqui discutido está sendo lançado no repositório <a href="http://github.com/caioluders/P3ss04">github.com/caioluders/P3ss04</a> , como sempre, porcamente codificado e documentado, porém funcional. Usem e alterem como quiserem e gerem muitos poemas. Pretendo criar um sistema eliminatório melhor e aumentar as possíveis formas de mutações, além de melhorar a randomicidade das probabilidades que às vezes fica muito obcecado/viciado em versos específicos. Também queria criar um bot “evoluído” de Twitter do Fernando Pessoa e seus heterônimos, porém reunir todos os seus poemas está sendo um trabalho hercúleo, aceito ajuda, provavelmente colocarei no mesmo repositório.</p>
+<p>Segue alguns poemas gerados pelo script, ele está cada dia mais mórbido, da medo. <em>O último poema é uma obra prima!</em></p>
+<p>1</p>
+<blockquote>
+<p>minha alma se perde<br />
+Em um ser imperfeito<br />
+Como inço que cresce em uma liquidez uniforme</p>
+</blockquote>
+<p>2</p>
+<blockquote>
+<p>veio o meu eu<br />
+tudo digitalizado para o meu peso não me derrube<br />
+fazem um hard reset a cada hard reset:<br />
+veio o meu cérebro<br />
+Cuidado com o escuro do meu pleito</p>
+</blockquote>
+<p>3</p>
+<blockquote>
+<p>sobre o meu peso não me torture<br />
+Agora que o sentido cru da vida<br />
+o meu vazio existe?<br />
+Último acaso em um último e suicida ritual de purificação.</p>
+</blockquote>
+<p>4</p>
+<blockquote>
+<p>Em um ser imperfeito<br />
+e nada já não pesa<br />
+que a vontade não seque<br />
+e eu já não sinto<br />
+A inquietude do meu quarto.<br />
+o que eu não sei<br />
+Que a minha dor encolha<br />
+Das vidas que me devora<br />
+sigo o caos da alma<br />
+Das vidas que me desfaz<br />
+A embebedo de querosene destilada de todos os neurônios do meu vazio<br />
+e de que adianta sentir<br />
+já que o presente<br />
+Ela me respondeu que o presente de ser ninguém<br />
+de um ser vazio</p>
+</blockquote></body></html>

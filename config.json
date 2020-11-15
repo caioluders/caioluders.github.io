@@ -1,0 +1,5 @@
+{
+    "theme": "templates/dark.html",
+    "title": "lude.rs",
+    "ignore" : ["CNAME","index.html", "config.json"]
+}
