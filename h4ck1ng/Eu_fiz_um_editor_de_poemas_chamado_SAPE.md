@@ -25,7 +25,6 @@ function countSilabas(line) {
     var f_v = false ; // flag to check if the last letter was a vogal
     var p_c = false ;
     console.log(almost_done) ;
-
     // holy shit that code is ugly , PLZ DO NOT READ IT , IT WILL MAKE YOUR EYES BURN !!!
     for (var i = 0 ; i <  almost_done.length; i++) { // word
       for (var y = 0; y < almost_done[i].length ;y++) { // letter
