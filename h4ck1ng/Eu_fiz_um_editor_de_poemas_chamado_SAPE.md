@@ -1,4 +1,4 @@
-# Eu fiz um editor de poemas chamado SAPE
+# Codei um editor de poemas chamado SAPE
 1615439218
 
 [lude.rs/SAPE/](https://lude.rs/SAPE/)
@@ -11,9 +11,9 @@ Completamente off-topic de segurança em geral, mas é sobre computação então
 ## Motivação
 A idéia de ter um editor de poemas é meio antiga, na verdade eu já tinha feito um em 2017 em Electron e ficou uma bosta, Electron é uma bosta, ficou grande e pesado, embutir um chrome num programa só pra rodar uns html/css/js é uma péssima idéia. Então eu decidi refazer todo o código e adicionar mais funcionalidades.
 
-A motivação principal foi pura preguiça, preguiça de contar a métrica de cada verso e preguiça de procurar rima em dicionário/Google. Essas foram as duas primeiras funcionalidades da primeira versão de 2017, mas tive algumas problemas. 
+A motivação principal foi pura preguiça, preguiça de contar a métrica de cada verso e preguiça de procurar rima em dicionário/Google. Essas foram as duas primeiras funcionalidades da primeira versão de 2017, mas tive algumas problemas. Outra motivação menor, foi a idéia de simbose com o computador, algo da linha do [P3ss04](https://lude.rs/h4ck1ng/p3ss04.html), usar ferramentas computacionais para elevar a humanindade, ou qualquer brisa assim.
 
-O primeiro problema foi COMO CARALHOS EU VOU CONTAR AS SÍLABAS ?!?!? É um problema super difícil que eu substimei, comecei tentando criar um algoritmo baseado em algumas regras gramaticais, mas além de porco, ficou errado, coisa de 60% de acerto. A língua portuguesa é linda e extremamente complexa, aqui em baixo tá a minha tentativa de função para contagem de sílabas poéticas, QUE CÓDIGO FEIO DA PORRA:
+O primeiro problema foi COMO CARALHOS EU VOU CONTAR AS SÍLABAS ?!?!? É um problema super difícil que eu substimei, comecei tentando criar um algoritmo baseado em algumas regras gramaticais, mas além de porco, ficou errado, coisa de 60% de acerto. A língua portuguesa é linda e extremamente complexa, aqui em baixo tá a minha tentativa de função para contagem de sílabas poéticas, OLHA QUE CÓDIGO FEIO DA PORRA:
 
 ```javascript
 function countSilabas(line) {
@@ -93,7 +93,7 @@ O segundo problema foi a pesquisa de rimas, ou seja, as duas funcionalidades for
 O que seria um bom substituto, nativo de prefêrencia, para o Electron? Tava usando o Binary Ninja e descobri que [o primeiro prototype](https://github.com/Vector35/deprecated-binaryninja-python) dele foi feito em [Qt](https://www.qt.io/) for Python, e é muito bonitinho. A versão comercial também foi feita em Qt, pelo o que entendi, mas com C++. Então decidi fazer a nova versão em Qt + Python usando o [Pyside2](https://pypi.org/project/PySide2/). O Qt é um framework que consegue unificar uma única API para todas as plataformas, além de ter bindings em Python o que facilita muito a minha vida.
 
 ### Segundo aprendizado
-Database local realmente não foi uma boa ideia, uma simples requisição para uma API externa para pesquisar rimas não é tão ruim. Eu só não gosto de ter que depender de uma API de terceiro, talvez no futuro eu faça a minha própia.
+Database local claramente não foi uma boa ideia, uma simples requisição para uma API externa para pesquisar rimas não é tão ruim assim vai. Eu só não gosto de ter que depender de uma API de terceiro, talvez no futuro eu faça a minha própia.
 
 ### Terceiro aprendizado
 Aqui que as coisas começam a ficar minimamente interessantes e menos noobice. Separação silábica e contagem de sílabas poéticas, apesar de parecidas, não são iguais. A forma como os sons interagem dentro do verso importa muito na métrica, e nem um pouco apenas para separar as sílabas de uma palavra. Apesar disso, imaginei que poderia usar como base as sílabas e apenas adicionar as regras que fossem necessárias, a separação foi o mais díficil naquela coisa horrível de cima. 
@@ -118,7 +118,7 @@ Descrevendo rapidamente o que foi implementado no SAPE, até pra eu não me perd
 Precisei também fazer a distribuição para macOS/Windows/Linux, porque eu imagino que a maioria dos potenciais usuários não sejam de computação. Então usei o [Pyinstaller](https://www.pyinstaller.org/) para empacotar o programa, e todos os seus arquivos, em um executável. O processo foi bastante straight-forwarded e só precisei adicionar os arquivos adicionais manualmente na configuração, além de setar algumas flags, como não mostrar o console no Windows. Os executáveis ficaram em torno de ~40mb, um grande avanço.
 
 ## Futuro
-Enquanto codava tive a idéia de que o editor poderia realçar as rimas do texto, estilo syntax highlight, isso seria muuuito útil. Porque agora, já munido da representação fonética, eu nem preciso ficar preso a rimas que tem grafia exatamente igual, teoricamente devo conseguir identificar rimas que possuem grafias diferentes. Apenas checando a representação do IPA o SAPE deveria ser capaz de encontrar sílabas foneticamente iguais. Ah! Um 1337zador de texto vai ficar de easter egg pro futuro tbm lol.
+Enquanto codava tive a idéia de que o editor poderia realçar as rimas do texto, estilo syntax highlight, isso seria muuuito útil. Porque agora, já munido da representação fonética, eu nem preciso ficar preso a rimas que tem grafia exatamente igual, teoricamente devo conseguir identificar rimas que possuem grafias diferentes. Apenas checando a representação do IPA, o SAPE deveria ser capaz de encontrar sílabas foneticamente iguais. Ah! Um 1337zador de texto vai ficar de easter egg pro futuro tbm lol.
 
 Acabou que a API de syntax highlight do Qt é meio bugada e estou tendo problemas para comparar as palavras com o IPA, então vou deixar essa funcionalidade para a próxima versão. Também vou deixar pra próxima versão o tema escuro do app, apesar de estar funcionando no Linux, não rolou no Windows/macOS e eu tô sem saco pra descobrir o por quê.
 
