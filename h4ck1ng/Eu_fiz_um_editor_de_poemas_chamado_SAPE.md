@@ -26,6 +26,7 @@ function countSilabas(line) {
     var p_c = false ;
     console.log(almost_done) ;
     // holy shit that code is ugly , PLZ DO NOT READ IT , IT WILL MAKE YOUR EYES BURN !!!
+    
     for (var i = 0 ; i <  almost_done.length; i++) { // word
       for (var y = 0; y < almost_done[i].length ;y++) { // letter
         if (list_acentuadas.indexOf(almost_done[i][y]) > -1) { // toda acentuada conta
