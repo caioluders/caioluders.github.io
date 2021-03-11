@@ -17,7 +17,7 @@ O primeiro problema foi COMO CARALHOS EU VOU CONTAR AS SÍLABAS ?!?!? É um prob
 
 ```
 function countSilabas(line) {
-    var almost_done = line.replace(/[.,\/#$%\^&\*;:{}=\-_`~()]/g,"").split(" ") ; // remove pontuations, but not "!" that changes the metric
+    var almost_done = line.replace(/[.,\/#$%\^&\*;:{}=\-_~()]/g,"").split(" ") ; // remove pontuations, but not "!" that changes the metric
     var silabas_counter = 0 ; // main counter
     var list_consoantes =  Array.from("çbcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ") ; // almost forgot the "ç"
     var list_vogais = Array.from("aeiouAEIOUõã") ;
