@@ -16,7 +16,6 @@ A motivação principal foi pura preguiça, preguiça de contar a métrica de ca
 O primeiro problema foi COMO CARALHOS EU VOU CONTAR AS SÍLABAS ?!?!? É um problema super difícil que eu substimei, comecei tentando criar um algoritmo baseado em algumas regras gramaticais, mas além de porco, ficou errado, coisa de 60% de acerto. A língua portuguesa é linda e extremamente complexa, aqui em baixo tá a minha tentativa de função para contagem de sílabas poéticas, OLHA QUE CÓDIGO FEIO DA PORRA:
 
 ```
-
 function countSilabas(line) {
     var almost_done = line.replace(/[.,\/#$%\^&\*;:{}=\-_~()]/g,"").split(" ") ; // remove pontuations, but not "!" that changes the metric
     var silabas_counter = 0 ; // main counter
@@ -76,7 +75,6 @@ function countSilabas(line) {
 
     return silabas_counter ;
 }
-
 ```
 
 Tem comentários explicando porcamente as regras gramaticais, eu não tentei dividir as sílabas e só tentei contar a métrica, deu errado. 
