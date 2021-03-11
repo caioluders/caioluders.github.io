@@ -14,68 +14,67 @@
 <p>A idéia de ter um editor de poemas é meio antiga, na verdade eu já tinha feito um em 2017 em Electron e ficou uma bosta, Electron é uma bosta, ficou grande e pesado, embutir um chrome num programa só pra rodar uns html/css/js é uma péssima idéia. Então eu decidi refazer todo o código e adicionar mais funcionalidades.</p>
 <p>A motivação principal foi pura preguiça, preguiça de contar a métrica de cada verso e preguiça de procurar rima em dicionário/Google. Essas foram as duas primeiras funcionalidades da primeira versão de 2017, mas tive algumas problemas. Outra motivação menor, foi a idéia de simbose com o computador, algo da linha do <a href="https://lude.rs/h4ck1ng/p3ss04.html">P3ss04</a>, usar ferramentas computacionais para elevar a humanindade, ou qualquer brisa assim.</p>
 <p>O primeiro problema foi COMO CARALHOS EU VOU CONTAR AS SÍLABAS ?!?!? É um problema super difícil que eu substimei, comecei tentando criar um algoritmo baseado em algumas regras gramaticais, mas além de porco, ficou errado, coisa de 60% de acerto. A língua portuguesa é linda e extremamente complexa, aqui em baixo tá a minha tentativa de função para contagem de sílabas poéticas, OLHA QUE CÓDIGO FEIO DA PORRA:</p>
-<p><code>``javascript
-function countSilabas(line) {
-    var almost_done = line.replace(/[.,\/#$%\^&amp;\*;:{}=\-_</code>~()]/g,"").split(" ") ; // remove pontuations, but not "!" that changes the metric
+<pre><code>function countSilabas(line) {
+    var almost_done = line.replace(/[.,\/#$%\^&amp;\*;:{}=\-_~()]/g,&quot;&quot;).split(&quot; &quot;) ; // remove pontuations, but not &quot;!&quot; that changes the metric
     var silabas_counter = 0 ; // main counter
-    var list_consoantes =  Array.from("çbcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ") ; // almost forgot the "ç"
-    var list_vogais = Array.from("aeiouAEIOUõã") ;
-    var list_acentuadas = Array.from("àáâäåæèéêëæìíîïòóôöøùúûü");
+    var list_consoantes =  Array.from(&quot;çbcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ&quot;) ; // almost forgot the &quot;ç&quot;
+    var list_vogais = Array.from(&quot;aeiouAEIOUõã&quot;) ;
+    var list_acentuadas = Array.from(&quot;àáâäåæèéêëæìíîïòóôöøùúûü&quot;);
     var f_v = false ; // flag to check if the last letter was a vogal
     var p_c = false ;
-    console.log(almost_done) ;</p>
-<pre><code>// holy shit that code is ugly , PLZ DO NOT READ IT , IT WILL MAKE YOUR EYES BURN !!!
-for (var i = 0 ; i &lt;  almost_done.length; i++) { // word
-  for (var y = 0; y &lt; almost_done[i].length ;y++) { // letter
-    if (list_acentuadas.indexOf(almost_done[i][y]) &gt; -1) { // toda acentuada conta
-      console.log("ac -&gt;"+almost_done[i][y]) ;
-      silabas_counter += 1 ;  
-      f_v = false ; // it's a vogal, but a tonic one
-    } else {
-      if (list_vogais.indexOf(almost_done[i][y]) &gt; -1) { // if vogal
-        f_v = true;
-        if (y == almost_done[i].length-1) { // check if last letter of word
-          var tf = true ;
-          for ( var k = 0 ; k &lt; almost_done[i].length ; k++ ) {
-            if (list_consoantes.indexOf(almost_done[i][k]) &gt; -1 ) {
-              tf = false ;
-              break ;
+    console.log(almost_done) ;
+    // holy shit that code is ugly , PLZ DO NOT READ IT , IT WILL MAKE YOUR EYES BURN !!!
+    for (var i = 0 ; i &lt;  almost_done.length; i++) { // word
+      for (var y = 0; y &lt; almost_done[i].length ;y++) { // letter
+        if (list_acentuadas.indexOf(almost_done[i][y]) &gt; -1) { // toda acentuada conta
+          console.log(&quot;ac -&gt;&quot;+almost_done[i][y]) ;
+          silabas_counter += 1 ;  
+          f_v = false ; // it's a vogal, but a tonic one
+        } else {
+          if (list_vogais.indexOf(almost_done[i][y]) &gt; -1) { // if vogal
+            f_v = true;
+            if (y == almost_done[i].length-1) { // check if last letter of word
+              var tf = true ;
+              for ( var k = 0 ; k &lt; almost_done[i].length ; k++ ) {
+                if (list_consoantes.indexOf(almost_done[i][k]) &gt; -1 ) {
+                  tf = false ;
+                  break ;
+                }
+              }
+              if ( tf &amp;&amp; i != 0 ) { // if last letter is a vogal and isn't the first word
+                if (list_vogais.indexOf(almost_done[i-1][almost_done[i].length-1]) &gt; -1) { // if begin of the next word is a vogal
+                  f_v = false ;
+                  continue ; // goto
+                }
+              }
+              console.log(almost_done[i][y]) ;
+              silabas_counter += 1 ;
+              f_v = false;
+            }
+            if (y == 0 &amp;&amp; i != 0){
+              if (list_vogais.indexOf(almost_done[i-1][almost_done[i-1].length-1]) &gt; -1) {
+                f_v = false ;
+              }
+            }
+          } else {
+            if ( (list_consoantes.indexOf(almost_done[i][y]) &gt; -1) &amp;&amp; f_v ){
+                silabas_counter += 1 ;  
+                f_v = false ;
+                p_c = true ;
+                console.log(almost_done[i][y]) ;
             }
           }
-          if ( tf &amp;&amp; i != 0 ) { // if last letter is a vogal and isn't the first word
-            if (list_vogais.indexOf(almost_done[i-1][almost_done[i].length-1]) &gt; -1) { // if begin of the next word is a vogal
-              f_v = false ;
-              continue ; // goto
-            }
-          }
-          console.log(almost_done[i][y]) ;
-          silabas_counter += 1 ;
-          f_v = false;
-        }
-        if (y == 0 &amp;&amp; i != 0){
-          if (list_vogais.indexOf(almost_done[i-1][almost_done[i-1].length-1]) &gt; -1) {
-            f_v = false ;
-          }
-        }
-      } else {
-        if ( (list_consoantes.indexOf(almost_done[i][y]) &gt; -1) &amp;&amp; f_v ){
-            silabas_counter += 1 ;  
-            f_v = false ;
-            p_c = true ;
-            console.log(almost_done[i][y]) ;
-        }
+        }  
       }
-    }  
-  }
-}
-if (silabas_counter &gt;= 2 &amp;&amp; (almost_done[almost_done.length-1][almost_done[almost_done.length-1].length-1] != '!') ) {
-  silabas_counter -= 1 ; // BUG FIX
-}
+    }
+    if (silabas_counter &gt;= 2 &amp;&amp; (almost_done[almost_done.length-1][almost_done[almost_done.length-1].length-1] != '!') ) {
+      silabas_counter -= 1 ; // BUG FIX
+    }
 
-return silabas_counter ;
+    return silabas_counter ;
+}
 </code></pre>
-<p>}
-```</p>
+
 <p>Tem comentários explicando porcamente as regras gramaticais, eu não tentei dividir as sílabas e só tentei contar a métrica, deu errado. </p>
 <p>O segundo problema foi a pesquisa de rimas, ou seja, as duas funcionalidades foram problemas kkkkkrying. Na minha cabeça o SAPE não deveria precisar de internet, pra ser mais acessível, dai eu tive a brilhante idéia de usar uma database local de palavras do <a href="dicionario-aberto.net">https://dicionario-aberto.net/</a> junto com o programa, resultado? O executável ficou com 300mb, uns 200mb do SQLite e uns 100mb só da porra do Chrome do Electron.</p>
 <h2>Aprendizados</h2>
