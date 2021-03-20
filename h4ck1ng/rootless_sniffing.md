@@ -36,7 +36,7 @@ Reading through the config file of `php-fpm` I found out that it used a [Unix do
 
 1. First that renaming the socket brought the server down, obviously.
 2. Secondly that if my spoofed socket crashed for some reason the server would also go down. 
-3. Thirdly that I you shouldn't depend on `socat` as it's a redflag on server, and a pretty big binary.
+3. Thirdly that you shouldn't depend on `socat` as it's a red-flag on any server, and a pretty big binary.
 
 So I made a script that automatizes this whole proccess, and makes sure that if anything goes wrong it will rename the old socket back, and the server will not go offline.
 
