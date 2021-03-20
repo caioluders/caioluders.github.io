@@ -34,11 +34,9 @@ The ideia here was that to each request the Nginx worker was going to open a new
 ## Unix domain socket
 Reading through the config file of `php-fpm` I found out that it used a [Unix domain socket][ https://en.wikipedia.org/wiki/Unix_domain_socket ) to communicate with Nginx using [Fastcgi]( https://en.wikipedia.org/wiki/FastCGI ) , what a horrible name btw. So I began to search for ways of sniffing the Unix domain socket, and turns out it's pretty hard to properly sniff it, mainly because it isn't bound to any protocol, and most reliable ways uses `ptrace`, but a dirty hack it's to just rename the socket, everything's a file on unix yadayada, and create a new one that MiTM it ( Like this [superuser.com/a/576404](https://superuser.com/a/576404) ) using `socat`. Nice, the PoC worked locally and I was seeing the FastCGI requests, but this PoC had some problems.
 
-First that renaming the socket brought the server down, obviously.
-
-Secondly that if my spoofed socket crashed for some reason the server would also go down. 
-
-Thirdly that I you shouldn't depend on `socat` as it's a redflag on server, and a pretty big binary.
+1. First that renaming the socket brought the server down, obviously.
+2. Secondly that if my spoofed socket crashed for some reason the server would also go down. 
+3. Thirdly that I you shouldn't depend on `socat` as it's a redflag on server, and a pretty big binary.
 
 So I made a script that automatizes this whole proccess, and makes sure that if anything goes wrong it will rename the old socket back, and the server will not go offline.
 
