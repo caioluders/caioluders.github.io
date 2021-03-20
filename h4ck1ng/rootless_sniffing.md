@@ -21,7 +21,7 @@ cap_add:
 
 More deep analysis of this on https://jvns.ca/blog/2020/04/29/why-strace-doesnt-work-in-docker/.
 
-On Docker running kernels after 4.8 you still can't dump the memory of any of proccess under your user, if the `/proc/sys/kernel/yama/ptrace_scope` is set to `1`  it will only allow `ptrace` if your proccess is the father of the proccess you want to `ptrace`, if it's set to zero you can dump the memory, but it's `1` by default on most systems. More info on `Yama` on general : https://www.kernel.org/doc/Documentation/security/Yama.txt
+On Docker running kernels after 4.8 you can use the `process_vm_readv` syscall to dump the memory without attaching to it, but you still can't dump the memory of any of proccess under your user. If the `/proc/sys/kernel/yama/ptrace_scope` is set to `1` it will only allow `ptrace`/`process_vm_readv` if your proccess is the father of the proccess you want to `ptrace`, if it's set to zero you can dump the memory, but it's `1` by default on most systems. More info on `Yama` on general : https://www.kernel.org/doc/Documentation/security/Yama.txt
 
 Basically I can only dump the memory of a proccess that I executed, not of any proccess running on my user. The workers are executed by the masters proccess that run under root :'( So I can't just spawn a new worker from `www-data`.
 
@@ -41,7 +41,7 @@ So I made a script that automatizes this whole proccess, and makes sure that if 
 
 <script src="https://gist-it.appspot.com/github/caioluders/rootless_sniffing/blob/main/dsm.c"></script>
 
-Here's static-linked binaries for red teamming purposes on https://github.com/caioluders/rootless_sniffing
+Here's static-linked binaries for red teamming purposes on [github.com/caioluders/rootless_sniffing](https://github.com/caioluders/rootless_sniffing)
 
 # Conclusions
 It was really insightfull to go this low on the unix kernel, I'm more of a web guy I guess, and helped a lot to better understand basic authorization flows on the linux kernel. Altho most of my ideas were shit and didn't work, having found that I can spoof the Unix domain socket that the Nginx uses internally is a new technique for me. This can be used on red teaming to escalate privileges, if you weren't able to root it, by getting plain text credentials on a login POST request for example.
