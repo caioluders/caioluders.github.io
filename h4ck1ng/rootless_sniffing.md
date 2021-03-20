@@ -10,20 +10,17 @@ I had access to the `www-data` user, and the server was running `Nginx+php-fpm`,
 # Ideias
 
 ## Dumping the memory
-The first ideia that came to mind was to just dump the memory of the workers via the `/proc/PID/mem` and hope that the requests were there. Here is a nice thread about it [unix.stackexchange.com/questions/6301/how-do-i-read-from-proc-pid-mem-under-linux](https://unix.stackexchange.com/questions/6301/how-do-i-read-from-proc-pid-mem-under-linux) got most of the info there, unfortunately it's somewhat outdated, I'll explain more later.
-The problem that I ran into was that most tools/scripts uses PTRACE to attatch to the process before dumping it, and as far as my understanding goes ~sorry if I got something wrong~, this was needed on older kernels to access the memory of another proccess, and you can't PTRACE on Docker without a specific config `--cap-add=SYS_PTRACE` or on `docker-compose.yml` :
+The first ideia that came to mind was to just dump the memory of the workers via the `/proc/PID/mem` and hope that the requests were there. Here is a nice thread about it [unix.stackexchange.com/questions/6301/how-do-i-read-from-proc-pid-mem-under-linux](https://unix.stackexchange.com/questions/6301/how-do-i-read-from-proc-pid-mem-under-linux) got most of the info there.
+The problem that I ran into was that most tools/scripts uses the `ptrace` syscall to attatch to the process before dumping it, and you can't `ptrace` at all on Docker on kernels older than 4.8 without a specific config `--cap-add=SYS_PTRACE` or on `docker-compose.yml` :
 
 ```
 cap_add:
     - SYS_PTRACE
 ```
 
-Looks like that a new syscall was introduced to replace `ptrace`, 
+More deep analysis of this on https://jvns.ca/blog/2020/04/29/why-strace-doesnt-work-in-docker/. On Docker running kernels after 4.8 you still can't dump the memory of any of procces, if the `/proc/sys/kernel/yama/ptrace_scope` is set to `1` because it will only allow `ptrace` on childrens of your proccess, if it's set to zero you can dump the memory, but it's `1` by default on most systems. More info on `Yama` on general : https://www.kernel.org/doc/Documentation/security/Yama.txt
 
-https://jvns.ca/blog/2020/04/29/why-strace-doesnt-work-in-docker/
-https://gist.github.com/FergusInLondon/fec6aebabc3c9e61e284983618f40730
-
-If I wasn't on docker I could use `gcore`. A tool to automatize this would be nice, I think [mimipenguin](https://github.com/huntergregal/mimipenguin) has a similar ideia but needs root. I'll probably code this later.
+Basically I can only dump the memory of a proccess that I executted, not of any proccess running on my user.
 
 ## Logs
 Editing `Nginx` config to add some logs? No `root` , no way :(
