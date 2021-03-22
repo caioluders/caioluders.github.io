@@ -29,7 +29,9 @@ Basically I can only dump the memory of a proccess that I executed, not of any p
 Editing `Nginx` config to add some logs? No `root` , no way :(
 
 ## File Descriptors
-The ideia here was that to each request the Nginx worker was going to open a new file descriptor to that socket, and I could dump his contents, if I'm quick, via `/proc/PID/fd/N`. It's a nice ideia , but the only way that I found to achieve this is by copying all the file descriptors using the fairly "new" syscall `pidfd_getfd`, this was introduced on kernel 5.6, with the `pidfd_open` syscall you can open a new file descriptor that refers to another proccess, with that you can use `pidfd_getfd` to copy all file descriptors and use them. We need this because you can't interact with sockets/pipes by just using the file `/proc/PID/fd/N`, this is why you need to copy'em. Now for the sad part: `pidfd_getfd` permissions is governed by `ptrace` (T_T) So this falls at the same problem as dumping the memory.  
+The ideia here was that to each request the Nginx worker was going to open a new file descriptor to that socket, and I could dump his contents, if I'm quick, via `/proc/PID/fd/N`. It's a nice ideia, but you can't interact with sockets/pipes by just using the file `/proc/PID/fd/N`.
+
+There is one way that I found to achieve this: copying all the file descriptors using the fairly new syscall `pidfd_getfd`, this was introduced on kernel 5.6, with the `pidfd_open` syscall you can open a new file descriptor that refers to another proccess, with that you can use `pidfd_getfd` to copy all file descriptors and use them. Now for the sad part: `pidfd_getfd` permissions is governed by `ptrace` (T_T) So this falls in the same problem as dumping the memory.  
  
 ## Unix domain socket
 Reading through the config file of `php-fpm` I found out that it used a [Unix domain socket]( https://en.wikipedia.org/wiki/Unix_domain_socket ) to communicate with Nginx using [Fastcgi]( https://en.wikipedia.org/wiki/FastCGI ) , what a horrible name btw.
