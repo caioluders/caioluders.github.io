@@ -67,7 +67,7 @@ Nice, the PoC worked locally and I was seeing the FastCGI requests, but this PoC
 2. If my spoofed socket crashed for some reason the server would also go down. 
 3. I don't want to depend on `socat` as it's a red-flag on any server, and a pretty big binary.
 
-So I made a script that automatizes this whole proccess, and makes sure that if anything goes wrong it will rename the old socket back so that the server will not go offline.
+So I made a script that automatizes this whole proccess, and makes sure that if anything goes wrong it will rename the old socket back so the server don't go offline.
 
 <script src="https://gist-it.appspot.com/github/caioluders/rootless_sniffing/blob/main/dsm.c"></script>
 
