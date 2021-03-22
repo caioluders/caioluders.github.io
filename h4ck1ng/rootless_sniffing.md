@@ -74,7 +74,7 @@ So I made a script that automatizes this whole proccess, and makes sure that if 
 Here's static-linked binaries for red teaming purposes on [github.com/caioluders/rootless_sniffing](https://github.com/caioluders/rootless_sniffing)
 
 # Conclusions
-It was really insightfull to go this low on the unix kernel, I'm more of a web guy I guess, and helped a lot to better understand basic authorization flows on the linux kernel. Altho most of my ideas were shit and didn't work, having found that I can spoof the Unix domain socket that the Nginx uses internally is a new technique for me. This can be used on red teaming to escalate privileges, if you weren't able to root it, by getting plain text credentials on a login POST request for example.
+It was really insightfull to go this low on the unix kernel, I'm more of a web guy I guess, and helped a lot to better understand basic authorization flows on the linux kernel. Altho most of my ideas were shit and didn't work, having found that I can spoof the Unix domain socket that the Nginx uses internally is a new technique for me. This can be used on red teaming to escalate privileges, if you weren't able to root it, by getting plain text credentials on a login POST request for example. You can also do more than just sniffing the requests: you can alter the server's responses! Use your imagination, maybe I make a tool later to achieve that.
 
 I don't know which archictures uses a Unix domain socket on the same way as `Nginx+php-fpm`, but I guess that should exist more contexts that this works, please publish it if you find more scenarios. 
 
