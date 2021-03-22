@@ -10,7 +10,7 @@ I had access to the `www-data` user, and the server was running `Nginx+php-fpm`,
 # Ideias
 
 ## Dumping the memory
-The first ideia that came to mind was to just dump the memory of the Nginx/php workers via the `/proc/PID/mem` and hope that the requests are there. Here is a nice thread about it [unix.stackexchange.com/questions/6301/how-do-i-read-from-proc-pid-mem-under-linux](https://unix.stackexchange.com/questions/6301/how-do-i-read-from-proc-pid-mem-under-linux) got most of the info there.
+The first ideia that came to mind was to just dump the memory of the Nginx/php-fpm workers via the `/proc/PID/mem` and hope that the requests are there. Here is a nice thread about it [unix.stackexchange.com/questions/6301/how-do-i-read-from-proc-pid-mem-under-linux](https://unix.stackexchange.com/questions/6301/how-do-i-read-from-proc-pid-mem-under-linux) got most of the info there.
 
 The problem that I ran into was that most tools/scripts uses the `ptrace` syscall to attatch to the process before dumping it, and you can't `ptrace` at all on Docker on kernels older than 4.8 without a specific config `--cap-add=SYS_PTRACE` or on `docker-compose.yml` :
 
