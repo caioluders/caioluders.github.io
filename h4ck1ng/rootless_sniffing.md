@@ -71,7 +71,7 @@ So I made a script that automatizes this whole proccess, and makes sure that if 
 
 <script src="https://gist-it.appspot.com/github/caioluders/rootless_sniffing/blob/main/dsm.c"></script>
 
-Here's static-linked binaries for red teamming purposes on [github.com/caioluders/rootless_sniffing](https://github.com/caioluders/rootless_sniffing)
+Here's static-linked binaries for red teaming purposes on [github.com/caioluders/rootless_sniffing](https://github.com/caioluders/rootless_sniffing)
 
 # Conclusions
 It was really insightfull to go this low on the unix kernel, I'm more of a web guy I guess, and helped a lot to better understand basic authorization flows on the linux kernel. Altho most of my ideas were shit and didn't work, having found that I can spoof the Unix domain socket that the Nginx uses internally is a new technique for me. This can be used on red teaming to escalate privileges, if you weren't able to root it, by getting plain text credentials on a login POST request for example.
