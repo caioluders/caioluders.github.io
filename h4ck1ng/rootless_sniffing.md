@@ -135,7 +135,7 @@ CONNECT:/tmp/.php-fpm.sock.1
 --
 ```
 
-Nice, the PoC worked locally and I was seeing the FastCGI requests, but this PoC had some problems.
+Yay! The PoC worked locally and I was seeing the FastCGI requests, but this PoC has some problems:
 
 1. Renaming the socket brought the server down.
 2. If my spoofed socket crashed for some reason the server would also go down. 
