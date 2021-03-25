@@ -53,7 +53,7 @@ listen = /tmp/.php-fpm.sock
 [...]
 ```
 
-So I began to search for ways of sniffing the Unix domain socket, and turns out it's pretty hard to properly sniff it, mainly because it isn't bound to any protocol, and most reliable ways use `ptrace`, but a dirty hack it's to just rename the socket, everything's a file on unix yadayada, and create a new one that MiTM it , like this [superuser.com/a/576404](https://superuser.com/a/576404), using `socat`. Note that this only works if you can write on the socket's directory, I'm still not sure if this is thedefault when using a supervisor, or it's a misconfig putting the socket on `/tmp`, but surely it isn't that uncommon.
+So I began to search for ways of sniffing the Unix domain socket, and turns out it's pretty hard to properly sniff it, mainly because it isn't bound to any protocol, and most reliable ways use `ptrace`, but a dirty hack it's to just rename the socket, everything's a file on unix yadayada, and create a new one that MiTM it , like this [superuser.com/a/576404](https://superuser.com/a/576404), using `socat`. Note that this only works if you can write on the socket's directory, I'm still not sure if this is the default when using a supervisor, or it's a misconfig putting the socket on `/tmp`, but surely it isn't that uncommon.
 
 ```
 /tmp $ id
