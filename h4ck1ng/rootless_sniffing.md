@@ -1,4 +1,5 @@
 # Rootless Sniffing
+1617736356
 
 Once upon a time, a noob found an RCE on a server but didn't got root, the noob wanted to sniff the requests that were arriving on that server, to escalate privileges, but didn't know how. That noob is me , and this is my story.
 

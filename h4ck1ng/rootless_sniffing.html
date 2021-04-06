@@ -6,20 +6,21 @@
 </head>
 
 <body><h1>Rootless Sniffing</h1>
+<p>1617736356</p>
 <p>Once upon a time, a noob found an RCE on a server but didn't got root, the noob wanted to sniff the requests that were arriving on that server, to escalate privileges, but didn't know how. That noob is me , and this is my story.</p>
 <h1>Scenario</h1>
 <p>Okay, ignore the bullshit intro.
 I had access to the <code>www-data</code> user, and the server was running <code>Nginx+php-fpm</code>, how could I sniff the requests without rooting it to run <code>tcpdump</code>? The <code>Nginx</code> and <code>php-fpm</code> master processes run as <code>root</code>, but the workers run on <code>www-data</code>. Oh, and it was a docker alpine instance, fack.</p>
 <h1>Ideias</h1>
 <h2>Dumping the memory</h2>
-<p>The first idea that came to mind was to just dump the memory of the Nginx/php-fpm workers via the <code>/proc/PID/mem</code> and hope that the requests are there. Here is a nice thread about it <a href="https://unix.stackexchange.com/questions/6301/how-do-i-read-from-proc-pid-mem-under-linux">unix.stackexchange.com/questions/6301/how-do-i-read-from-proc-pid-mem-under-linux</a> got most of the info there.</p>
+<p>The first idea that came to mind was to just dump the memory of the <code>Nginx/php-fpm</code> workers via the <code>/proc/PID/mem</code> and hope that the requests are there. Here is a nice thread about it <a href="https://unix.stackexchange.com/questions/6301/how-do-i-read-from-proc-pid-mem-under-linux">unix.stackexchange.com/questions/6301/how-do-i-read-from-proc-pid-mem-under-linux</a> got most of the info there.</p>
 <p>The problem that I ran into was that most tools/scripts uses the <code>ptrace</code> syscall to attach  to the process before dumping it, and you can't <code>ptrace</code> at all on Docker on kernels older than 4.8 without a specific config <code>--cap-add=SYS_PTRACE</code> or on <code>docker-compose.yml</code> :</p>
 <pre><code>cap_add:
     - SYS_PTRACE
 </code></pre>
 
-<p>More deep analysis of this on https://jvns.ca/blog/2020/04/29/why-strace-doesnt-work-in-docker/.</p>
-<p>On Docker running kernels after 4.8 you can use the <code>process_vm_readv</code> syscall to dump the memory without attaching to it, but you still can't dump the memory of any process under your user. If the <code>/proc/sys/kernel/yama/ptrace_scope</code> is set to <code>1</code> it will only allow <code>ptrace</code>/<code>process_vm_readv</code> if your proccess is the father of the process you want to <code>ptrace</code>, if it's set to zero you can dump the memory, but it's <code>1</code> by default on most systems. More info on <code>Yama</code> on general : https://www.kernel.org/doc/Documentation/security/Yama.txt</p>
+<p>A deeper analysis of this on <a href="https://jvns.ca/blog/2020/04/29/why-strace-doesnt-work-in-docker/">jvns.ca/blog/2020/04/29/why-strace-doesnt-work-in-docker/</a>.</p>
+<p>On Docker running kernels after 4.8 you can use the <code>process_vm_readv</code> syscall to dump the memory without attaching to it, but you still can't dump the memory of any process under your user. If the <code>/proc/sys/kernel/yama/ptrace_scope</code> is set to <code>1</code> it will only allow <code>ptrace</code>/<code>process_vm_readv</code> if your proccess is the father of the process you want to <code>ptrace</code>, if it's set to zero you can dump the memory, but it's <code>1</code> by default on most systems. More info on <code>Yama</code> on general : <a href="https://www.kernel.org/doc/Documentation/security/Yama.txt">kernel.org/doc/Documentation/security/Yama.txt</a></p>
 <p>Basically I can only dump the memory of a process  that I executed, not of any process running on my user. The workers are executed by the masters process that run under root :'( I also can't just spawn a new worker from <code>www-data</code> because the master process will ignore it.</p>
 <h2>Logs</h2>
 <p>Editing <code>Nginx</code> config to add some logs? No <code>root</code> , no way :(</p>
