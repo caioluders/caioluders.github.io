@@ -10,7 +10,7 @@ I had access to the `www-data` user, and the server was running `Nginx+php-fpm`,
 # Ideias
 
 ## Dumping the memory
-The first idea that came to mind was to just dump the memory of the Nginx/php-fpm workers via the `/proc/PID/mem` and hope that the requests are there. Here is a nice thread about it [unix.stackexchange.com/questions/6301/how-do-i-read-from-proc-pid-mem-under-linux](https://unix.stackexchange.com/questions/6301/how-do-i-read-from-proc-pid-mem-under-linux) got most of the info there.
+The first idea that came to mind was to just dump the memory of the `Nginx/php-fpm` workers via the `/proc/PID/mem` and hope that the requests are there. Here is a nice thread about it [unix.stackexchange.com/questions/6301/how-do-i-read-from-proc-pid-mem-under-linux](https://unix.stackexchange.com/questions/6301/how-do-i-read-from-proc-pid-mem-under-linux) got most of the info there.
 
 The problem that I ran into was that most tools/scripts uses the `ptrace` syscall to attach  to the process before dumping it, and you can't `ptrace` at all on Docker on kernels older than 4.8 without a specific config `--cap-add=SYS_PTRACE` or on `docker-compose.yml` :
 
@@ -19,9 +19,9 @@ cap_add:
     - SYS_PTRACE
 ```
 
-More deep analysis of this on https://jvns.ca/blog/2020/04/29/why-strace-doesnt-work-in-docker/.
+A deeper analysis of this on [jvns.ca/blog/2020/04/29/why-strace-doesnt-work-in-docker/](https://jvns.ca/blog/2020/04/29/why-strace-doesnt-work-in-docker/).
 
-On Docker running kernels after 4.8 you can use the `process_vm_readv` syscall to dump the memory without attaching to it, but you still can't dump the memory of any process under your user. If the `/proc/sys/kernel/yama/ptrace_scope` is set to `1` it will only allow `ptrace`/`process_vm_readv` if your proccess is the father of the process you want to `ptrace`, if it's set to zero you can dump the memory, but it's `1` by default on most systems. More info on `Yama` on general : https://www.kernel.org/doc/Documentation/security/Yama.txt
+On Docker running kernels after 4.8 you can use the `process_vm_readv` syscall to dump the memory without attaching to it, but you still can't dump the memory of any process under your user. If the `/proc/sys/kernel/yama/ptrace_scope` is set to `1` it will only allow `ptrace`/`process_vm_readv` if your proccess is the father of the process you want to `ptrace`, if it's set to zero you can dump the memory, but it's `1` by default on most systems. More info on `Yama` on general : [kernel.org/doc/Documentation/security/Yama.txt](https://www.kernel.org/doc/Documentation/security/Yama.txt)
 
 Basically I can only dump the memory of a process  that I executed, not of any process running on my user. The workers are executed by the masters process that run under root :'( I also can't just spawn a new worker from `www-data` because the master process will ignore it.
 
