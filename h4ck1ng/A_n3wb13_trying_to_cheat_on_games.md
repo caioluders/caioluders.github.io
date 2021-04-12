@@ -55,7 +55,11 @@ So , what now ? Errrrrr , I could edit the binary of the game to make more po
 
 First let’s open this on radare2 — No , I’m not trying to show off not using a GUI tool , r2 is free and opensource, and I’m just a student who doesn’t have money to buy IDA Pro or Hopper.
 
-				$ sudo r2 -w /Applications/2048+.app/Contents/MacOS/2048+ Password: arw 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020160000010000000000000000000000000000000000000000000000000000000000000000000000 -- You see it, you fix it! [0x100001620]>
+				$ sudo r2 -w /Applications/2048+.app/Contents/MacOS/2048+ Password: arw 00000000000000000000000000000000000000000000000000000000000000000000000000000000000
+				00000000000000000000000000000000000000000000000000000000000000000000000000000000000
+				00000000000000000000000000000000000000000000000000000000000000000000000000000000000
+				00000002016000001000000000000000000000000000000000000000000000000000000000000000000
+				0000 -- You see it, you fix it! [0x100001620]>
 
 The `-w` is for writing. First thing you want to do is `aaa` to analyse all the functions and name then. The r2 has a really cool way to name the commands, it's just the first letters of the description, the first `a` is for "analyse", the second is for "all" , and the third is for "autoname" . r2 also has a really helpfull help (pun not intended) interface, just put a question mark after the command and it will show all the adjacents, something like that :
 
@@ -183,24 +187,26 @@ Now analysing the assembly : `mov [rdi+0x70], eax` . `[rdi+0x70]` is the regis
 from bitslicer import VirtualMemoryError, DebuggerError  
 import keycode, keymod
 
-				class Script(object):  
-						def __init__(self):
-								self.currentLifeAddress = None # variable to store where the enemy's life address is
-								debug.registerHotkey(keycode.A, keymod.CONTROL, self.killShip) # Add a hotkey to call the self.killShip function
-								debug.addBreakpoint(vm.base() + 0xDC642, self.shipDamaged) # Make a breakpoint every time that mov [rdi+0x70], eax is reached and call self.shipDamaged , vm.base() is the pagination of the memory , this changes every time it loads
+```
+class Script(object):  
+		def __init__(self):
+				self.currentLifeAddress = None # variable to store where the enemy's life address is
+				debug.registerHotkey(keycode.A, keymod.CONTROL, self.killShip) # Add a hotkey to call the self.killShip function
+				debug.addBreakpoint(vm.base() + 0xDC642, self.shipDamaged) # Make a breakpoint every time that mov [rdi+0x70], eax is reached and call self.shipDamaged , vm.base() is the pagination of the memory , this changes every time it loads
 
-						def killShip(self,hotkeyID) :
-								if self.currentLifeAddress is not None: 
-										vm.writeInt32(self.currentLifeAddress,0) # write 0 at the enemy's life
+		def killShip(self,hotkeyID) :
+				if self.currentLifeAddress is not None: 
+						vm.writeInt32(self.currentLifeAddress,0) # write 0 at the enemy's life
 
-						def shipDamaged(self, instructionAddress, registers):
-								self.currentLifeAddress = registers['rdi']+0x70 # gets the address of enemy's life
-								debug.log(registers['rdi']) # debug shit
-								debug.resume()
+		def shipDamaged(self, instructionAddress, registers):
+				self.currentLifeAddress = registers['rdi']+0x70 # gets the address of enemy's life
+				debug.log(registers['rdi']) # debug shit
+				debug.resume()
 
-						def finish(self):
-								debug.log('Cleaning up..')
-								pass
+		def finish(self):
+				debug.log('Cleaning up..')
+				pass
+```
 
 
 It’s all commented, add that to the BitSlicer, make some damage in the enemy to get the address of his life and `cntrl+a` to kill it ˆ-ˆ

