@@ -1,5 +1,6 @@
 {
     "theme": "templates/dark.html",
     "title": "lude.rs",
+    "footnote":"by Caio Lüders <a href='https://twitter.com/caioluders'>@caioluders</a>",
     "ignore" : ["CNAME","index.html", "config.json"]
 }
