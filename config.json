@@ -1,6 +1,6 @@
 {
-    "theme": "templates/dark.html",
+    "theme": "templates/terminal.html",
     "title": "Index of lude.rs",
     "footnote":"by Caio Lüders <a href='https://twitter.com/caioluders'>@caioluders</a>",
-    "ignore" : ["CNAME","index.html", "config.json"]
+    "ignore" : ["CNAME","index.html", "config.json","gohu.woff"]
 }
