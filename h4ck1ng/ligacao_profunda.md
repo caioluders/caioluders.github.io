@@ -2,16 +2,15 @@
 
 ## Introdução
 
-Esse artigo tem como objetivo introduzir as vulnerabilidades que ocorrem através de Intents no Android. Tentarei ser o mais introdutório possível e listarei todas as referências necessárias, caso algum conceito parecer muito avançado. Será utilizado o aplicativo [InjuredAndroid](https://github.com/B3nac/InjuredAndroid) como exemplo de aplicativo vulnerável. 54lv3 pros companheiros da @duphouse, sem eles esse texto não seria possível.
+Esse artigo tem como objetivo introduzir as vulnerabilidades que ocorrem no Android por meio do abuso de Intents. Tentarei ser o mais introdutório possível e listarei todas as referências necessárias, caso algum conceito pareça muito avançado. Será utilizado o aplicativo [InjuredAndroid](https://github.com/B3nac/InjuredAndroid) como exemplo de aplicativo vulnerável. 54lv3 pros companheiros da [@duphouse](https://www.instagram.com/duphouse/), sem eles esse texto não seria possível.
 
-https://github.com/B3nac/InjuredAndroid
+Recomendo a [série de vídeos](https://www.youtube.com/watch?v=4eso_7RyZ58) do Maycon Vitali sobre Android no geral, assim como [a minha talk](https://www.youtube.com/watch?v=WFUEbMFx2EQ) na DupCon com vulnerabilidades reais.
 
-https://www.youtube.com/watch?v=4eso_7RyZ58
-https://www.youtube.com/watch?v=WFUEbMFx2EQ
+Perfil no Instagram sobre segurança em mobile: https://www.instagram.com/thatmobileproject/
 
 ## Intents
 
-Os [Intents](https://developer.android.com/guide/components/intents-filters) funcionam como a forma dos aplicativos se comunicarem internamente entre eles. Por exemplo, se um aplicativo quer abrir o [InjuredAndroid](https://github.com/B3nac/InjuredAndroid) ele pode iniciar um Intent utilizando a [URI](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier) `flag13://rce`.
+Os [Intents](https://developer.android.com/guide/components/intents-filters) funcionam como a principal forma dos aplicativos se comunicarem internamente entre si. Por exemplo, se um aplicativo quer abrir o [InjuredAndroid](https://github.com/B3nac/InjuredAndroid) ele pode iniciar-lo por meio de um Intent utilizando a [URI](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier) `flag13://rce`.
 
 ```java
 Intent intent = new Intent();
@@ -19,12 +18,12 @@ intent.setData(Uri.parse("flag13://rce"));
 startActivity(intent);
 ```
 
-Além de aceitar todos os dados de uma [URI](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier) ( scheme, host, path, query, fragment ), um Intent também pode levar dados [fortemente tipados](https://pt.wikipedia.org/wiki/Linguagem_tipada) através dos [Intent Extras](https://developer.android.com/reference/android/content/Intent#putExtra(java.lang.String,%20android.os.Bundle)). Na prática, queries e extras são as formas mais comuns de passar dados entre os aplicativos. Eles serão discutidos com exemplos mais adiante.
+Além de aceitar todos os elementos de uma [URI](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier) ( scheme, host, path, query, fragment ), um Intent também pode levar dados [fortemente tipados](https://pt.wikipedia.org/wiki/Linguagem_tipada) por meio dos [Intent Extras](https://developer.android.com/reference/android/content/Intent#putExtra(java.lang.String,%20android.os.Bundle)). Na prática, *queries* e *extras* são as formas mais comuns de passar dados entre os aplicativos, eles serão discutidos com exemplos mais adiante.
 
 
 ## Intents Filters
 
-Como o Android sabe qual aplicativo é referente a `flag13://rce`? O InjuredAndroid define um [Intent Filter](https://developer.android.com/guide/components/intents-filters#Resolution) que diz quais tipos de Intent o Sistema Operacional deve enviar para ele.
+Como o Android sabe qual aplicativo se refere `flag13://rce`? O InjuredAndroid define um [Intent Filter](https://developer.android.com/guide/components/intents-filters#Resolution) que diz quais tipos de Intent o Sistema Operacional deve enviar para ele.
 
 O Intent Filter é definido no [AndroidManifest.xml](https://developer.android.com/guide/topics/manifest/manifest-intro). Vamos analizar a definição do Intent Filter relacionado a `flag13://rce` : https://github.com/B3nac/InjuredAndroid/blob/master/InjuredAndroid/app/src/main/AndroidManifest.xml
 
@@ -45,18 +44,20 @@ O Intent Filter é definido no [AndroidManifest.xml](https://developer.android.c
 </activity>
 ```
 
-O `name` define de qual [Activity](https://developer.android.com/reference/android/app/Activity) estamos tratando, como ele começa com ponto, o nome é igual a `package`+`.RCEActivity` = `b3nac.injuredandroid.RCEActivity`.  
+O atributo `name` define qual [Activity](https://developer.android.com/reference/android/app/Activity) será inicializada, como ele começa com ponto, o nome é resolvido para `package`+`.RCEActivity` = `b3nac.injuredandroid.RCEActivity`. Dentro do Intent Filter, o `action` se refere ao [tipo de ação](https://developer.android.com/reference/android/content/Intent#intent-structure) que será executada, existem uma miríade de tipos de ações que são definidas na classe Intent, porém, na maioria das vezes é utilizado o `action` padrão `android.intent.action.VIEW`.
+
+`category` são propriedades extras que definem como o Intent vai se comportar. `android.intent.category.DEFAULT` define que essa Activity pode ser inicializada mesmo se o Intent não tiver nenhum `category`. `android.intent.category.BROWSABLE` dita que a Activity pode ser inicializada pelo browser, isso é super importante pois transforma qualquer ataque em remoto. Digamos que um usuário entre em um site malicioso, esse site consegue inicializar um Intent que abre o App apenas se o Intent Filter tiver a propriedade `BROWSABLE`.
+
+A *tag* [`data`](https://developer.android.com/guide/topics/manifest/data-element) especifica quais URLs vão corresponder com esse Intent Filter, no nosso caso, o `scheme` tem que ser `flag13` e o `host` igual a `rce`, ficando `flag13://rce`. Todas as partes da URI podem ser definidas, como *path*, *port*, etc. 
 
 
-	- Como usar
-	- Definições
+## Vulnerabilidade
 
-## Análise estática
+Agora que entedemos como Intents e Intents Filters funcionam, vamos procurar alguma vulnerabilidade no `flag13://rce` (O "rce" ficou meio óbvio né).
 
-	- AndroidManifest.xml
-	- Exported
- 	- Browsable
- 	- OnCreate
+O código-fonte da Activity `b3nac.injuredandroid.RCEActivity` : https://github.com/B3nac/InjuredAndroid/blob/master/InjuredAndroid/app/src/main/java/b3nac/injuredandroid/RCEActivity.kt
+
+A Activity é inicializada na função `onCreate` e é lá que o Intent será devidamente tratado. Na linha 49 ele começa a 
 
 ## Tipos vulnerabilidades
 
