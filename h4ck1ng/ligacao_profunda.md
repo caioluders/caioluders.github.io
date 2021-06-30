@@ -2,11 +2,9 @@
 
 ## Introdução
 
-Esse artigo tem como objetivo introduzir as vulnerabilidades que ocorrem no Android por meio do abuso de Intents. Tentarei ser o mais introdutório possível e listarei todas as referências necessárias, caso algum conceito pareça muito avançado. Será utilizado o aplicativo [InjuredAndroid](https://github.com/B3nac/InjuredAndroid) como exemplo de aplicativo vulnerável. 54lv3 pros companheiros da [@duphouse](https://www.instagram.com/duphouse/), sem eles esse texto não seria possível.
+Esse artigo tem como objetivo introduzir as vulnerabilidades que ocorrem no Android por meio do abuso de Intents. Tentarei ser o mais introdutório possível e listarei todas as referências necessárias, caso algum conceito pareça muito avançado. Será utilizado o aplicativo [InjuredAndroid](https://github.com/B3nac/InjuredAndroid) como exemplo de *apk* vulnerável. 541v3 pros companheiros da [@duphouse](https://www.instagram.com/duphouse/), sem eles esse texto não seria possível.
 
-Recomendo a [série de vídeos](https://www.youtube.com/watch?v=4eso_7RyZ58) do Maycon Vitali sobre Android no geral, assim como [a minha talk](https://www.youtube.com/watch?v=WFUEbMFx2EQ) na DupCon com vulnerabilidades reais.
-
-Perfil no Instagram sobre segurança em mobile: https://www.instagram.com/thatmobileproject/
+Recomendo a [série de vídeos](https://www.youtube.com/watch?v=4eso_7RyZ58) do Maycon Vitali sobre Android no geral, assim como [a minha talk](https://www.youtube.com/watch?v=WFUEbMFx2EQ) na DupCon com vulnerabilidades reais. Existe também o [@thatmobileproject](https://www.instagram.com/thatmobileproject/) para posts sobre segurança em mobile.
 
 ## Intents
 
@@ -57,7 +55,55 @@ Agora que entedemos como Intents e Intents Filters funcionam, vamos procurar alg
 
 O código-fonte da Activity `b3nac.injuredandroid.RCEActivity` : https://github.com/B3nac/InjuredAndroid/blob/master/InjuredAndroid/app/src/main/java/b3nac/injuredandroid/RCEActivity.kt
 
-A Activity é inicializada na função `onCreate` e é lá que o Intent será devidamente tratado. Na linha 49 ele começa a 
+```kotlin
+49 if (intent != null && intent.data != null) {
+50     copyAssets()
+51     val data = intent.data
+52     try {
+53         val intentParam = data!!.getQueryParameter("binary")
+54         val binaryParam = data.getQueryParameter("param")
+55         val combinedParam = data.getQueryParameter("combined")
+56         if (combinedParam != null) {
+57             childRef.addListenerForSingleValueEvent(object : ValueEventListener {
+58                 override fun onDataChange(dataSnapshot: DataSnapshot) {
+59                     val value = dataSnapshot.value as String?
+60                     if (combinedParam == value) {
+61                         FlagsOverview.flagThirteenButtonColor = true
+62                         val secure = SecureSharedPrefs()
+63                         secure.editBoolean(applicationContext, "flagThirteenButtonColor", true)
+64                         correctFlag()
+65                     } else {
+66                         Toast.makeText(this@RCEActivity, "Try again! :D",
+67                                 Toast.LENGTH_SHORT).show()
+68                     }
+69                 }
+70
+71                 override fun onCancelled(databaseError: DatabaseError) {
+72                     Log.e(TAG, "onCancelled", databaseError.toException())
+73                 }
+74             })
+75         }
+```
+
+A Activity é inicializada na função `onCreate` e é lá que o Intent será devidamente tratado. Na linha [49](https://github.com/B3nac/InjuredAndroid/blob/master/InjuredAndroid/app/src/main/java/b3nac/injuredandroid/RCEActivity.kt#L49) o aplicativo checa se `intent` é nulo, se não for ele irá pegar algumas *queries* `binary`, `param` e `combined`. Se `combined` for nulo ele não entrará no `if` da linha 56 e irá para o seguinte `else`:
+
+```kotlin
+76 else {
+77
+78     val process = Runtime.getRuntime().exec(filesDir.parent + "/files/" + intentParam + " " + binaryParam)
+79     val bufferedReader = BufferedReader(
+80             InputStreamReader(process.inputStream))
+81     val log = StringBuilder()
+82     bufferedReader.forEachLine {
+83         log.append(it)
+84     }
+85     process.waitFor()
+86     val tv = findViewById<TextView>(R.id.RCEView)
+87     tv.text = log.toString()
+88 }
+```
+
+
 
 ## Tipos vulnerabilidades
 
