@@ -21,9 +21,9 @@ Além de aceitar todos os elementos de uma [URI](https://en.wikipedia.org/wiki/U
 
 ## Intents Filters
 
-Como o Android sabe qual aplicativo se refere `flag13://rce`? O InjuredAndroid define um [Intent Filter](https://developer.android.com/guide/components/intents-filters#Resolution) que diz quais tipos de Intent o Sistema Operacional deve enviar para ele.
+Como o Android sabe qual aplicativo se refere `flag13://rce`? O InjuredAndroid define um [Intent Filter](https://developer.android.com/guide/components/intents-filters#Resolution) que diz quais tipos de Intent o Sistema Operacional deve enviar para ele. O Intent Filter é definido no [AndroidManifest.xml](https://developer.android.com/guide/topics/manifest/manifest-intro).
 
-O Intent Filter é definido no [AndroidManifest.xml](https://developer.android.com/guide/topics/manifest/manifest-intro). Vamos analizar a definição do Intent Filter relacionado a `flag13://rce` : https://github.com/B3nac/InjuredAndroid/blob/master/InjuredAndroid/app/src/main/AndroidManifest.xml
+Vamos analizar a definição do Intent Filter relacionado a `flag13://rce` : https://github.com/B3nac/InjuredAndroid/blob/master/InjuredAndroid/app/src/main/AndroidManifest.xml
 
 ```xml
 <activity
@@ -42,7 +42,7 @@ O Intent Filter é definido no [AndroidManifest.xml](https://developer.android.c
 </activity>
 ```
 
-O atributo `name` define qual [Activity](https://developer.android.com/reference/android/app/Activity) será inicializada, como ele começa com ponto, o nome é resolvido para `package`+`.RCEActivity` = `b3nac.injuredandroid.RCEActivity`. Dentro do Intent Filter, o `action` se refere ao [tipo de ação](https://developer.android.com/reference/android/content/Intent#intent-structure) que será executada, existem uma miríade de tipos de ações que são definidas na classe Intent, porém, na maioria das vezes é utilizado o `action` padrão `android.intent.action.VIEW`.
+O atributo `name` define qual [Activity](https://developer.android.com/reference/android/app/Activity) será inicializada, como ele começa com ponto, o nome é resolvido para `package`+`.RCEActivity` = `b3nac.injuredandroid.RCEActivity`. Dentro do `<intent-filter>`, o `action` se refere ao [tipo de ação](https://developer.android.com/reference/android/content/Intent#intent-structure) que será executada, existem uma miríade de tipos de ações que são definidas na classe Intent, porém, na maioria das vezes é utilizado o `action` padrão `android.intent.action.VIEW`.
 
 `category` são propriedades extras que definem como o Intent vai se comportar. `android.intent.category.DEFAULT` define que essa Activity pode ser inicializada mesmo se o Intent não tiver nenhum `category`. `android.intent.category.BROWSABLE` dita que a Activity pode ser inicializada pelo browser, isso é super importante pois transforma qualquer ataque em remoto. Digamos que um usuário entre em um site malicioso, esse site consegue inicializar um Intent que abre o App apenas se o Intent Filter tiver a propriedade `BROWSABLE`.
 
@@ -105,7 +105,7 @@ A Activity é inicializada na função `onCreate` e é lá que o Intent será de
 
 Na linha 78 é passado para a função `Runtime.getRuntime().exec()` as variáveis `intentParam` e `binaryParam`, essa função executa comandos no sistema, logo temos um [Command Injection](https://owasp.org/www-community/attacks/Command_Injection) através do Intent. Vamos tentar explora-lo!
 
-Normalmente, num Command Injection tentaríamos passar algum carácter para executar outro commando, como `&`/`|`/`;`, porém se tentarmos desse jeito o Android irá dar um erro na primeira parte do comando, o `filesDir.parent + "/files/"`, pois não encontrará o arquivo ou dará erro de permissão e não executará o resto do nosso *payload*. Para resolvermos esse problema podemos voltar os diretórios com `../` até chegarmos no diretório *root*, a partir dai podemos executar o `/system/bin/sh` e executar qualquer comando que quisermos.
+Normalmente, num Command Injection tentaríamos passar algum carácter para executar outro commando, como `&`/`|`/`;`, porém se tentarmos desse jeito o Android irá dar um erro na primeira parte do comando, o `filesDir.parent + "/files/"`, pois não encontrará o arquivo, ou dará erro de permissão e não executará o resto do nosso *payload*. Para resolvermos esse problema podemos voltar os diretórios com `../` até chegarmos no diretório *root*, a partir dai podemos executar o `/system/bin/sh` e executar qualquer comando que quisermos.
 
 Nossa [PoC](https://pt.wikipedia.org/wiki/Prova_de_conceito) terá os seguintes passos :
 
