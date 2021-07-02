@@ -19,7 +19,7 @@ startActivity(intent);
 Além de aceitar todos os elementos de uma [URI](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier) ( scheme, host, path, query, fragment ), um Intent também pode levar dados [fortemente tipados](https://pt.wikipedia.org/wiki/Linguagem_tipada) por meio dos [Intent Extras](https://developer.android.com/reference/android/content/Intent#putExtra(java.lang.String,%20android.os.Bundle)). Na prática, *queries* e *extras* são as formas mais comuns de passar dados entre os aplicativos, eles serão discutidos com exemplos mais adiante.
 
 
-## <intent-filter>
+## < intent-filter >
 
 Como o Android sabe qual aplicativo se refere `flag13://rce`? O InjuredAndroid define um [Intent Filter](https://developer.android.com/guide/components/intents-filters#Resolution) que diz quais tipos de Intent o Sistema Operacional deve enviar para ele. O Intent Filter é definido no [AndroidManifest.xml](https://developer.android.com/guide/topics/manifest/manifest-intro).
 
