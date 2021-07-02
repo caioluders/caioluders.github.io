@@ -4,7 +4,7 @@
 
 Esse artigo tem como objetivo introduzir as vulnerabilidades que ocorrem no Android por meio do abuso de Intents. Tentarei ser o mais introdutório possível e listarei todas as referências necessárias, caso algum conceito pareça muito avançado. Será utilizado o aplicativo [InjuredAndroid](https://github.com/B3nac/InjuredAndroid) como exemplo de *apk* vulnerável. 541v3 pros companheiros da [@duphouse](https://www.instagram.com/duphouse/), sem eles esse texto não seria possível.
 
-Recomendo a [série de vídeos](https://www.youtube.com/watch?v=4eso_7RyZ58) do Maycon Vitali sobre Android no geral, assim como [a minha talk](https://www.youtube.com/watch?v=WFUEbMFx2EQ) na DupCon com vulnerabilidades reais. Existe também o [@thatmobileproject](https://www.instagram.com/thatmobileproject/) para posts sobre segurança em mobile.
+Para mais conteúdos em português, recomendo a [série de vídeos](https://www.youtube.com/watch?v=4eso_7RyZ58) do Maycon Vitali sobre Android no geral, assim como [a minha talk](https://www.youtube.com/watch?v=WFUEbMFx2EQ) na DupCon com vulnerabilidades reais. Existe também o [@thatmobileproject](https://www.instagram.com/thatmobileproject/) para posts sobre segurança em mobile.
 
 ## intent://
 
