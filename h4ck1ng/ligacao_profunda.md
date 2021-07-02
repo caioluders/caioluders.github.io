@@ -21,7 +21,7 @@ Além de aceitar todos os elementos de uma [URI](https://en.wikipedia.org/wiki/U
 
 ## < intent-filter >
 
-Como o Android sabe qual aplicativo se refere `flag13://rce`? O InjuredAndroid define um [Intent Filter](https://developer.android.com/guide/components/intents-filters#Resolution) que diz quais tipos de Intent o Sistema Operacional deve enviar para ele. O Intent Filter é definido no [AndroidManifest.xml](https://developer.android.com/guide/topics/manifest/manifest-intro).
+Como o Android sabe a qual aplicativo se refere `flag13://rce`? O InjuredAndroid define um [Intent Filter](https://developer.android.com/guide/components/intents-filters#Resolution) que diz quais tipos de Intent o Sistema Operacional deve enviar para ele. O Intent Filter é definido no [AndroidManifest.xml](https://developer.android.com/guide/topics/manifest/manifest-intro).
 
 Vamos analizar a definição do Intent Filter relacionado a `flag13://rce` : https://github.com/B3nac/InjuredAndroid/blob/master/InjuredAndroid/app/src/main/AndroidManifest.xml
 
@@ -103,7 +103,7 @@ A Activity é inicializada na função `onCreate` e é lá que o Intent será de
 88 }
 ```
 
-Na linha 78 é passado para a função `Runtime.getRuntime().exec()` as variáveis `intentParam` e `binaryParam`, essa função executa comandos no sistema, logo temos um [Command Injection](https://owasp.org/www-community/attacks/Command_Injection) através do Intent. Vamos tentar explora-lo!
+Na linha 78 é passado para a função [`Runtime.getRuntime().exec()`](https://developer.android.com/reference/java/lang/Runtime#exec(java.lang.String[])) as variáveis `intentParam` e `binaryParam`, essa função executa comandos no sistema, logo temos um [Command Injection](https://owasp.org/www-community/attacks/Command_Injection) através do Intent. Vamos tentar explora-lo!
 
 Normalmente, num Command Injection tentaríamos passar algum carácter para executar outro commando, como `&`/`|`/`;`, porém se tentarmos desse jeito o Android irá dar um erro na primeira parte do comando, o `filesDir.parent + "/files/"`, pois não encontrará o arquivo, ou dará erro de permissão e não executará o resto do nosso *payload*. Para resolvermos esse problema podemos voltar os diretórios com `../` até chegarmos no diretório *root*, a partir dai podemos executar o `/system/bin/sh` e executar qualquer comando que quisermos.
 
@@ -138,7 +138,7 @@ Ok, com isso conseguimos passar Intents Extras por meio de outro App, mas e pelo
 <a href="intent://rce/#Intent;scheme=flag13;S.binary=..%2F..%2F..%2F..%2F..%2Fsystem%2Fbin%2Fsh%20-c%20%27id%27;S.param=1;end">pwn me</a>
 ```
 
-Primeiro vem o scheme `intent://`, depois o host `rce` e logo após a string `#Intent`, que é obrigatória. A partir dai todas as variáveis são delimitadas por `;`. Passamos o `scheme=flag13` e definimos os Extras, o nome do Extra é precedido do tipo dele, como o Extra `binary` é do tipo String ele é definido com `S.binary`. Os Extras podem ter vários tipos, como a documentação do scheme `intent://` é escarso, o melhor jeito é ler o código fonte do Android que faz o parse dele:  https://cs.android.com/android/platform/superproject/+/master:frameworks/base/core/java/android/content/Intent.java;l=7115;drc=master
+Primeiro vem o scheme `intent://`, depois o host `rce` e logo após a string `#Intent`, que é obrigatória. A partir dai todas as variáveis são delimitadas por `;`. Passamos o `scheme=flag13` e definimos os Extras. O nome do Extra é precedido do tipo dele, como o Extra `binary` é do tipo String ele é definido com `S.binary`. Os Extras podem ter vários tipos, como a documentação do scheme `intent://` é escarsa, o melhor jeito é ler o código fonte do Android que faz o *parse* dele:  https://cs.android.com/android/platform/superproject/+/master:frameworks/base/core/java/android/content/Intent.java;l=7115;drc=master
 
 ```java
 if      (uri.startsWith("S.", i)) b.putString(key, value);
@@ -159,4 +159,6 @@ Por fim só colocar um `end` (:
 
 ## ;end
 
-Podem existir vários tipos de vulnerabilidades oriundas dos Intents, RCE/SQLi/XSS até Buffer Overflow, vai depender só da criatividade do desenvolvedor. Para estudar esse assunto mais a fundo, recomendo a leitura do blog do [@bagipro_](https://twitter.com/_bagipro) https://blog.oversecured.com/ e dos reports públicos de Bug Bounty https://github.com/B3nac/Android-Reports-and-Resources . Além do [InjuredAndroid]((https://github.com/B3nac/InjuredAndroid)) também podem brincar com o [Ovaa](https://github.com/oversecured/ovaa). |-|4ck th3 |>l4n3t  
+Podem existir vários tipos de vulnerabilidades oriundas dos Intents, RCE/SQLi/XSS até Buffer Overflow, vai depender só da criatividade do desenvolvedor. Para estudar esse assunto mais a fundo, recomendo a leitura do blog do [@bagipro_](https://twitter.com/_bagipro) https://blog.oversecured.com/ e dos reports públicos de Bug Bounty https://github.com/B3nac/Android-Reports-and-Resources . Além do [InjuredAndroid](https://github.com/B3nac/InjuredAndroid) também podem brincar com o [Ovaa](https://github.com/oversecured/ovaa). |-|4ck th3 |>l4n3t 
+
+[@caioluders ](twitter.com/caioluders/)
