@@ -7,7 +7,7 @@ On the twenty-eight of May occured the Pwn2Win 2021, THE BEST, BIGGEST AND MOST 
 ## Dots Exposed
 The first challenge was a Misc challenge about an Esolang called [AsciiDots](https://github.com/aaronjanse/asciidots), I fucking love Esolangs. It was a Arbitrary File Read 0day through importing Libraries, and the objective was to read `/flag` via an AsciiDots program.
 
-I actually began working on that challenge a year ago and made a warmup challenge for Pwn2Win 2020 that achieved partial file read and only if you was able to write to that file, like an PHP session file or a `access_log`. A few weeks prior to Pwn2Win I tried to get arbitrary file read again, and it was incredibly fast to achieve that lol -- like two hours -- turns out that getting a year break from a task really helps (:
+I actually began working on that challenge a year ago and made a warmup challenge for Pwn2Win 2020 that achieved PARTIAL file read ONLY if you was able to write to that file, like an PHP session file or a `access_log`. A few weeks prior to Pwn2Win I tried to get arbitrary file read again, and it was incredibly fast to achieve that lol -- like two hours -- turns out that getting a year break from a task really helps (:
 
 ### Intended 
 
@@ -19,8 +19,7 @@ Okay, the only way to read files is via `Libraries`, the ideia it's that you can
 178         path = os.path.join(dir_path, filename)
 ```
 
-We can control the `filename` variable via the [lib import](https://ajanse.me/asciidots/language/#libraries) `%!filename`, and it's possible to use an absolute path to import ANY file, `%!/etc/passwd` for example. This will end up in a 
-list called `char_obj_array` which has all the characters of the main program and libraries. Let's see an example:
+We can control the `filename` variable via the [lib import](https://ajanse.me/asciidots/language/#libraries) `%!filename`, and it's possible to use an absolute path to import ANY file, `%!/etc/passwd` for example. This will end up in a list called `char_obj_array` which has all the characters of the main program and libraries. Let's see an example:
 
 
 ```
