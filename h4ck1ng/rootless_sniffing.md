@@ -144,7 +144,7 @@ Yay! The `socat` worked locally and I was seeing the FastCGI requests, but `soca
 
 So I made a script that automatizes this whole process, and makes sure that if anything goes wrong it will rename the old socket back so the server doesn't go offline.
 
-<script src="https://gist-it.appspot.com/github/caioluders/rootless_sniffing/blob/main/dsm.c"></script>
+<script src="https://emgithub.com/embed.js?target=https%3A%2F%2Fgithub.com%2Fcaioluders%2Funix_domain_socket_mitm%2Fblob%2Fmain%2Fudsmitm.c&style=github&showBorder=on&showLineNumbers=on&showFileMeta=on&showCopy=on"></script>
 
 The PoC running :
 
