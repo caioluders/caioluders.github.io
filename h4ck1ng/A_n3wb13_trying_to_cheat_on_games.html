@@ -9,10 +9,14 @@
 			margin: 0 auto;
 			color: white;
 			background: black;
+			line-height: calc(1ex / 0.32);
 		}
 		pre {
 			font-family: 'gohu', monospace;
 			white-space: pre-wrap;
+			line-height: 125%;
+      background-color: #111;
+      padding: 1em;
 		}
 		@media only screen and (max-width:768px) {
 			body {
@@ -25,6 +29,48 @@
 		a:visited {
 			color: #004100 ;
 		}
+		td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+		span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+		td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+		span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+		.codehilite .hll { background-color: #0000ff }
+		.codehilite { background: #000000; }
+		.codehilite .c { color: #00ff00 } /* Comment */
+		.codehilite .k { color: #ff0000 } /* Keyword */
+		.codehilite .ch { color: #00ff00 } /* Comment.Hashbang */
+		.codehilite .cm { color: #00ff00 } /* Comment.Multiline */
+		.codehilite .cp { color: #e5e5e5 } /* Comment.Preproc */
+		.codehilite .cpf { color: #00ff00 } /* Comment.PreprocFile */
+		.codehilite .c1 { color: #00ff00 } /* Comment.Single */
+		.codehilite .cs { color: #00ff00 } /* Comment.Special */
+		.codehilite .kc { color: #ff0000 } /* Keyword.Constant */
+		.codehilite .kd { color: #ff0000 } /* Keyword.Declaration */
+		.codehilite .kn { color: #ff0000 } /* Keyword.Namespace */
+		.codehilite .kp { color: #ff0000 } /* Keyword.Pseudo */
+		.codehilite .kr { color: #ff0000 } /* Keyword.Reserved */
+		.codehilite .kt { color: #ee82ee } /* Keyword.Type */
+		.codehilite .s { color: #87ceeb } /* Literal.String */
+		.codehilite .no { color: #7fffd4 } /* Name.Constant */
+		.codehilite .nf { color: #ffff00 } /* Name.Function */
+		.codehilite .nv { color: #eedd82 } /* Name.Variable */
+		.codehilite .sa { color: #87ceeb } /* Literal.String.Affix */
+		.codehilite .sb { color: #87ceeb } /* Literal.String.Backtick */
+		.codehilite .sc { color: #87ceeb } /* Literal.String.Char */
+		.codehilite .dl { color: #87ceeb } /* Literal.String.Delimiter */
+		.codehilite .sd { color: #87ceeb } /* Literal.String.Doc */
+		.codehilite .s2 { color: #87ceeb } /* Literal.String.Double */
+		.codehilite .se { color: #87ceeb } /* Literal.String.Escape */
+		.codehilite .sh { color: #87ceeb } /* Literal.String.Heredoc */
+		.codehilite .si { color: #87ceeb } /* Literal.String.Interpol */
+		.codehilite .sx { color: #87ceeb } /* Literal.String.Other */
+		.codehilite .sr { color: #87ceeb } /* Literal.String.Regex */
+		.codehilite .s1 { color: #87ceeb } /* Literal.String.Single */
+		.codehilite .ss { color: #87ceeb } /* Literal.String.Symbol */
+		.codehilite .fm { color: #ffff00 } /* Name.Function.Magic */
+		.codehilite .vc { color: #eedd82 } /* Name.Variable.Class */
+		.codehilite .vg { color: #eedd82 } /* Name.Variable.Global */
+		.codehilite .vi { color: #eedd82 } /* Name.Variable.Instance */
+		.codehilite .vm { color: #eedd82 } /* Name.Variable.Magic */
 	
 </style>
 <head>
@@ -55,30 +101,38 @@
  There I found a dir with the bundleId of the game, and the plist that contains the game state : <code>~/Library/Containers/com.codinn.2048/Data/Library/Preferences/com.codinn.2048.plist</code>. Opening in Xcode :</p>
 <p><img alt="" src="img/0__z__EY9hYplPfIOG7l.png" /></p>
 <p>The value of “gameState” is :</p>
-<pre><code>            {"grid":{"size":4,"cells":[[{"position":{"x":0,"y":0},"value":4},{"position":{"x":0,"y":1},"value":8},{"position":{"x":0,"y":2},"value":32},{"position":{"x":0,"y":3},"value":8}],[{"position":{"x":1,"y":0},"value":8},{"position":{"x":1,"y":1},"value":16},{"position":{"x":1,"y":2},"value":2},{"position":{"x":1,"y":3},"value":4}],[{"position":{"x":2,"y":0},"value":2},{"position":{"x":2,"y":1},"value":8},null,{"position":{"x":2,"y":3},"value":2}],[{"position":{"x":3,"y":0},"value":4},{"position":{"x":3,"y":1},"value":2},null,{"position":{"x":3,"y":3},"value":2}]]},"score":1337,"over":false,"won":false,"keepPlaying":false}
-</code></pre>
+<div class="codehilite"><pre><span></span><code>            {&quot;grid&quot;:{&quot;size&quot;:4,&quot;cells&quot;:[[{&quot;position&quot;:{&quot;x&quot;:0,&quot;y&quot;:0},&quot;value&quot;:4},{&quot;position&quot;:{&quot;x&quot;:0,&quot;y&quot;:1},&quot;value&quot;:8},{&quot;position&quot;:{&quot;x&quot;:0,&quot;y&quot;:2},&quot;value&quot;:32},{&quot;position&quot;:{&quot;x&quot;:0,&quot;y&quot;:3},&quot;value&quot;:8}],[{&quot;position&quot;:{&quot;x&quot;:1,&quot;y&quot;:0},&quot;value&quot;:8},{&quot;position&quot;:{&quot;x&quot;:1,&quot;y&quot;:1},&quot;value&quot;:16},{&quot;position&quot;:{&quot;x&quot;:1,&quot;y&quot;:2},&quot;value&quot;:2},{&quot;position&quot;:{&quot;x&quot;:1,&quot;y&quot;:3},&quot;value&quot;:4}],[{&quot;position&quot;:{&quot;x&quot;:2,&quot;y&quot;:0},&quot;value&quot;:2},{&quot;position&quot;:{&quot;x&quot;:2,&quot;y&quot;:1},&quot;value&quot;:8},null,{&quot;position&quot;:{&quot;x&quot;:2,&quot;y&quot;:3},&quot;value&quot;:2}],[{&quot;position&quot;:{&quot;x&quot;:3,&quot;y&quot;:0},&quot;value&quot;:4},{&quot;position&quot;:{&quot;x&quot;:3,&quot;y&quot;:1},&quot;value&quot;:2},null,{&quot;position&quot;:{&quot;x&quot;:3,&quot;y&quot;:3},&quot;value&quot;:2}]]},&quot;score&quot;:1337,&quot;over&quot;:false,&quot;won&quot;:false,&quot;keepPlaying&quot;:false}
+</code></pre></div>
+
+
 <p>It’s nothing more than a json with the values and the positions of the tiles. So I just edit this and Voila, right? No :/ For some reason , probably because the app is sandboxed , even if I edit this , the gameState is not going to change . I’m sure that must be a way to bypass and edit this, I will try in the future.</p>
 <h3>Reversing and editing the game</h3>
 <p>So , what now ? Errrrrr , I could edit the binary of the game to make more points and so on. Let’s do that !</p>
 <p>First let’s open this on radare2 — No , I’m not trying to show off not using a GUI tool , r2 is free and opensource, and I’m just a student who doesn’t have money to buy IDA Pro or Hopper.</p>
-<pre><code>            $ sudo r2 -w /Applications/2048+.app/Contents/MacOS/2048+ Password: arw 00000000000000000000000000000000000000000000000000000000000000000000000000000000000
+<div class="codehilite"><pre><span></span><code>            $ sudo r2 -w /Applications/2048+.app/Contents/MacOS/2048+ Password: arw 00000000000000000000000000000000000000000000000000000000000000000000000000000000000
             00000000000000000000000000000000000000000000000000000000000000000000000000000000000
             00000000000000000000000000000000000000000000000000000000000000000000000000000000000
             00000002016000001000000000000000000000000000000000000000000000000000000000000000000
             0000 -- You see it, you fix it! [0x100001620]&gt;
-</code></pre>
+</code></pre></div>
+
+
 <p>The <code>-w</code> is for writing. First thing you want to do is <code>aaa</code> to analyse all the functions and name then. The r2 has a really cool way to name the commands, it's just the first letters of the description, the first <code>a</code> is for "analyse", the second is for "all" , and the third is for "autoname" . r2 also has a really helpfull help (pun not intended) interface, just put a question mark after the command and it will show all the adjacents, something like that :</p>
 <p><img alt="" src="img/0__yepZay9IO0I49lau.png" /></p>
 <p>So , after run <code>aaa</code> , you want to list all the functions . Just run <code>afl</code> and it will show a ton of functions, if you put a <code>~</code> after the command it will grep it. I wanted to search for the beginning of the binary, and so I did <code>afl~main</code>; <code>afl~entrypoint</code> ; <code>afl~begin</code> ; <code>afl~start</code> , and nothing ( Note that this is case sensitive ).</p>
 <p>I came back to basics, and did a <code>strings</code> at the binary , something really made me "WTF?" : it showed a lot of <code>webView</code> strings. So , yeah , that shit is just a web application --'</p>
 <p>After that shitty realization , I just open the “Resources” dir in the app , and it was all the html/js/css of the app, really frustating .</p>
-<pre><code>            $ ls
+<div class="codehilite"><pre><span></span><code>            $ ls
                 CONTRIBUTING.md README.md index.html sound LICENSE.txt fontello js style
-</code></pre>
+</code></pre></div>
+
+
 <p>That’s really easy to edit. <br />
  In the line 188 of the file <code>Resources/2048/js/game_manager.js</code> it's where the game calculate the new value when two tiles merges, it just multiply the previous value for 2.</p>
-<pre><code>            var merged = new Tile(positions.next, tile.value * 2);
-</code></pre>
+<div class="codehilite"><pre><span></span><code>            <span class="k">var</span> <span class="n">merged</span> <span class="o">=</span> <span class="n">new</span> <span class="n">Tile</span><span class="p">(</span><span class="n">positions</span><span class="o">.</span><span class="n">next</span><span class="p">,</span> <span class="n">tile</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="mi">2</span><span class="p">);</span>
+</code></pre></div>
+
+
 <p>So , just change the 2 to , let’s say , 9999 . And that’s beautifull .</p>
 <p><img alt="" src="img/0__uws5CnpdR0MX9hAw.png" /></p>
 <p>All easy , all great. But was really fun. And now I’m the first of the global rank ^^</p>
@@ -92,14 +146,18 @@
 <h4>Editing the save</h4>
 <p>But the game is more complex, so you have to constantly edit your life , you can’t edit your damage (because you don’t know what to search), and that’s boring.</p>
 <p>First thing I tried was to edit the save game, because I failed in the last game. The save game is at <code>~/Library/Application Support/fasterthanlight</code> , not in the <code>Containers</code>, so no sandbox, nice . The files :</p>
-<pre><code>            $ lsae_prof.sav continue.sav prof.sav settings.ini
-</code></pre>
+<div class="codehilite"><pre><span></span><code>            $ <span class="nv">lsae_prof</span>.<span class="nv">sav</span> <span class="k">continue</span>.<span class="nv">sav</span> <span class="nv">prof</span>.<span class="nv">sav</span> <span class="nv">settings</span>.<span class="nv">ini</span>
+</code></pre></div>
+
+
 <p><code>settings.ini</code> is just a txt with the configurations of the game, sound , fullscreen, etc. The .sav ones is the saves/stats/achievements. So , wtf is that ?</p>
-<pre><code>            $ file continue.sav
-            continue.sav:data
-            $ xxd continue.sav
-            0000000: 0900 0000 0000 0000 0100 0000 0100 0000 ................ 0000010: 0400 0000 1600 0000 0300 0000 0b00 0000 ................ 0000020: 5468 6520 4b65 7374 7265 6c10 0000 0050 The Kestrel....P 0000030: 4c41 5945 525f 5348 4950 5f48 4152 4401 LAYER_SHIP_HARD. 0000040: 0000 0000 0000 0003 0000 000a 0000 0066 ...............f 0000050: 6972 6564 5f73 686f 7405 0000 0006 0000 ired_shot....... 0000060: 0068 6967 686f 3201 0000 000c 0000 0075 .higho2........u 0000070: 7365 645f 6d69 7373 696c 6502 0000 0010 sed_missile..... 0000080: 0000 0050 4c41 5945 525f 5348 4950 5f48 ...PLAYER_SHIP_H 0000090: 4152 440b 0000 0054 6865 204b 6573 7472 ARD....The Kestr 00000a0: 656c 0700 0000 6b65 7374 7261 6c03 0000 el....kestral... 00000b0: 0005 0000 0068 756d 616e 0700 0000 4359 .....human....CY 00000c0: 2048 656e 6705 0000 0068 756d 616e 0600 Heng....human.. 00000d0: 0000 4772 6163 6965 0500 0000 6875 6d61 ..Gracie....huma 00000e0: 6e06 0000 0041 7472 6579 7501 0000 00c2 n....Atreyu..... ... ETC
-</code></pre>
+<div class="codehilite"><pre><span></span><code>            $ <span class="nv">file</span> <span class="k">continue</span>.<span class="nv">sav</span>
+            <span class="k">continue</span>.<span class="nv">sav</span>:<span class="nv">data</span>
+            $ <span class="nv">xxd</span> <span class="k">continue</span>.<span class="nv">sav</span>
+            <span class="mi">0000000</span>: <span class="mi">0900</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0100</span> <span class="mi">0000</span> <span class="mi">0100</span> <span class="mi">0000</span> ................ <span class="mi">0000010</span>: <span class="mi">0400</span> <span class="mi">0000</span> <span class="mi">1600</span> <span class="mi">0000</span> <span class="mi">0300</span> <span class="mi">0000</span> <span class="mi">0</span><span class="nv">b00</span> <span class="mi">0000</span> ................ <span class="mi">0000020</span>: <span class="mi">5468</span> <span class="mi">6520</span> <span class="mi">4</span><span class="nv">b65</span> <span class="mi">7374</span> <span class="mi">7265</span> <span class="mi">6</span><span class="nv">c10</span> <span class="mi">0000</span> <span class="mi">0050</span> <span class="nv">The</span> <span class="nv">Kestrel</span>....<span class="nv">P</span> <span class="mi">0000030</span>: <span class="mi">4</span><span class="nv">c41</span> <span class="mi">5945</span> <span class="mi">525</span><span class="nv">f</span> <span class="mi">5348</span> <span class="mi">4950</span> <span class="mi">5</span><span class="nv">f48</span> <span class="mi">4152</span> <span class="mi">4401</span> <span class="nv">LAYER_SHIP_HARD</span>. <span class="mi">0000040</span>: <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0000</span> <span class="mi">0003</span> <span class="mi">0000</span> <span class="mi">000</span><span class="nv">a</span> <span class="mi">0000</span> <span class="mi">0066</span> ...............<span class="nv">f</span> <span class="mi">0000050</span>: <span class="mi">6972</span> <span class="mi">6564</span> <span class="mi">5</span><span class="nv">f73</span> <span class="mi">686</span><span class="nv">f</span> <span class="mi">7405</span> <span class="mi">0000</span> <span class="mi">0006</span> <span class="mi">0000</span> <span class="nv">ired_shot</span>....... <span class="mi">0000060</span>: <span class="mi">0068</span> <span class="mi">6967</span> <span class="mi">686</span><span class="nv">f</span> <span class="mi">3201</span> <span class="mi">0000</span> <span class="mi">000</span><span class="nv">c</span> <span class="mi">0000</span> <span class="mi">0075</span> .<span class="nv">higho2</span>........<span class="nv">u</span> <span class="mi">0000070</span>: <span class="mi">7365</span> <span class="mi">645</span><span class="nv">f</span> <span class="mi">6</span><span class="nv">d69</span> <span class="mi">7373</span> <span class="mi">696</span><span class="nv">c</span> <span class="mi">6502</span> <span class="mi">0000</span> <span class="mi">0010</span> <span class="nv">sed_missile</span>..... <span class="mi">0000080</span>: <span class="mi">0000</span> <span class="mi">0050</span> <span class="mi">4</span><span class="nv">c41</span> <span class="mi">5945</span> <span class="mi">525</span><span class="nv">f</span> <span class="mi">5348</span> <span class="mi">4950</span> <span class="mi">5</span><span class="nv">f48</span> ...<span class="nv">PLAYER_SHIP_H</span> <span class="mi">0000090</span>: <span class="mi">4152</span> <span class="mi">440</span><span class="nv">b</span> <span class="mi">0000</span> <span class="mi">0054</span> <span class="mi">6865</span> <span class="mi">204</span><span class="nv">b</span> <span class="mi">6573</span> <span class="mi">7472</span> <span class="nv">ARD</span>....<span class="nv">The</span> <span class="nv">Kestr</span> <span class="mi">00000</span><span class="nv">a0</span>: <span class="mi">656</span><span class="nv">c</span> <span class="mi">0700</span> <span class="mi">0000</span> <span class="mi">6</span><span class="nv">b65</span> <span class="mi">7374</span> <span class="mi">7261</span> <span class="mi">6</span><span class="nv">c03</span> <span class="mi">0000</span> <span class="nv">el</span>....<span class="nv">kestral</span>... <span class="mi">00000</span><span class="nv">b0</span>: <span class="mi">0005</span> <span class="mi">0000</span> <span class="mi">0068</span> <span class="mi">756</span><span class="nv">d</span> <span class="mi">616</span><span class="nv">e</span> <span class="mi">0700</span> <span class="mi">0000</span> <span class="mi">4359</span> .....<span class="nv">human</span>....<span class="nv">CY</span> <span class="mi">00000</span><span class="nv">c0</span>: <span class="mi">2048</span> <span class="mi">656</span><span class="nv">e</span> <span class="mi">6705</span> <span class="mi">0000</span> <span class="mi">0068</span> <span class="mi">756</span><span class="nv">d</span> <span class="mi">616</span><span class="nv">e</span> <span class="mi">0600</span> <span class="nv">Heng</span>....<span class="nv">human</span>.. <span class="mi">00000</span><span class="nv">d0</span>: <span class="mi">0000</span> <span class="mi">4772</span> <span class="mi">6163</span> <span class="mi">6965</span> <span class="mi">0500</span> <span class="mi">0000</span> <span class="mi">6875</span> <span class="mi">6</span><span class="nv">d61</span> ..<span class="nv">Gracie</span>....<span class="nv">huma</span> <span class="mi">00000</span><span class="nv">e0</span>: <span class="mi">6</span><span class="nv">e06</span> <span class="mi">0000</span> <span class="mi">0041</span> <span class="mi">7472</span> <span class="mi">6579</span> <span class="mi">7501</span> <span class="mi">0000</span> <span class="mi">00</span><span class="nv">c2</span> <span class="nv">n</span>....<span class="nv">Atreyu</span>..... ... <span class="nv">ETC</span>
+</code></pre></div>
+
+
 <p>That is a proprietary file format , so I have to try to understand where is the values I want to edit. I’ve used the HexFiend app , which is a hex editor for Mac , also open source , in fact Bit Slicer uses some part of their code.</p>
 <p>First I want to edit how much scrap I have ( which is the money of the game ) . If I was doing that with the BitSlicer , I would have to be able to change the value to narrow down the research. <br />
  My money at the time was 10 , which in hexa is <code>0xa</code>, so just search:</p>
@@ -111,30 +169,40 @@
 <p>The other thing I wanted to do was to be invencible without the need to edit the memory by hand all the time . r2 time !</p>
 <p>The binary of the game is at <code>/Library/Application Support/Steam/steamapps/common/FTL Faster Than Light/FTL.app/Contents/MacOS/FTL</code> because it it's on the Steam. First I've checked if it was a WebApp , and it wasn't :'(</p>
 <p>Running on the r2 and analysing all the functions take some time, and after that I started to look with functions that had something with “Damage”</p>
-<pre><code>            [0x1000f9959]&gt; afl~Damage 0x100018382 1 8 sym.Collideable::DamageBeam 0x10001838a 1 8 sym.Collideable::DamageArea 0x100018392 1 8 sym.Collideable::DamageShield 0x1000183bc 1 6 sym.Targetable::DamageTarget 0x1000184f2 1 60 sym.Projectile::SetDamage 0x10001a9b8 3 168 sym.IonDrone::GetRoomDamage 0x10001b778 3 35 sym.CrewDrone::ShipDamage 0x10001cb80 1 14 sym.CrewMember::GetDamageMultiplier 0x10001cbe2 1 83 sym.CrewMember::GetRoomDamage 0x10001ce52 1 14 sym.BoarderDrone::GetDamageMultiplier ... ETC ... ETC
-</code></pre>
+<div class="codehilite"><pre><span></span><code>            [0x1000f9959]&gt; afl~Damage 0x100018382 1 8 sym.Collideable::DamageBeam 0x10001838a 1 8 sym.Collideable::DamageArea 0x100018392 1 8 sym.Collideable::DamageShield 0x1000183bc 1 6 sym.Targetable::DamageTarget 0x1000184f2 1 60 sym.Projectile::SetDamage 0x10001a9b8 3 168 sym.IonDrone::GetRoomDamage 0x10001b778 3 35 sym.CrewDrone::ShipDamage 0x10001cb80 1 14 sym.CrewMember::GetDamageMultiplier 0x10001cbe2 1 83 sym.CrewMember::GetRoomDamage 0x10001ce52 1 14 sym.BoarderDrone::GetDamageMultiplier ... ETC ... ETC
+</code></pre></div>
+
+
 <p>After some hours analysing the functions, all of them or really did nothing special, or I was unable to edit because of some really weird instructions, like :</p>
 <p><img alt="" src="img/0__N2m4QgwsnSR085GP.jpg" /></p>
 <p>Really , I have no idea what those instructions do,and I’ve searched, it’s something with double/float types I think . <br />
  So I had a idea, the ship is able to dodge missiles and shoots, it has to be a function that calculates that.</p>
-<pre><code>            [0x1000f8104]&gt; afl~Dodge 0x10001839a 1 8 sym.Collideable::GetDodged 0x1000f8828 19 340 sym.ShipManager::GetDodgeFactor 0x1000f9906 1 47 sym.ShipManager::GetNetDodgeFactor 0x1000f9935 1 18 sym.non_virtualthunktoShipManager::GetDodged__ 0x1000f9948 20 396 sym.ShipManager::GetDodged 0x100112c18 2 27 sym.ShipSystem::GetEngineDodgeFactor 0x1001137d0 8 159 -&gt; 105 sym.EngineSystem::GetDodgeFactor
-</code></pre>
+<div class="codehilite"><pre><span></span><code>            <span class="p">[</span><span class="mh">0x1000f8104</span><span class="p">]</span><span class="o">&gt;</span> <span class="n">afl</span><span class="o">~</span><span class="n">Dodge</span> <span class="mh">0x10001839a</span> <span class="mi">1</span> <span class="mi">8</span> <span class="n">sym</span><span class="p">.</span><span class="n">Collideable</span><span class="o">::</span><span class="n">GetDodged</span> <span class="mh">0x1000f8828</span> <span class="mi">19</span> <span class="mi">340</span> <span class="n">sym</span><span class="p">.</span><span class="n">ShipManager</span><span class="o">::</span><span class="n">GetDodgeFactor</span> <span class="mh">0x1000f9906</span> <span class="mi">1</span> <span class="mi">47</span> <span class="n">sym</span><span class="p">.</span><span class="n">ShipManager</span><span class="o">::</span><span class="n">GetNetDodgeFactor</span> <span class="mh">0x1000f9935</span> <span class="mi">1</span> <span class="mi">18</span> <span class="n">sym</span><span class="p">.</span><span class="n">non_virtualthunktoShipManager</span><span class="o">::</span><span class="n">GetDodged__</span> <span class="mh">0x1000f9948</span> <span class="mi">20</span> <span class="mi">396</span> <span class="n">sym</span><span class="p">.</span><span class="n">ShipManager</span><span class="o">::</span><span class="n">GetDodged</span> <span class="mh">0x100112c18</span> <span class="mi">2</span> <span class="mi">27</span> <span class="n">sym</span><span class="p">.</span><span class="n">ShipSystem</span><span class="o">::</span><span class="n">GetEngineDodgeFactor</span> <span class="mh">0x1001137d0</span> <span class="mi">8</span> <span class="mi">159</span> <span class="o">-&gt;</span> <span class="mi">105</span> <span class="n">sym</span><span class="p">.</span><span class="n">EngineSystem</span><span class="o">::</span><span class="n">GetDodgeFactor</span>
+</code></pre></div>
+
+
 <p>And looking at <code>sym.ShipManager::GetDodged</code> :</p>
-<pre><code>            [0x1000f8104]&gt; s sym.ShipManager::GetDodged [0x1000f9948]&gt; VV
-</code></pre>
+<div class="codehilite"><pre><span></span><code>            [0x1000f8104]&gt; s sym.ShipManager::GetDodged [0x1000f9948]&gt; VV
+</code></pre></div>
+
+
 <p><code>s</code> stands for "seek" , and <code>VV</code> is for enter the visual mode. <code>p</code> in visual mode change the type of the visualization .</p>
 <p><img alt="" src="img/0__tMqI5PIy8syhNrIE.png" /></p>
 <p><em>Beginning of the function</em></p>
 <p><img alt="" src="img/0__rpHMUVbx2ADpMrxC.png" /></p>
 <p><em>End of the function</em></p>
 <p>At the end ( second print ) , in <code>0x1000f9ac6</code> it just move the register <code>bl</code> to the <code>eax</code> and return it, so <code>bl</code> must be the register that holds if the ship was able to dodge or not . And in the <code>0x1000f995b</code> ( first print ) it moves 1 to <code>bl</code> and jumps to the end of the function . Now, the first jump <code>0x1000f9959</code> is a <code>jne</code> ( Jump Not Equal ) , which check if the last cmp <code>0x1000f995</code> was successful , if it was jumps to <code>0x1000f9962</code> , if not just continues the execution . Well , the chain of execution which leads to <code>0x1000f9962</code> it's really confusing and it does a lot of compares and checks to determine if it will mov 1 or 0 to <code>bl</code> , so I just want to the function return 1 , and always dodge . Editing the <code>0x1000f9959</code> and puting a <code>nop</code> ( instruction that does nothing ) instead of the <code>jne</code> , it will result to the function always mov 1 to <code>bl</code> and <code>jmp</code> to the finish . Let's do that :</p>
-<pre><code>            [0x1000f9948]&gt; s 0x1000f9959 [0x1000f9959]&gt; wa nop Written 1 bytes (nop) = wx 90
-</code></pre>
+<div class="codehilite"><pre><span></span><code>            [0x1000f9948]&gt; s 0x1000f9959 [0x1000f9959]&gt; wa nop Written 1 bytes (nop) = wx 90
+</code></pre></div>
+
+
 <p>Resulting in :</p>
 <p><img alt="" src="img/0__YKEzVahsKrRbDeb1.png" /></p>
 <p>Now , if you look at <code>0x1000f995a</code> , it shows "invalid" , because the <code>90</code> which is the <code>nop</code> hexadecimal representation did not overwrite all the <code>jne</code> hexa <code>7507</code> . Let's just put a <code>nop</code> at the remaining and it's all good , probably there is a better way to do , but fuck it .</p>
-<pre><code>            [0x1000f995b]&gt; s 0x1000f995a [0x1000f995a]&gt; wa nop
-</code></pre>
+<div class="codehilite"><pre><span></span><code>            [0x1000f995b]&gt; s 0x1000f995a [0x1000f995a]&gt; wa nop
+</code></pre></div>
+
+
 <p><img alt="" src="img/0__S4H7d72h3y7GH5nt.png" /></p>
 <p>Now it will always dodge things , nice ! SUPER NINJA MODE (: You can edit anything you want in the game, but that was the simplest way I’ve found to become invincible .</p>
 <h3>Scripting</h3>
@@ -143,25 +211,26 @@
 <p>Now analysing the assembly : <code>mov [rdi+0x70], eax</code> . <code>[rdi+0x70]</code> is the register that holds the enemy's life and the one we want to edit it is stored at <code>0xD642</code>, that value doens't change , so I've made that script :</p>
 <p>from bitslicer import VirtualMemoryError, DebuggerError<br />
 import keycode, keymod</p>
-<pre><code>class Script(object):  
-        def __init__(self):
-                self.currentLifeAddress = None # variable to store where the enemy's life address is
-                debug.registerHotkey(keycode.A, keymod.CONTROL, self.killShip) # Add a hotkey to call the self.killShip function
-                debug.addBreakpoint(vm.base() + 0xDC642, self.shipDamaged) # Make a breakpoint every time that mov [rdi+0x70], eax is reached and call self.shipDamaged , vm.base() is the pagination of the memory , this changes every time it loads
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="n">Script</span><span class="p">(</span><span class="n">object</span><span class="p">):</span>  
+        <span class="n">def</span> <span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">currentLifeAddress</span> <span class="o">=</span> <span class="n">None</span> <span class="c1"># variable to store where the enemy&#39;s life address is</span>
+                <span class="n">debug</span><span class="o">.</span><span class="n">registerHotkey</span><span class="p">(</span><span class="n">keycode</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">keymod</span><span class="o">.</span><span class="n">CONTROL</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">killShip</span><span class="p">)</span> <span class="c1"># Add a hotkey to call the self.killShip function</span>
+                <span class="n">debug</span><span class="o">.</span><span class="n">addBreakpoint</span><span class="p">(</span><span class="n">vm</span><span class="o">.</span><span class="n">base</span><span class="p">()</span> <span class="o">+</span> <span class="mh">0xDC642</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shipDamaged</span><span class="p">)</span> <span class="c1"># Make a breakpoint every time that mov [rdi+0x70], eax is reached and call self.shipDamaged , vm.base() is the pagination of the memory , this changes every time it loads</span>
 
-        def killShip(self,hotkeyID) :
-                if self.currentLifeAddress is not None: 
-                        vm.writeInt32(self.currentLifeAddress,0) # write 0 at the enemy's life
+        <span class="n">def</span> <span class="n">killShip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">hotkeyID</span><span class="p">)</span> <span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentLifeAddress</span> <span class="k">is</span> <span class="ow">not</span> <span class="n">None</span><span class="p">:</span> 
+                        <span class="n">vm</span><span class="o">.</span><span class="n">writeInt32</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">currentLifeAddress</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># write 0 at the enemy&#39;s life</span>
 
-        def shipDamaged(self, instructionAddress, registers):
-                self.currentLifeAddress = registers['rdi']+0x70 # gets the address of enemy's life
-                debug.log(registers['rdi']) # debug shit
-                debug.resume()
+        <span class="n">def</span> <span class="n">shipDamaged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instructionAddress</span><span class="p">,</span> <span class="n">registers</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">currentLifeAddress</span> <span class="o">=</span> <span class="n">registers</span><span class="p">[</span><span class="s1">&#39;rdi&#39;</span><span class="p">]</span><span class="o">+</span><span class="mh">0x70</span> <span class="c1"># gets the address of enemy&#39;s life</span>
+                <span class="n">debug</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">registers</span><span class="p">[</span><span class="s1">&#39;rdi&#39;</span><span class="p">])</span> <span class="c1"># debug shit</span>
+                <span class="n">debug</span><span class="o">.</span><span class="n">resume</span><span class="p">()</span>
 
-        def finish(self):
-                debug.log('Cleaning up..')
-                pass
-</code></pre>
+        <span class="n">def</span> <span class="n">finish</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="n">debug</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;Cleaning up..&#39;</span><span class="p">)</span>
+                <span class="k">pass</span>
+</code></pre></div>
+
 
 <p>It’s all commented, add that to the BitSlicer, make some damage in the enemy to get the address of his life and <code>cntrl+a</code> to kill it ˆ-ˆ</p>
 <p>That sums up all the ways to cheat in a offline game, I’m doing some research at online games and reversing their protocol, but that will take time.</p>
