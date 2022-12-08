@@ -1,0 +1,44 @@
+<?xml version="1.0" ?>
+<rss version="2.0">
+  <channel>
+    <title>Index of lude.rs</title>
+    <link>https://lude.rs/</link>
+    <description>by &lt;a href='https://twitter.com/caioluders'&gt;@caioluders&lt;/a&gt;</description>
+    <item>
+      <title>nul0</title>
+      <link>https://lude.rs//4rt3/1337/nul0.txt</link>
+      <description>A blog post</description>
+      <pubDate>Sat, 10 Jul 2021 02:18:00 </pubDate>
+    </item>
+    <item>
+      <title>Null 3</title>
+      <link>https://lude.rs//4rt3/1337/50c13d4d3_51l1c14d4.txt</link>
+      <description>A blog post</description>
+      <pubDate>Fri, 26 Feb 2021 01:11:05 </pubDate>
+    </item>
+    <item>
+      <title>M3nsch</title>
+      <link>https://lude.rs//4rt3/1337/M3nsch.txt</link>
+      <description>A blog post</description>
+      <pubDate>Fri, 01 Feb 2019 00:00:00 </pubDate>
+    </item>
+    <item>
+      <title>Null 2</title>
+      <link>https://lude.rs//4rt3/1337/null2.txt</link>
+      <description>A blog post</description>
+      <pubDate>Thu, 23 Mar 2017 00:00:00 </pubDate>
+    </item>
+    <item>
+      <title>1num4n1d4d3 s0l1d4</title>
+      <link>https://lude.rs//4rt3/1337/1num4n1d4d3_s0l1d4.txt</link>
+      <description>A blog post</description>
+      <pubDate>Sat, 03 Dec 2016 00:00:00 </pubDate>
+    </item>
+    <item>
+      <title>Hum4n1d4d3 l1qu1d4</title>
+      <link>https://lude.rs//4rt3/1337/Hum4n1d4d3_l1qu1d4.txt</link>
+      <description>A blog post</description>
+      <pubDate>Wed, 15 Jun 2016 00:00:00 </pubDate>
+    </item>
+  </channel>
+</rss>

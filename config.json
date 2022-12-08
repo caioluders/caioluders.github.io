@@ -1,6 +1,8 @@
 {
     "theme": "templates/terminal.html",
     "title": "Index of lude.rs",
+	"url": "https://lude.rs/",
     "footnote":"by <a href='https://twitter.com/caioluders'>@caioluders</a>",
-    "ignore" : ["CNAME","index.html", "config.json","gohu.woff"]
+	"rss": true,
+    "ignore" : ["CNAME","index.html", "config.json","gohu.woff","r4nd0m"]
 }
