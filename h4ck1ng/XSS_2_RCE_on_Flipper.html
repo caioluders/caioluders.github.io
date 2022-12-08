@@ -83,6 +83,7 @@
 <p>Got RCE through an XSS on lab.flipper.net, here's the writeup</p>
 <p><a href="https://lude.rs/h4ck1ng/img/flipper_rce_poc.mp4">PoC Video, printing 1337 on the screen</a></p>
 <p>Was installing the unleashed firmware on my flipper and notice that the "channel" parameter was being reflected on the dropdown. Being the nerd I am, injected an <code>&lt;img/src/onerror=alert(1)&gt;</code> (<a href="https://tinyxss.terjanq.me/">https://tinyxss.terjanq.me/</a>) tag and boom XSS</p>
+<p><img alt="xss alert" src="https://lude.rs/h4ck1ng/img/veMxVtC.jpg" /></p>
 <p>The vulnerability occurs because of the "v-html" directive of Vue.js on the page 
 <code>&lt;q-item-label v-html="scope.opt.label" /&gt;</code></p>
 <p><a href="https://vuejs.org/api/built-in-directives.html#v-html">https://vuejs.org/api/built-in-directives.html#v-html</a></p>
