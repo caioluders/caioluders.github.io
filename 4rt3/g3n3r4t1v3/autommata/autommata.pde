@@ -1,6 +1,8 @@
+import processing.svg.*;
+
 // GAME OF LIFE
-int columns = 1024; // width of the gameboard
-int rows = 1024; //height of the gameboard
+int columns = 250; // width of the gameboard
+int rows = 250; //height of the gameboard
 int tile_size = 1; // size of the tiles
 int tick = 1;
 int tick_time = 1;
@@ -8,7 +10,7 @@ int[][] gameboard = new int[columns][rows];
 int[][] next = new int[columns][rows];
 
 void setup(){
-  size(1024,1024);
+  size(250,250);
   
   // Initialize the game board
   for (int x = 0; x < columns; x++){
@@ -22,6 +24,7 @@ void setup(){
       next[x][y] = gameboard[x][y];
     }
   }
+  beginRecord(SVG,"shell.svg");
   DrawBoard();
 }
 void draw(){
@@ -88,5 +91,5 @@ void DrawBoard(){
 }
 
 void mouseClicked() {
-  saveFrame() ;
+  endRecord();
 }
