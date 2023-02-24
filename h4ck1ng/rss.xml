@@ -5,6 +5,12 @@
     <link>https://lude.rs/</link>
     <description>by &lt;a href='https://twitter.com/caioluders'&gt;@caioluders&lt;/a&gt;</description>
     <item>
+      <title># draw.io CVEs</title>
+      <link>https://lude.rs//h4ck1ng/draw.io_cves.html</link>
+      <description>A blog post</description>
+      <pubDate>Fri, 24 Feb 2023 13:38:14 </pubDate>
+    </item>
+    <item>
       <title># XSS 2 RCE on Flipper Zero</title>
       <link>https://lude.rs//h4ck1ng/XSS_2_RCE_on_Flipper.html</link>
       <description>A blog post</description>
