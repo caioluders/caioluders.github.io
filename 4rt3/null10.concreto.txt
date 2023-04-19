@@ -1,0 +1,34 @@
+Null 10
+1472871600
+
+paz
+PAZ
+P A Z
+P  A  Z
+P   A   Z
+P    A    Z
+P     A     Z
+P      A      Z
+P   c   A       Z
+P   c    A  o     Z
+P   c     A o   s   Z
+P   c     a o   s   Z
+P   c    a  o   s  Z
+P   c   a   o   s Z
+P   c  a    o   S
+P   c a     o  S
+P   ca      o S
+P   ca      oS
+P   ca      OS
+P   ca     OS
+P   ca    OS
+P   ca   OS
+P   ca  OS
+P   ca OS
+P   caOS
+P   cAOS
+P   CAOS
+P  CAOS
+P CAOS
+PCAOS
+CAOS
