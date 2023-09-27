@@ -8,91 +8,91 @@
       <title># draw.io CVEs</title>
       <link>https://lude.rs//h4ck1ng/draw.io_cves.html</link>
       <description>A blog post</description>
-      <pubDate>Sat, 25 Feb 2023 01:38:14 </pubDate>
+      <pubDate>Fri, 24 Feb 2023 13:38:14 </pubDate>
     </item>
     <item>
       <title># XSS 2 RCE on Flipper Zero</title>
       <link>https://lude.rs//h4ck1ng/XSS_2_RCE_on_Flipper.html</link>
       <description>A blog post</description>
-      <pubDate>Thu, 08 Dec 2022 11:06:01 </pubDate>
+      <pubDate>Wed, 07 Dec 2022 23:06:01 </pubDate>
     </item>
     <item>
       <title>#Live Helper Chat CVEs</title>
       <link>https://lude.rs//h4ck1ng/lhc.html</link>
       <description>A blog post</description>
-      <pubDate>Tue, 12 Apr 2022 13:19:12 </pubDate>
+      <pubDate>Tue, 12 Apr 2022 01:19:12 </pubDate>
     </item>
     <item>
       <title># Messing Nuclei up</title>
       <link>https://lude.rs//h4ck1ng/messing_nuclei_up.html</link>
       <description>A blog post</description>
-      <pubDate>Tue, 28 Sep 2021 22:01:32 </pubDate>
+      <pubDate>Tue, 28 Sep 2021 10:01:32 </pubDate>
     </item>
     <item>
       <title># Pequenas ligações, grandes vulnerabilidades: Uma breve introdução a deep links Android.</title>
       <link>https://lude.rs//h4ck1ng/ligacao_profunda.html</link>
       <description>A blog post</description>
-      <pubDate>Thu, 08 Jul 2021 06:56:33 </pubDate>
+      <pubDate>Wed, 07 Jul 2021 18:56:33 </pubDate>
     </item>
     <item>
       <title># Tales from Pwn2win 2021: Dots Exposed and Ruthless Monster writeups</title>
       <link>https://lude.rs//h4ck1ng/Tales_from_Pwn2win_2021.html</link>
       <description>A blog post</description>
-      <pubDate>Thu, 17 Jun 2021 11:58:29 </pubDate>
+      <pubDate>Wed, 16 Jun 2021 23:58:29 </pubDate>
     </item>
     <item>
       <title># Rootless Sniffing</title>
       <link>https://lude.rs//h4ck1ng/rootless_sniffing.html</link>
       <description>A blog post</description>
-      <pubDate>Wed, 07 Apr 2021 04:12:36 </pubDate>
+      <pubDate>Tue, 06 Apr 2021 16:12:36 </pubDate>
     </item>
     <item>
       <title># Codei um editor de poemas chamado SAPE</title>
       <link>https://lude.rs//h4ck1ng/Eu_fiz_um_editor_de_poemas_chamado_SAPE.html</link>
       <description>A blog post</description>
-      <pubDate>Thu, 11 Mar 2021 14:06:58 </pubDate>
+      <pubDate>Thu, 11 Mar 2021 02:06:58 </pubDate>
     </item>
     <item>
       <title># P3ss04 — Utilizando Cadeias de Markov e Algoritmo Genético para a geração de poemas generativos</title>
       <link>https://lude.rs//h4ck1ng/p3ss04.html</link>
       <description>A blog post</description>
-      <pubDate>Sat, 15 Jun 2019 09:00:00 </pubDate>
+      <pubDate>Fri, 14 Jun 2019 21:00:00 </pubDate>
     </item>
     <item>
       <title># Bypassando NX e Canary em x86</title>
       <link>https://lude.rs//h4ck1ng/bypassando_nx_e_canary_em_x86.html</link>
       <description>A blog post</description>
-      <pubDate>Fri, 13 Apr 2018 09:00:00 </pubDate>
+      <pubDate>Thu, 12 Apr 2018 21:00:00 </pubDate>
     </item>
     <item>
       <title># Roteador TC7337 : DNS Poisoning através de XSS</title>
       <link>https://lude.rs//h4ck1ng/roteador_TC7337.html</link>
       <description>A blog post</description>
-      <pubDate>Wed, 02 Aug 2017 09:00:00 </pubDate>
+      <pubDate>Tue, 01 Aug 2017 21:00:00 </pubDate>
     </item>
     <item>
       <title># Six files that are also a valid PHP</title>
       <link>https://lude.rs//h4ck1ng/six_files_that_are_also_a_valid_PHP.html</link>
       <description>A blog post</description>
-      <pubDate>Fri, 09 Jun 2017 09:00:00 </pubDate>
+      <pubDate>Thu, 08 Jun 2017 21:00:00 </pubDate>
     </item>
     <item>
       <title># NET\_2GXXXX default password</title>
       <link>https://lude.rs//h4ck1ng/NET_2GXXXX_default_password.html</link>
       <description>A blog post</description>
-      <pubDate>Thu, 01 Dec 2016 09:00:00 </pubDate>
+      <pubDate>Wed, 30 Nov 2016 21:00:00 </pubDate>
     </item>
     <item>
       <title># A n3wb13 trying to cheat on games</title>
       <link>https://lude.rs//h4ck1ng/A_n3wb13_trying_to_cheat_on_games.html</link>
       <description>A blog post</description>
-      <pubDate>Wed, 16 Nov 2016 09:00:00 </pubDate>
+      <pubDate>Tue, 15 Nov 2016 21:00:00 </pubDate>
     </item>
     <item>
       <title># Opening doors</title>
       <link>https://lude.rs//h4ck1ng/Opening_doors.html</link>
       <description>A blog post</description>
-      <pubDate>Mon, 11 Jul 2016 09:00:00 </pubDate>
+      <pubDate>Sun, 10 Jul 2016 21:00:00 </pubDate>
     </item>
   </channel>
 </rss>
