@@ -18,8 +18,11 @@
 			font-family: 'gohu', monospace;
 			white-space: pre-wrap;
 			line-height: 125%;
-      background-color: #111;
-      padding: 1em;
+      		background-color: #111;
+    	  	padding: 1em;
+		}
+		.bg_black {
+			background-color: rgb(0,0,0,0.7);
 		}
 		@media only screen and (max-width:768px) {
 			body {
@@ -80,7 +83,7 @@
   <meta charset="UTF-8">
 </head>
 
-<body><h1>Live Helper Chat CVEs</h1>
+<body><div class="bg_black"><h1>Live Helper Chat CVEs</h1>
 <p>1649737152</p>
 <p>Did a secure code review on Live Helper Chat as part of a pentest, found some CVEs, and learned some tricks that I think are cool to have in mind while doing bug bounty.</p>
 <h2>Authenticated SSRF - <a href="https://huntr.dev/bounties/7264a2e1-17e7-4244-93e4-49ec14f282b3/">CVE-2022-1191</a></h2>
@@ -144,4 +147,4 @@ Connection: close
 <p>Every time I see a JSON now I'll put a true somewhere.</p>
 <h2>Closing thoughts</h2>
 <p>Always chain authenticated vulnerabilities, not ignore hashes, and put true ( or Array ) every-fucking-where.</p>
-<p>Also, shoutout to <a href="https://huntr.dev">huntr.dev</a>, made it really easy to send the vulnerabilities and talk directly to the dev, they also managed the whole CVE process, having a bounty on projects on github is really nice (altho small at the moment, &gt;0 is nice anyway) I don't have any clue how they make money :p</p></body><hr>by <a href='https://twitter.com/caioluders'>@caioluders</a></html>
+<p>Also, shoutout to <a href="https://huntr.dev">huntr.dev</a>, made it really easy to send the vulnerabilities and talk directly to the dev, they also managed the whole CVE process, having a bounty on projects on github is really nice (altho small at the moment, &gt;0 is nice anyway) I don't have any clue how they make money :p</p></body><hr>by <a href='https://twitter.com/caioluders'>@caioluders</a></div></html>

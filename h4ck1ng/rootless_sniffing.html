@@ -18,8 +18,11 @@
 			font-family: 'gohu', monospace;
 			white-space: pre-wrap;
 			line-height: 125%;
-      background-color: #111;
-      padding: 1em;
+      		background-color: #111;
+    	  	padding: 1em;
+		}
+		.bg_black {
+			background-color: rgb(0,0,0,0.7);
 		}
 		@media only screen and (max-width:768px) {
 			body {
@@ -80,7 +83,7 @@
   <meta charset="UTF-8">
 </head>
 
-<body><h1>Rootless Sniffing</h1>
+<body><div class="bg_black"><h1>Rootless Sniffing</h1>
 <p>1617736356</p>
 <p>Once upon a time, a noob found an RCE on a server but didn't got root, the noob wanted to sniff the requests that were arriving on that server, to escalate privileges, but didn't know how. That noob is me , and this is my story.</p>
 <h1>Scenario</h1>
@@ -253,4 +256,4 @@ File not found.
 <h1>Conclusions</h1>
 <p>It was really insightful to go this low on the unix kernel, I'm more of a web guy I guess, and helped a lot to better understand basic authorization flows on the linux kernel. Altho most of my ideas were shit and didn't work, having found that I can spoof the Unix domain socket that the Nginx uses internally is a new technique for me. This can be used on red teaming to escalate privileges, if you weren't able to root it, by getting plain text credentials on a login POST request for example. You can also do more than just sniffing the requests: you can alter the server's responses! Use your imagination, maybe I make a tool later to achieve that.</p>
 <p>I don't know which frameworks uses a Unix domain socket in the same way as <code>Nginx+php-fpm</code>, but I guess that should exist more contexts that this works, please publish it if you find more scenarios. </p>
-<p>I hope that this is helpful for someone ^.^</p></body><hr>by <a href='https://twitter.com/caioluders'>@caioluders</a></html>
+<p>I hope that this is helpful for someone ^.^</p></body><hr>by <a href='https://twitter.com/caioluders'>@caioluders</a></div></html>

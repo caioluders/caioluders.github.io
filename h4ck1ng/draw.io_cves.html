@@ -18,8 +18,11 @@
 			font-family: 'gohu', monospace;
 			white-space: pre-wrap;
 			line-height: 125%;
-      background-color: #111;
-      padding: 1em;
+      		background-color: #111;
+    	  	padding: 1em;
+		}
+		.bg_black {
+			background-color: rgb(0,0,0,0.7);
 		}
 		@media only screen and (max-width:768px) {
 			body {
@@ -80,7 +83,7 @@
   <meta charset="UTF-8">
 </head>
 
-<body><h1>draw.io CVEs</h1>
+<body><div class="bg_black"><h1>draw.io CVEs</h1>
 <p>1677256694</p>
 <p>A couple of months ago draw.io was listed as a boosted project on huntr.dev , paying up to 2000 USD for critical vulnerabilities, and as I really enjoy drawing diagrams, I thought it was a good idea to do some security code reviewing on it. I found two CVEs ( <a href="https://huntr.dev/bounties/6ac07c49-bb7f-47b5-b361-33e6757b8757/">CVE-2022-1774</a>, <a href="https://huntr.dev/bounties/cad3902f-3afb-4ed2-abd0-9f96a248de11/">CVE-2022-1713</a> ) in one week and this is a write up about the vulnerabilities and how I found them.</p>
 <h2>Starting the code review</h2>
@@ -331,4 +334,4 @@ Cf-Ray: 70b0c6119831273d-FOR
 </li>
 </ol>
 <p>the power of an space
-ψ( ` ∇ ´ )ψ</p></body><hr>by <a href='https://twitter.com/caioluders'>@caioluders</a></html>
+ψ( ` ∇ ´ )ψ</p></body><hr>by <a href='https://twitter.com/caioluders'>@caioluders</a></div></html>

@@ -18,8 +18,11 @@
 			font-family: 'gohu', monospace;
 			white-space: pre-wrap;
 			line-height: 125%;
-      background-color: #111;
-      padding: 1em;
+      		background-color: #111;
+    	  	padding: 1em;
+		}
+		.bg_black {
+			background-color: rgb(0,0,0,0.7);
 		}
 		@media only screen and (max-width:768px) {
 			body {
@@ -80,7 +83,7 @@
   <meta charset="UTF-8">
 </head>
 
-<body><h1>Pequenas ligações, grandes vulnerabilidades: Uma breve introdução a deep links Android.</h1>
+<body><div class="bg_black"><h1>Pequenas ligações, grandes vulnerabilidades: Uma breve introdução a deep links Android.</h1>
 <p>1625694993</p>
 <h2>AndroidManifest.xml</h2>
 <p>Esse artigo tem como objetivo introduzir as vulnerabilidades que ocorrem no Android por meio do abuso de Intents. Tentarei ser o mais introdutório possível e listarei todas as referências necessárias, caso algum conceito pareça muito avançado. Será utilizado o aplicativo <a href="https://github.com/B3nac/InjuredAndroid">InjuredAndroid</a> como exemplo de <em>apk</em> vulnerável. 541v3 pros companheiros da <a href="https://www.instagram.com/duphouse/">@duphouse</a>, sem eles esse texto não seria possível.</p>
@@ -205,4 +208,4 @@ else throw new URISyntaxException(uri, &quot;unknown EXTRA type&quot;, i);
 <p>Por fim só colocar um <code>end</code> (:</p>
 <h2>;end</h2>
 <p>Podem existir vários tipos de vulnerabilidades oriundas dos Intents, RCE/SQLi/XSS até Buffer Overflow, vai depender só da criatividade do desenvolvedor. Para estudar esse assunto mais a fundo, recomendo a leitura do blog do <a href="https://twitter.com/_bagipro">@bagipro_</a> https://blog.oversecured.com/ e dos reports públicos de Bug Bounty https://github.com/B3nac/Android-Reports-and-Resources . Além do <a href="https://github.com/B3nac/InjuredAndroid">InjuredAndroid</a> também podem brincar com o <a href="https://github.com/oversecured/ovaa">Ovaa</a>. |-|4ck th3 |&gt;l4n3t </p>
-<p><a href="twitter.com/caioluders/">@caioluders </a></p></body><hr>by <a href='https://twitter.com/caioluders'>@caioluders</a></html>
+<p><a href="twitter.com/caioluders/">@caioluders </a></p></body><hr>by <a href='https://twitter.com/caioluders'>@caioluders</a></div></html>
