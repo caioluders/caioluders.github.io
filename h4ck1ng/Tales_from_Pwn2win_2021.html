@@ -94,39 +94,39 @@
 <h3>Writeup</h3>
 <p>AsciiDots is a language inspired by ASCII Art and works by having it's <code>dots</code> travel through the paths, somehow like eletronic circuits ( I know the physics don't work that way, don't hate me plz ). I'm not going to fully dive on how the language works, but will focus on the vulnerability. </p>
 <p>Okay, the only way to read files is via <code>Libraries</code>, the ideia it's that you can import other <code>dots</code> programs to use on your main program. The first bug occurs here https://github.com/aaronjanse/asciidots/blob/6d5bb842cdfaea7e03e38ca31ce49e4910798c4e/dots/world.py#L178</p>
-<pre class="codehilite"><code class="language-python">178         path = os.path.join(dir_path, filename)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="mi">178</span>         <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir_path</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+</code></pre></div>
 
 <p>We can control the <code>filename</code> variable via the <a href="https://ajanse.me/asciidots/language/#libraries">lib import</a> <code>%!filename</code>, and it's possible to use an absolute path to import <strong>any</strong> file, <code>%!/etc/passwd</code> for example. This will end up in a list called <code>char_obj_array</code> which has all the characters of the main program and libraries. Let's see an example:</p>
-<pre class="codehilite"><code>%!/etc/hostname a
+<div class="codehilite"><pre><span></span><code><span class="c">%!/etc/hostname a</span>
 
-.a
-</code></pre>
+<span class="p">.</span><span class="n">a</span>
+</code></pre></div>
 
 <p>The lists <code>char_obj_array</code>/<code>map</code> will end up like this after the parsing:</p>
-<pre class="codehilite"><code>%!/etc/hostname a
+<div class="codehilite"><pre><span></span><code><span class="c">%!/etc/hostname a</span>
 
-.a
+<span class="p">.</span><span class="n">a</span>
 
-h0stn4m3
-</code></pre>
+<span class="n">h0stn4m3</span>
+</code></pre></div>
 
-<pre class="codehilite"><code>[['%', '!', '/', 'e', 't', 'c', '/', 'h', 'o', 's', 't', 'n', 'a', 'm', 'e', ' ', 'a'], [], ['.', 'a'], []]
-[['h', '0', 's', 't', 'n', '4', 'm', '3'], []]
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">[[&#39;%&#39;, &#39;!&#39;, &#39;/&#39;, &#39;e&#39;, &#39;t&#39;, &#39;c&#39;, &#39;/&#39;, &#39;h&#39;, &#39;o&#39;, &#39;s&#39;, &#39;t&#39;, &#39;n&#39;, &#39;a&#39;, &#39;m&#39;, &#39;e&#39;, &#39; &#39;, &#39;a&#39;], [], [&#39;.&#39;, &#39;a&#39;], []]</span>
+<span class="k">[[&#39;h&#39;, &#39;0&#39;, &#39;s&#39;, &#39;t&#39;, &#39;n&#39;, &#39;4&#39;, &#39;m&#39;, &#39;3&#39;], []]</span>
+</code></pre></div>
 
 <p>Notice the empty lists after <code>.a</code>? This occurs because the interpreter will <code>.split('\n')</code> the source code, this way we can't make an ASCII path to access the imported file's characters and print them, because there is a newline between the library and the original main program :c</p>
 <p>The second bug is that the interpreter expects that the main program file will end with an <code>\n</code>, this is sometimes true because some code editors will append a <code>\n</code> to the end of the file, Vim for example. This is a clear example of how a simple assumption about the user input can cause disastrous outcomes. If our program doesn't end with newline we can make a path to the library's characters. With these two bugs we can print all the characters of a library, column by column, and achieve arbitrary file read. </p>
 <p>Final payload:</p>
-<pre class="codehilite"><code>%!/flag a
+<div class="codehilite"><pre><span></span><code><span class="c">%!/flag a</span>
 
-a
+<span class="n">a</span>
 
-..................................................
-||||||||||||||||||||||||||||||||||||||||||||||||||
+<span class="s">..................................................</span>
+<span class="o">||||||||||||||||||||||||||||||||||||||||||||||||||</span>
 $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-''''''''''''''''''''''''''''''''''''''''''''''''''
-</code></pre>
+<span class="s">&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;</span>
+</code></pre></div>
 
 <p>Output:</p>
 <p><code>CTF-BR{gosh,I_hate_those_fucking_0x0a}</code></p>

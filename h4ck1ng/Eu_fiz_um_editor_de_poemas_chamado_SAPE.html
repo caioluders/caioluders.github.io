@@ -92,66 +92,66 @@
 <p>A idéia de ter um editor de poemas é meio antiga, na verdade eu já tinha feito um em 2017 em Electron e ficou uma bosta, Electron é uma bosta, ficou grande e pesado, embutir um chrome num programa só pra rodar uns html/css/js é uma péssima idéia. Então eu decidi refazer todo o código e adicionar mais funcionalidades.</p>
 <p>A motivação principal foi pura preguiça, preguiça de contar a métrica de cada verso e preguiça de procurar rima em dicionário/Google. Essas foram as duas primeiras funcionalidades da primeira versão de 2017, mas tive algumas problemas. Outra motivação menor, foi a idéia de simbose com o computador, algo da linha do <a href="https://lude.rs/h4ck1ng/p3ss04.html">P3ss04</a>, usar ferramentas computacionais para elevar a humanindade, ou qualquer brisa assim.</p>
 <p>O primeiro problema foi COMO CARALHOS EU VOU CONTAR AS SÍLABAS ?!?!? É um problema super difícil que eu substimei, comecei tentando criar um algoritmo baseado em algumas regras gramaticais, mas além de porco, ficou errado, coisa de 60% de acerto. A língua portuguesa é linda e extremamente complexa, aqui em baixo tá a minha tentativa de função para contagem de sílabas poéticas, OLHA QUE CÓDIGO FEIO DA PORRA:</p>
-<pre class="codehilite"><code>function countSilabas(line) {
-    var almost_done = line.replace(/[.,\/#$%\^&amp;\*;:{}=\-_~()]/g,&quot;&quot;).split(&quot; &quot;) ; // remove pontuations, but not &quot;!&quot; that changes the metric
-    var silabas_counter = 0 ; // main counter
-    var list_consoantes =  Array.from(&quot;çbcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ&quot;) ; // almost forgot the &quot;ç&quot;
-    var list_vogais = Array.from(&quot;aeiouAEIOUõã&quot;) ;
-    var list_acentuadas = Array.from(&quot;àáâäåæèéêëæìíîïòóôöøùúûü&quot;);
-    var f_v = false ; // flag to check if the last letter was a vogal
-    var p_c = false ;
-    console.log(almost_done) ;
-    // holy shit that code is ugly , PLZ DO NOT READ IT , IT WILL MAKE YOUR EYES BURN !!!
-    for (var i = 0 ; i &lt;  almost_done.length; i++) { // word
-      for (var y = 0; y &lt; almost_done[i].length ;y++) { // letter
-        if (list_acentuadas.indexOf(almost_done[i][y]) &gt; -1) { // toda acentuada conta
-          console.log(&quot;ac -&gt;&quot;+almost_done[i][y]) ;
-          silabas_counter += 1 ;  
-          f_v = false ; // it's a vogal, but a tonic one
-        } else {
-          if (list_vogais.indexOf(almost_done[i][y]) &gt; -1) { // if vogal
-            f_v = true;
-            if (y == almost_done[i].length-1) { // check if last letter of word
-              var tf = true ;
-              for ( var k = 0 ; k &lt; almost_done[i].length ; k++ ) {
-                if (list_consoantes.indexOf(almost_done[i][k]) &gt; -1 ) {
-                  tf = false ;
-                  break ;
-                }
-              }
-              if ( tf &amp;&amp; i != 0 ) { // if last letter is a vogal and isn't the first word
-                if (list_vogais.indexOf(almost_done[i-1][almost_done[i].length-1]) &gt; -1) { // if begin of the next word is a vogal
-                  f_v = false ;
-                  continue ; // goto
-                }
-              }
-              console.log(almost_done[i][y]) ;
-              silabas_counter += 1 ;
-              f_v = false;
-            }
-            if (y == 0 &amp;&amp; i != 0){
-              if (list_vogais.indexOf(almost_done[i-1][almost_done[i-1].length-1]) &gt; -1) {
-                f_v = false ;
-              }
-            }
-          } else {
-            if ( (list_consoantes.indexOf(almost_done[i][y]) &gt; -1) &amp;&amp; f_v ){
-                silabas_counter += 1 ;  
-                f_v = false ;
-                p_c = true ;
-                console.log(almost_done[i][y]) ;
-            }
-          }
-        }  
-      }
-    }
-    if (silabas_counter &gt;= 2 &amp;&amp; (almost_done[almost_done.length-1][almost_done[almost_done.length-1].length-1] != '!') ) {
-      silabas_counter -= 1 ; // BUG FIX
-    }
+<div class="codehilite"><pre><span></span><code><span class="k">function</span><span class="w"> </span><span class="n">countSilabas</span><span class="p">(</span><span class="n">line</span><span class="p">)</span><span class="w"> </span><span class="err">{</span>
+<span class="w">    </span><span class="nf">var</span><span class="w"> </span><span class="n">almost_done</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">line</span><span class="p">.</span><span class="nf">replace</span><span class="p">(</span><span class="o">/[</span><span class="n">.,\/#$%\^&amp;\*;:{}=\-_~()</span><span class="o">]/</span><span class="n">g</span><span class="p">,</span><span class="ss">&quot;&quot;</span><span class="p">).</span><span class="n">split</span><span class="p">(</span><span class="ss">&quot; &quot;</span><span class="p">)</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="n">remove</span><span class="w"> </span><span class="n">pontuations</span><span class="p">,</span><span class="w"> </span><span class="n">but</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="ss">&quot;!&quot;</span><span class="w"> </span><span class="n">that</span><span class="w"> </span><span class="n">changes</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">metric</span>
+<span class="w">    </span><span class="nf">var</span><span class="w"> </span><span class="n">silabas_counter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="n">main</span><span class="w"> </span><span class="n">counter</span>
+<span class="w">    </span><span class="nf">var</span><span class="w"> </span><span class="n">list_consoantes</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="k">Array</span><span class="p">.</span><span class="k">from</span><span class="p">(</span><span class="ss">&quot;çbcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="n">almost</span><span class="w"> </span><span class="n">forgot</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="ss">&quot;ç&quot;</span>
+<span class="w">    </span><span class="nf">var</span><span class="w"> </span><span class="n">list_vogais</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">Array</span><span class="p">.</span><span class="k">from</span><span class="p">(</span><span class="ss">&quot;aeiouAEIOUõã&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nf">var</span><span class="w"> </span><span class="n">list_acentuadas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">Array</span><span class="p">.</span><span class="k">from</span><span class="p">(</span><span class="ss">&quot;àáâäåæèéêëæìíîïòóôöøùúûü&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="nf">var</span><span class="w"> </span><span class="n">f_v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">false</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="n">flag</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="k">check</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">last</span><span class="w"> </span><span class="n">letter</span><span class="w"> </span><span class="n">was</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">vogal</span>
+<span class="w">    </span><span class="nf">var</span><span class="w"> </span><span class="n">p_c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">false</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="n">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="n">almost_done</span><span class="p">)</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="o">//</span><span class="w"> </span><span class="n">holy</span><span class="w"> </span><span class="n">shit</span><span class="w"> </span><span class="n">that</span><span class="w"> </span><span class="n">code</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">ugly</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="n">PLZ</span><span class="w"> </span><span class="n">DO</span><span class="w"> </span><span class="ow">NOT</span><span class="w"> </span><span class="k">READ</span><span class="w"> </span><span class="n">IT</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="n">IT</span><span class="w"> </span><span class="n">WILL</span><span class="w"> </span><span class="n">MAKE</span><span class="w"> </span><span class="n">YOUR</span><span class="w"> </span><span class="n">EYES</span><span class="w"> </span><span class="n">BURN</span><span class="w"> </span><span class="err">!!!</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="nf">var</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w">  </span><span class="n">almost_done</span><span class="p">.</span><span class="n">length</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="n">word</span>
+<span class="w">      </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="nf">var</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">almost_done</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">.</span><span class="n">length</span><span class="w"> </span><span class="p">;</span><span class="n">y</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="n">letter</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">list_acentuadas</span><span class="p">.</span><span class="n">indexOf</span><span class="p">(</span><span class="n">almost_done</span><span class="o">[</span><span class="n">i</span><span class="o">][</span><span class="n">y</span><span class="o">]</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="n">toda</span><span class="w"> </span><span class="n">acentuada</span><span class="w"> </span><span class="n">conta</span>
+<span class="w">          </span><span class="n">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="ss">&quot;ac -&gt;&quot;</span><span class="o">+</span><span class="n">almost_done</span><span class="o">[</span><span class="n">i</span><span class="o">][</span><span class="n">y</span><span class="o">]</span><span class="p">)</span><span class="w"> </span><span class="p">;</span>
+<span class="w">          </span><span class="n">silabas_counter</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">;</span><span class="w">  </span>
+<span class="w">          </span><span class="n">f_v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">false</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="n">it</span><span class="s1">&#39;s a vogal, but a tonic one</span>
+<span class="s1">        } else {</span>
+<span class="s1">          if (list_vogais.indexOf(almost_done[i][y]) &gt; -1) { // if vogal</span>
+<span class="s1">            f_v = true;</span>
+<span class="s1">            if (y == almost_done[i].length-1) { // check if last letter of word</span>
+<span class="s1">              var tf = true ;</span>
+<span class="s1">              for ( var k = 0 ; k &lt; almost_done[i].length ; k++ ) {</span>
+<span class="s1">                if (list_consoantes.indexOf(almost_done[i][k]) &gt; -1 ) {</span>
+<span class="s1">                  tf = false ;</span>
+<span class="s1">                  break ;</span>
+<span class="s1">                }</span>
+<span class="s1">              }</span>
+<span class="s1">              if ( tf &amp;&amp; i != 0 ) { // if last letter is a vogal and isn&#39;</span><span class="n">t</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">first</span><span class="w"> </span><span class="n">word</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">list_vogais</span><span class="p">.</span><span class="n">indexOf</span><span class="p">(</span><span class="n">almost_done</span><span class="o">[</span><span class="n">i-1</span><span class="o">][</span><span class="n">almost_done[i</span><span class="o">]</span><span class="p">.</span><span class="n">length</span><span class="o">-</span><span class="mi">1</span><span class="err">]</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="k">begin</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">next</span><span class="w"> </span><span class="n">word</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">vogal</span>
+<span class="w">                  </span><span class="n">f_v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">false</span><span class="w"> </span><span class="p">;</span>
+<span class="w">                  </span><span class="k">continue</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="k">goto</span>
+<span class="w">                </span><span class="err">}</span>
+<span class="w">              </span><span class="err">}</span>
+<span class="w">              </span><span class="n">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="n">almost_done</span><span class="o">[</span><span class="n">i</span><span class="o">][</span><span class="n">y</span><span class="o">]</span><span class="p">)</span><span class="w"> </span><span class="p">;</span>
+<span class="w">              </span><span class="n">silabas_counter</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">;</span>
+<span class="w">              </span><span class="n">f_v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">false</span><span class="p">;</span>
+<span class="w">            </span><span class="err">}</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">y</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="err">{</span>
+<span class="w">              </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">list_vogais</span><span class="p">.</span><span class="n">indexOf</span><span class="p">(</span><span class="n">almost_done</span><span class="o">[</span><span class="n">i-1</span><span class="o">][</span><span class="n">almost_done[i-1</span><span class="o">]</span><span class="p">.</span><span class="n">length</span><span class="o">-</span><span class="mi">1</span><span class="err">]</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="err">{</span>
+<span class="w">                </span><span class="n">f_v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">false</span><span class="w"> </span><span class="p">;</span>
+<span class="w">              </span><span class="err">}</span>
+<span class="w">            </span><span class="err">}</span>
+<span class="w">          </span><span class="err">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="err">{</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="p">(</span><span class="n">list_consoantes</span><span class="p">.</span><span class="n">indexOf</span><span class="p">(</span><span class="n">almost_done</span><span class="o">[</span><span class="n">i</span><span class="o">][</span><span class="n">y</span><span class="o">]</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">f_v</span><span class="w"> </span><span class="p">)</span><span class="err">{</span>
+<span class="w">                </span><span class="n">silabas_counter</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">;</span><span class="w">  </span>
+<span class="w">                </span><span class="n">f_v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">false</span><span class="w"> </span><span class="p">;</span>
+<span class="w">                </span><span class="n">p_c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">true</span><span class="w"> </span><span class="p">;</span>
+<span class="w">                </span><span class="n">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="n">almost_done</span><span class="o">[</span><span class="n">i</span><span class="o">][</span><span class="n">y</span><span class="o">]</span><span class="p">)</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="err">}</span>
+<span class="w">          </span><span class="err">}</span>
+<span class="w">        </span><span class="err">}</span><span class="w">  </span>
+<span class="w">      </span><span class="err">}</span>
+<span class="w">    </span><span class="err">}</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">silabas_counter</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">almost_done</span><span class="o">[</span><span class="n">almost_done.length-1</span><span class="o">][</span><span class="n">almost_done[almost_done.length-1</span><span class="o">]</span><span class="p">.</span><span class="n">length</span><span class="o">-</span><span class="mi">1</span><span class="err">]</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="s1">&#39;!&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="err">{</span>
+<span class="w">      </span><span class="n">silabas_counter</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="n">BUG</span><span class="w"> </span><span class="n">FIX</span>
+<span class="w">    </span><span class="err">}</span>
 
-    return silabas_counter ;
-}
-</code></pre>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">silabas_counter</span><span class="w"> </span><span class="p">;</span>
+<span class="err">}</span>
+</code></pre></div>
 
 <p>Tem comentários explicando porcamente as regras gramaticais, eu não tentei dividir as sílabas e só tentei contar a métrica, deu errado. </p>
 <p>O segundo problema foi a pesquisa de rimas, ou seja, as duas funcionalidades foram problemas kkkkkrying. Na minha cabeça o SAPE não deveria precisar de internet, pra ser mais acessível, dai eu tive a brilhante idéia de usar uma database local de palavras do <a href="dicionario-aberto.net">https://dicionario-aberto.net/</a> junto com o programa, resultado? O executável ficou com 300mb, uns 200mb do SQLite e uns 100mb só da porra do Chrome do Electron.</p>
