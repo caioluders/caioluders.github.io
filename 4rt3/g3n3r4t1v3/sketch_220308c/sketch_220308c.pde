@@ -1,25 +1,44 @@
 void setup() {
-  //size(1024,1024) ;
-  fullScreen();
+  size(1200, 675);
   noSmooth();
   background(0);
-  stroke(255);
-}                                                                 
+  //colorMode(RGB, 360, 100, 100, 100);
+}
 
 void draw() {
-  background(0);
+  background(240, 80, 5); // Deep blue background
   
-  int f = frameCount%width;
+  // Create a subtle nebula effect
+  loadPixels();
+  for (int i = 0; i < width * height; i++) {
+    float n = noise(i * 0.001, frameCount ) * 100;
+    pixels[i] = color(280 + n, 70, 20, 20);
+  }
+  updatePixels();
   
-  translate(width/2,height/2);
+  int f = frameCount % width;
   
-  for( int n = 0 ; n < width ; n++) {
-    for( int i = 0 ; i < 360 ; i+= 4 ) {      
-      float xx = sin(radians(f+random(0,0.5)+noise(i)*(500)))*n;
-      float yy = cos(radians(i+n))*n;
-      //stroke(map(i,0,300,0,255));
-      point(xx,yy/2);
-    } 
+  translate(width/2, height/2);
+  
+  // Main spiral pattern
+  for (int n = 0; n < width/2; n += 2) {
+    for (int i = 0; i < 360; i += 3) {
+      float spiralNoise = noise(i * 0.01, n * 0.005, f * 0.01);
+      float xx = sin(radians(i + spiralNoise * 180 + f * 0.1)) * n;
+      float yy = cos(radians(i + n * 0.2)) * n;
+      
+      
+      // Varying point size for depth effect
+      float pointSize = map(noise(frameCount * 0.01, yy * 0.01), 0, 1, 1, 3);
+      strokeWeight(pointSize);
+      
+      point(xx * 0.8, yy * 0.5);
+    }
   }
   
+}
+
+void mousePressed() {
+  // Save the frame when mouse is pressed
+  saveFrame("space-art-####.jpg");
 }
