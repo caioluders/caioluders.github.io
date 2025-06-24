@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<style>
+
+		@font-face { font-family: "gohu"; src: url("/gohu.woff") format('woff'); }
+		html {
+			background: url('/4rt3/g3n3r4t1v3/sketch_5p4c3/out1.gif') no-repeat center/100% fixed;
+		}
+		body {
+			font-family: 'gohu', monospace;
+			max-width: 50em;
+			margin: 0 auto;
+			color: white;
+			line-height: calc(1ex / 0.32);
+			margin-top: 3em;
+		}
+		pre {
+			font-family: 'gohu', monospace;
+			white-space: pre-wrap;
+			line-height: 125%;
+      		background-color: #111;
+    	  	padding: 1em;
+		}
+		.bg_black {
+			background-color: rgb(0,0,0,0.7);
+		}
+		@media only screen and (max-width:768px) {
+			body {
+				max-width:100%;
+			}
+		}
+		a:link {
+			color: #0a0 ;
+		}
+		a:visited {
+			color: #004100 ;
+		}
+		td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+		span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+		td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+		span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+		.codehilite .hll { background-color: #0000ff }
+		.codehilite { background: #000000; }
+		.codehilite .c { color: #00ff00 } /* Comment */
+		.codehilite .k { color: #ff0000 } /* Keyword */
+		.codehilite .ch { color: #00ff00 } /* Comment.Hashbang */
+		.codehilite .cm { color: #00ff00 } /* Comment.Multiline */
+		.codehilite .cp { color: #e5e5e5 } /* Comment.Preproc */
+		.codehilite .cpf { color: #00ff00 } /* Comment.PreprocFile */
+		.codehilite .c1 { color: #00ff00 } /* Comment.Single */
+		.codehilite .cs { color: #00ff00 } /* Comment.Special */
+		.codehilite .kc { color: #ff0000 } /* Keyword.Constant */
+		.codehilite .kd { color: #ff0000 } /* Keyword.Declaration */
+		.codehilite .kn { color: #ff0000 } /* Keyword.Namespace */
+		.codehilite .kp { color: #ff0000 } /* Keyword.Pseudo */
+		.codehilite .kr { color: #ff0000 } /* Keyword.Reserved */
+		.codehilite .kt { color: #ee82ee } /* Keyword.Type */
+		.codehilite .s { color: #87ceeb } /* Literal.String */
+		.codehilite .no { color: #7fffd4 } /* Name.Constant */
+		.codehilite .nf { color: #ffff00 } /* Name.Function */
+		.codehilite .nv { color: #eedd82 } /* Name.Variable */
+		.codehilite .sa { color: #87ceeb } /* Literal.String.Affix */
+		.codehilite .sb { color: #87ceeb } /* Literal.String.Backtick */
+		.codehilite .sc { color: #87ceeb } /* Literal.String.Char */
+		.codehilite .dl { color: #87ceeb } /* Literal.String.Delimiter */
+		.codehilite .sd { color: #87ceeb } /* Literal.String.Doc */
+		.codehilite .s2 { color: #87ceeb } /* Literal.String.Double */
+		.codehilite .se { color: #87ceeb } /* Literal.String.Escape */
+		.codehilite .sh { color: #87ceeb } /* Literal.String.Heredoc */
+		.codehilite .si { color: #87ceeb } /* Literal.String.Interpol */
+		.codehilite .sx { color: #87ceeb } /* Literal.String.Other */
+		.codehilite .sr { color: #87ceeb } /* Literal.String.Regex */
+		.codehilite .s1 { color: #87ceeb } /* Literal.String.Single */
+		.codehilite .ss { color: #87ceeb } /* Literal.String.Symbol */
+		.codehilite .fm { color: #ffff00 } /* Name.Function.Magic */
+		.codehilite .vc { color: #eedd82 } /* Name.Variable.Class */
+		.codehilite .vg { color: #eedd82 } /* Name.Variable.Global */
+		.codehilite .vi { color: #eedd82 } /* Name.Variable.Instance */
+		.codehilite .vm { color: #eedd82 } /* Name.Variable.Magic */
+	
+</style>
+<head>
+  <meta charset="UTF-8">
+</head>
+
+<body><div class="bg_black"><h1>Binary Golf Grand Prix 5 (BGGP5) Writeup</h1>
+<p>1735019766</p>
+<h2>Introduction</h2>
+<p>(i was very lazy and made a llm write this)
+I recently participated in the Binary Golf Grand Prix 5 (BGGP5), a competition that challenges participants to create the smallest possible files that perform specific tasks. This year's challenge was to create a file under 4096 bytes that downloads a text file from https://binary.golf/5/5 and displays its contents.</p>
+<p>In this writeup, I'll walk through my seven different submissions, explain how each works, and the techniques I used to minimize file size.</p>
+<h2>The Challenge</h2>
+<p>The goal of BGGP5 was straightforward:</p>
+<ul>
+<li>Create a file 4096 bytes or less</li>
+<li>Download the text file at https://binary.golf/5/5</li>
+<li>Display the file's contents in some way</li>
+</ul>
+<p>The winning entries would be the smallest in each file type category.</p>
+<h2>My Submissions</h2>
+<h3>1. Python with Requests (64 bytes)</h3>
+<p><strong>File size:</strong> 64 bytes</p>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">requests</span> <span class="kn">import</span> <span class="o">*</span><span class="p">;</span><span class="nb">print</span><span class="p">(</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;http://binary.golf/5/5&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+</code></pre></div>
+
+<p>This was my first submission - a straightforward approach using Python's requests library to download and print the content. Nothing fancy, just a baseline solution to get started with the challenge. Really not optimal and was beaten by a lot.</p>
+<h3>2. Python Filename Trick (20 bytes)</h3>
+<p><strong>File size:</strong> 20 bytes</p>
+<div class="codehilite"><pre><span></span><code><span class="n">exec</span><span class="p">(</span><span class="vm">__file__</span><span class="p">[</span><span class="o">-</span><span class="mi">60</span><span class="p">:])</span>
+</code></pre></div>
+
+<p>After my first submission, I realized that many competitors were externalizing code outside the actual file content. For me personally, using command-line arguments or other external elements would feel like cheating, as they're not part of the file itself. However, the filename felt like a legitimate part of the file's identity, so I leveraged that.</p>
+<p>The file needs to be named:</p>
+<div class="codehilite"><pre><span></span><code>__import__(&#39;os&#39;).system(&#39;curl -L binary.golf\x2f5\x2f5&#39;)#.py
+</code></pre></div>
+
+<p>The code <code>exec(__file__[-60:])</code> executes the last 60 characters of the filename itself. When Python reads <code>__file__</code>, it includes the full file path, and the code slices the end portion which contains the command.</p>
+<p>When I saw that the winning Python solution was simply <code>eval(input())</code> - externalizing all the actual functionality - I felt that traditional programming language categories became less interesting. This led me to explore security tools not originally designed for this purpose, which turned into the theme for my remaining submissions.</p>
+<h3>3. Radare2 (.r2) File (46 bytes) 👑</h3>
+<p><strong>File size:</strong> 46 bytes</p>
+<div class="codehilite"><pre><span></span><code>#<span class="w"> </span><span class="n">r2</span><span class="w"> </span><span class="n">rdb</span><span class="w"> </span><span class="n">project</span><span class="w"> </span><span class="n">file</span>
+<span class="sx">!curl -L binary.golf/5/5</span>
+</code></pre></div>
+
+<p>Transitioning to security tools, I started with Radare2, a popular reverse engineering framework. I love using r2 for CTFs and reversing, and I thought it would be fun to leverage its project files for this challenge. The file needs to be placed in a folder named "bggp" and executed with Radare2 from one directory above using:</p>
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span>r2<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;dir.projects=./&quot;</span><span class="w"> </span>-p<span class="w"> </span>bggp
+</code></pre></div>
+
+<p>The <code>!</code> character in Radare2 allows for executing shell commands, so this simply runs curl to download and display the content.</p>
+<h3>4. HTML (67 bytes)</h3>
+<p><strong>File size:</strong> 67 bytes</p>
+<div class="codehilite"><pre><span></span><code><span class="p">&lt;</span><span class="nt">a</span> <span class="na">oncut</span><span class="o">=</span><span class="s">&quot;fetch`//binary.golf/5/5`.then(e=&gt;e.text().then(alert))&quot;</span><span class="p">&gt;</span>5
+</code></pre></div>
+
+<p>Moving to web technologies, I created this HTML solution using the <code>oncut</code> event handler. The winning HTML entry was simply <code>&lt;body onload=location.href='http://k7.uk'&gt;</code> - a redirect to a shorter URL than binary.golf. I found this approach similar to the Python tricks - just externalizing the content elsewhere.</p>
+<p>Instead, I searched through the PortSwigger XSS cheat sheet (https://portswigger.net/web-security/cross-site-scripting/cheat-sheet) to find the smallest workable event handler. When someone selects the "5" text and performs a cut action (Cmd+X on macOS), the JavaScript code executes a fetch request to download the file and displays its contents using an alert dialog.</p>
+<p>The file needs to be served over HTTPS for the fetch to work properly, which adds some complexity for the user but allowed me to keep the code extremely minimal.</p>
+<h3>5. SVG (108 bytes) 👑</h3>
+<p><strong>File size:</strong> 108 bytes</p>
+<div class="codehilite"><pre><span></span><code><span class="o">&lt;</span><span class="nv">svg</span><span class="w"> </span><span class="nv">xmlns</span><span class="o">=</span><span class="s2">&quot;http://www.w3.org/2000/svg&quot;</span><span class="w"> </span><span class="nv">oncut</span><span class="o">=</span><span class="s2">&quot;fetch`https:binary.golf/5/5`.then(e=&gt;e.text()).then(alert)&quot;</span><span class="o">/&gt;</span>
+</code></pre></div>
+
+<p>Building on the HTML approach, I wanted to see if SVG could offer any advantages. The implementation is similar, using the <code>oncut</code> event handler, but SVG files have different parsing rules that can sometimes allow for more compact code or different execution contexts.</p>
+<p>When opened in a browser and the user clicks and cuts (Cmd+X on macOS), it fetches the content from the target URL and displays it using an alert.</p>
+<p>During development, I found that <code>fetch\</code>https:binary.golf/5/5`` (without the double slashes) is smaller than using the full URL, which helped shave off a few more bytes.</p>
+<h3>6. Nuclei Template (134 bytes) 👑</h3>
+<p><strong>File size:</strong> 134 bytes</p>
+<div class="codehilite"><pre><span></span><code><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">a</span>
+<span class="nt">info</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="nv">a</span><span class="p p-Indicator">,</span><span class="nt"> author</span><span class="p">:</span><span class="w"> </span><span class="nv">a</span><span class="p p-Indicator">}</span>
+<span class="nt">requests</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[{</span><span class="nt">method</span><span class="p">:</span><span class="w"> </span><span class="nv">GET</span><span class="p p-Indicator">,</span><span class="nt"> path</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">https</span><span class="p p-Indicator">:</span><span class="nv">//binary.golf/5/5</span><span class="p p-Indicator">],</span><span class="nt"> extractors</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[{</span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="nv">regex</span><span class="p p-Indicator">,</span><span class="nt"> regex</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">.*</span><span class="p p-Indicator">]}]}]</span>
+</code></pre></div>
+
+<p>Continuing my exploration of security tools, I turned to Nuclei, a popular vulnerability scanner used in bug bounty hunting. I used several YAML golfing tricks here - like the single-letter identifiers and the compact array notation - to minimize the file size while maintaining valid YAML structure.</p>
+<p>When run with:</p>
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span>nuclei<span class="w"> </span>-t<span class="w"> </span>nuclei.yaml<span class="w"> </span>-target<span class="w"> </span>http://127.0.0.1
+</code></pre></div>
+
+<p>Nuclei will make a GET request to the specified URL and extract the entire content using a regex pattern that matches everything (<code>.*</code>), displaying the downloaded content in its output. The target URL doesn't matter here because we're forcing Nuclei to fetch our specific URL in the template.</p>
+<h3>7. Burp Suite Project Settings JSON RCE (216 bytes) 👑</h3>
+<p><strong>File size:</strong> 216 bytes</p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span><span class="nt">&quot;bambda&quot;</span><span class="p">:{</span><span class="nt">&quot;logger_capture_filter&quot;</span><span class="p">:{</span><span class="nt">&quot;bambda&quot;</span><span class="p">:</span><span class="s2">&quot;Runtime.getRuntime().exec(new String[]{\&quot;sh\&quot;,\&quot;-c\&quot;,\&quot;curl -Lo /tmp/5 binary.golf/5/5;open /*/5\&quot;});return true;&quot;</span><span class="p">}},</span><span class="nt">&quot;logger&quot;</span><span class="p">:{</span><span class="nt">&quot;capture_filter&quot;</span><span class="p">:{</span><span class="nt">&quot;filter_mode&quot;</span><span class="p">:</span><span class="s2">&quot;BAMBDA&quot;</span><span class="p">}}}</span>
+</code></pre></div>
+
+<p>Burp Suite is my go-to web proxy for security testing, and I wanted to see if I could leverage it for this challenge. This submission exploits Burp Suite's BAMBDA filter feature, which allows for Java code execution. I discovered this could be used to run arbitrary commands, effectively creating a Remote Code Execution (RCE) from a simple configuration file.</p>
+<p>When used as a project configuration file in Burp Suite:</p>
+<ol>
+<li>Start a new Burp Suite project</li>
+<li>Select this JSON configuration file</li>
+<li>Open the browser from Burp Suite's Proxy tab</li>
+<li>Visit any website</li>
+</ol>
+<p>The configuration causes Burp Suite to execute a shell command that downloads the file and opens it, showing its contents. This approach works on both the Professional and Community editions of Burp Suite.</p>
+<h3>8. Burp Suite Project Settings JSON (542 bytes)</h3>
+<p><strong>File size:</strong> 542 bytes</p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span><span class="nt">&quot;proxy&quot;</span><span class="p">:{</span><span class="nt">&quot;match_replace_rules&quot;</span><span class="p">:[{</span><span class="nt">&quot;enabled&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="nt">&quot;is_simple_match&quot;</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span><span class="nt">&quot;rule_type&quot;</span><span class="p">:</span><span class="s2">&quot;response_header&quot;</span><span class="p">,</span><span class="nt">&quot;string_match&quot;</span><span class="p">:</span><span class="s2">&quot;^HTTP.*$&quot;</span><span class="p">,</span><span class="nt">&quot;string_replace&quot;</span><span class="p">:</span><span class="s2">&quot;HTTP/2 301&quot;</span><span class="p">},{</span><span class="nt">&quot;enabled&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="nt">&quot;is_simple_match&quot;</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span><span class="nt">&quot;rule_type&quot;</span><span class="p">:</span><span class="s2">&quot;response_header&quot;</span><span class="p">,</span><span class="nt">&quot;string_match&quot;</span><span class="p">:</span><span class="s2">&quot;^Location.*$&quot;</span><span class="p">,</span><span class="nt">&quot;string_replace&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">},{</span><span class="nt">&quot;enabled&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="nt">&quot;is_simple_match&quot;</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span><span class="nt">&quot;rule_type&quot;</span><span class="p">:</span><span class="s2">&quot;response_header&quot;</span><span class="p">,</span><span class="nt">&quot;string_match&quot;</span><span class="p">:</span><span class="s2">&quot;^Strict-T.*$&quot;</span><span class="p">,</span><span class="nt">&quot;string_replace&quot;</span><span class="p">:</span><span class="s2">&quot;Location: https://binary.golf/5/5&quot;</span><span class="p">},{</span><span class="nt">&quot;enabled&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="nt">&quot;rule_type&quot;</span><span class="p">:</span><span class="s2">&quot;response_header&quot;</span><span class="p">,</span><span class="nt">&quot;string_match&quot;</span><span class="p">:</span><span class="s2">&quot;application/octet-stream&quot;</span><span class="p">,</span><span class="nt">&quot;string_replace&quot;</span><span class="p">:</span><span class="s2">&quot;text/html&quot;</span><span class="p">}]}}</span>
+</code></pre></div>
+
+<p>After the RCE approach with Burp Suite, I wanted to try a more legitimate method using Burp's built-in functionality. This is a more sophisticated approach that uses proxy match-and-replace rules to manipulate HTTP traffic:</p>
+<ol>
+<li>Replace HTTP response headers to create a 301 redirect</li>
+<li>Remove any existing Location header</li>
+<li>Add a new Location header pointing to https://binary.golf/5/5</li>
+<li>Change the content type to text/html</li>
+</ol>
+<p>When a user browses any website through the Burp Suite proxy configured with this file, they'll be redirected to the target URL, displaying its contents. This method doesn't rely on any code execution exploits, just clever use of Burp's legitimate traffic manipulation features.</p></body><hr>by <a href='https://twitter.com/caioluders'>@caioluders</a></div></html>
