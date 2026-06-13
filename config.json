@@ -1,8 +1,26 @@
 {
     "theme": "templates/terminal.html",
     "title": "Index of lude.rs",
-	"url": "https://lude.rs/",
-    "footnote":"by <a href='https://twitter.com/caioluders'>@caioluders</a>",
-	"rss": true,
-    "ignore" : ["CNAME","index.html", "config.json","gohu.woff","r4nd0m"]
+    "url": "https://lude.rs/",
+    "footnote": "by <a href='https://twitter.com/caioluders'>@caioluders</a>",
+    "rss": true,
+    "ignore": ["CNAME", "index.html", "config.json", "gohu.woff", "templates"],
+    "link_folders": {
+        "r4nd0m": [
+            {"name": "visualiza_isso_aqui", "url": "https://github.com/caioluders/visualiza_isso_aqui", "title": ""},
+            {"name": "pega-pega", "url": "https://github.com/caioluders/pega-pega", "title": "Multi-protocol request logger/catcher"},
+            {"name": "talks", "url": "https://github.com/caioluders/talks", "title": ""},
+            {"name": "DPWO", "url": "https://github.com/caioluders/DPWO", "title": ""},
+            {"name": "popcalc.js", "url": "https://lude.rs/popcalc.js/", "title": "Fake calculator popup for security demos"},
+            {"name": "plvrs", "url": "https://lude.rs/plvrs/", "title": "Dicionário de português comprimido"},
+            {"name": "LostAndFound", "url": "https://github.com/caioluders/LostAndFound", "title": ""},
+            {"name": "every-cpf", "url": "https://lude.rs/every-cpf/", "title": "todos os cpfs"},
+            {"name": "fluid_visualizer", "url": "https://lude.rs/fluid_visualizer/", "title": ""},
+            {"name": "CWErdle", "url": "https://lude.rs/CWErdle/", "title": "Claude que fez, eu só tive a ideia"},
+            {"name": "servers.casino", "url": "https://lude.rs/servers.casino/", "title": ""},
+            {"name": "SAPE", "url": "https://github.com/caioluders/SAPE", "title": "Software Assisted Poetry Editor"},
+            {"name": "-body-builder", "url": "https://github.com/caioluders/-body-builder", "title": ""},
+            {"name": "pocs", "url": "https://github.com/caioluders/pocs", "title": ""}
+        ]
+    }
 }

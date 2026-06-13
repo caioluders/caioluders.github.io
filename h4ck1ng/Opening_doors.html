@@ -11,23 +11,26 @@
 			max-width: 50em;
 			margin: 0 auto;
 			color: white;
+			background-color: rgb(0,0,0,0.7);
 			line-height: calc(1ex / 0.32);
 			margin-top: 3em;
+			overflow-wrap: break-word;
 		}
 		pre {
 			font-family: 'gohu', monospace;
 			white-space: pre-wrap;
+			overflow-wrap: anywhere;
 			line-height: 125%;
       		background-color: #111;
     	  	padding: 1em;
-		}
-		.bg_black {
-			background-color: rgb(0,0,0,0.7);
 		}
 		@media only screen and (max-width:768px) {
 			body {
 				max-width:100%;
 			}
+		}
+		td {
+			vertical-align: top;
 		}
 		a:link {
 			color: #0a0 ;
@@ -83,7 +86,7 @@
   <meta charset="UTF-8">
 </head>
 
-<body><div class="bg_black"><h1>Opening doors</h1>
+<body><h1>Opening doors</h1>
 <p>1468195200</p>
 <p><em>Or trying to reverse engineering a access control</em></p>
 <p>Everything started with me trying to get my RaspBerry PI to unlock a door . The door I’m supposed to open has a access control , like that one :</p>
@@ -163,4 +166,4 @@ Highlighted part is the data</p>
 2. Probablly that protocol is not so custom and I’m just dumb<br />
 3. <code>66</code> is the command to make that thing play a sound<br />
 4. You can edit a lot of this with root , A LOT<br />
-5- I’m n00b , sorry if I get something wrong</p></body><hr>by <a href='https://twitter.com/caioluders'>@caioluders</a></div></html>
+5- I’m n00b , sorry if I get something wrong</p></body><hr>by <a href='https://twitter.com/caioluders'>@caioluders</a></html>

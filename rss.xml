@@ -5,6 +5,102 @@
     <link>https://lude.rs/</link>
     <description>by &lt;a href='https://twitter.com/caioluders'&gt;@caioluders&lt;/a&gt;</description>
     <item>
+      <title># Binary Golf Grand Prix 5 (BGGP5) Writeup</title>
+      <link>https://lude.rs//bggp5.html</link>
+      <description>A blog post</description>
+      <pubDate>Tue, 24 Dec 2024 02:56:06 </pubDate>
+    </item>
+    <item>
+      <title># draw.io CVEs</title>
+      <link>https://lude.rs//draw.io_cves.html</link>
+      <description>A blog post</description>
+      <pubDate>Fri, 24 Feb 2023 13:38:14 </pubDate>
+    </item>
+    <item>
+      <title># XSS 2 RCE on Flipper Zero</title>
+      <link>https://lude.rs//XSS_2_RCE_on_Flipper.html</link>
+      <description>A blog post</description>
+      <pubDate>Wed, 07 Dec 2022 23:06:01 </pubDate>
+    </item>
+    <item>
+      <title>#Live Helper Chat CVEs</title>
+      <link>https://lude.rs//lhc.html</link>
+      <description>A blog post</description>
+      <pubDate>Tue, 12 Apr 2022 01:19:12 </pubDate>
+    </item>
+    <item>
+      <title># Messing Nuclei up</title>
+      <link>https://lude.rs//messing_nuclei_up.html</link>
+      <description>A blog post</description>
+      <pubDate>Tue, 28 Sep 2021 10:01:32 </pubDate>
+    </item>
+    <item>
+      <title># Pequenas ligações, grandes vulnerabilidades: Uma breve introdução a deep links Android.</title>
+      <link>https://lude.rs//ligacao_profunda.html</link>
+      <description>A blog post</description>
+      <pubDate>Wed, 07 Jul 2021 18:56:33 </pubDate>
+    </item>
+    <item>
+      <title># Tales from Pwn2win 2021: Dots Exposed and Ruthless Monster writeups</title>
+      <link>https://lude.rs//Tales_from_Pwn2win_2021.html</link>
+      <description>A blog post</description>
+      <pubDate>Wed, 16 Jun 2021 23:58:29 </pubDate>
+    </item>
+    <item>
+      <title># Rootless Sniffing</title>
+      <link>https://lude.rs//rootless_sniffing.html</link>
+      <description>A blog post</description>
+      <pubDate>Tue, 06 Apr 2021 16:12:36 </pubDate>
+    </item>
+    <item>
+      <title># Codei um editor de poemas chamado SAPE</title>
+      <link>https://lude.rs//Eu_fiz_um_editor_de_poemas_chamado_SAPE.html</link>
+      <description>A blog post</description>
+      <pubDate>Thu, 11 Mar 2021 02:06:58 </pubDate>
+    </item>
+    <item>
+      <title># P3ss04 — Utilizando Cadeias de Markov e Algoritmo Genético para a geração de poemas generativos</title>
+      <link>https://lude.rs//p3ss04.html</link>
+      <description>A blog post</description>
+      <pubDate>Fri, 14 Jun 2019 21:00:00 </pubDate>
+    </item>
+    <item>
+      <title># Bypassando NX e Canary em x86</title>
+      <link>https://lude.rs//bypassando_nx_e_canary_em_x86.html</link>
+      <description>A blog post</description>
+      <pubDate>Thu, 12 Apr 2018 21:00:00 </pubDate>
+    </item>
+    <item>
+      <title># Roteador TC7337 : DNS Poisoning através de XSS</title>
+      <link>https://lude.rs//roteador_TC7337.html</link>
+      <description>A blog post</description>
+      <pubDate>Tue, 01 Aug 2017 21:00:00 </pubDate>
+    </item>
+    <item>
+      <title># Six files that are also a valid PHP</title>
+      <link>https://lude.rs//six_files_that_are_also_a_valid_PHP.html</link>
+      <description>A blog post</description>
+      <pubDate>Thu, 08 Jun 2017 21:00:00 </pubDate>
+    </item>
+    <item>
+      <title># NET\_2GXXXX default password</title>
+      <link>https://lude.rs//NET_2GXXXX_default_password.html</link>
+      <description>A blog post</description>
+      <pubDate>Wed, 30 Nov 2016 21:00:00 </pubDate>
+    </item>
+    <item>
+      <title># A n3wb13 trying to cheat on games</title>
+      <link>https://lude.rs//A_n3wb13_trying_to_cheat_on_games.html</link>
+      <description>A blog post</description>
+      <pubDate>Tue, 15 Nov 2016 21:00:00 </pubDate>
+    </item>
+    <item>
+      <title># Opening doors</title>
+      <link>https://lude.rs//Opening_doors.html</link>
+      <description>A blog post</description>
+      <pubDate>Sun, 10 Jul 2016 21:00:00 </pubDate>
+    </item>
+    <item>
       <title>Null 55</title>
       <link>https://lude.rs///4rt3/null55.txt</link>
       <description>A blog post</description>
@@ -191,14 +287,14 @@
       <pubDate>Thu, 18 Apr 2019 00:00:00 </pubDate>
     </item>
     <item>
-      <title>4 de Janeiro</title>
-      <link>https://lude.rs///4rt3/4_de_Janeiro.txt</link>
+      <title>Do caminho</title>
+      <link>https://lude.rs///4rt3/Do_caminho.txt</link>
       <description>A blog post</description>
       <pubDate>Thu, 07 Mar 2019 00:00:00 </pubDate>
     </item>
     <item>
-      <title>Do caminho</title>
-      <link>https://lude.rs///4rt3/Do_caminho.txt</link>
+      <title>4 de Janeiro</title>
+      <link>https://lude.rs///4rt3/4_de_Janeiro.txt</link>
       <description>A blog post</description>
       <pubDate>Thu, 07 Mar 2019 00:00:00 </pubDate>
     </item>
@@ -299,14 +395,14 @@
       <pubDate>Thu, 12 Oct 2017 00:00:00 </pubDate>
     </item>
     <item>
-      <title>&lt;&gt;&lt;&gt;&lt;&gt;</title>
-      <link>https://lude.rs///4rt3/&lt;&gt;&lt;&gt;&lt;&gt;.txt</link>
+      <title>Última chama da alma</title>
+      <link>https://lude.rs///4rt3/Ultima_chama_da_alma.txt</link>
       <description>A blog post</description>
       <pubDate>Sun, 10 Sep 2017 00:00:00 </pubDate>
     </item>
     <item>
-      <title>Última chama da alma</title>
-      <link>https://lude.rs///4rt3/Ultima_chama_da_alma.txt</link>
+      <title>&lt;&gt;&lt;&gt;&lt;&gt;</title>
+      <link>https://lude.rs///4rt3/&lt;&gt;&lt;&gt;&lt;&gt;.txt</link>
       <description>A blog post</description>
       <pubDate>Sun, 10 Sep 2017 00:00:00 </pubDate>
     </item>
@@ -389,14 +485,14 @@
       <pubDate>Mon, 23 Jan 2017 00:00:00 </pubDate>
     </item>
     <item>
-      <title>Eufemismo temporal</title>
-      <link>https://lude.rs///4rt3/Eufemismo_temporal.txt</link>
+      <title>Null 6</title>
+      <link>https://lude.rs///4rt3/null6.txt</link>
       <description>A blog post</description>
       <pubDate>Sun, 04 Dec 2016 00:00:00 </pubDate>
     </item>
     <item>
-      <title>Null 6</title>
-      <link>https://lude.rs///4rt3/null6.txt</link>
+      <title>Eufemismo temporal</title>
+      <link>https://lude.rs///4rt3/Eufemismo_temporal.txt</link>
       <description>A blog post</description>
       <pubDate>Sun, 04 Dec 2016 00:00:00 </pubDate>
     </item>
@@ -431,26 +527,26 @@
       <pubDate>Sun, 13 Nov 2016 00:00:00 </pubDate>
     </item>
     <item>
-      <title>Null 9</title>
-      <link>https://lude.rs///4rt3/null9.txt</link>
-      <description>A blog post</description>
-      <pubDate>Sun, 23 Oct 2016 00:00:00 </pubDate>
-    </item>
-    <item>
       <title>Dejetos figurativos</title>
       <link>https://lude.rs///4rt3/Dejetos_figurativos.txt</link>
       <description>A blog post</description>
       <pubDate>Sun, 23 Oct 2016 00:00:00 </pubDate>
     </item>
     <item>
-      <title>Areia, por favor</title>
-      <link>https://lude.rs///4rt3/Areia,por_favor.txt</link>
+      <title>Null 9</title>
+      <link>https://lude.rs///4rt3/null9.txt</link>
       <description>A blog post</description>
-      <pubDate>Mon, 05 Sep 2016 00:00:00 </pubDate>
+      <pubDate>Sun, 23 Oct 2016 00:00:00 </pubDate>
     </item>
     <item>
       <title>Ladrilhos</title>
       <link>https://lude.rs///4rt3/Ladrilhos.txt</link>
+      <description>A blog post</description>
+      <pubDate>Mon, 05 Sep 2016 00:00:00 </pubDate>
+    </item>
+    <item>
+      <title>Areia, por favor</title>
+      <link>https://lude.rs///4rt3/Areia,por_favor.txt</link>
       <description>A blog post</description>
       <pubDate>Mon, 05 Sep 2016 00:00:00 </pubDate>
     </item>
@@ -473,26 +569,26 @@
       <pubDate>Sun, 21 Aug 2016 00:00:00 </pubDate>
     </item>
     <item>
-      <title>Null 12</title>
-      <link>https://lude.rs///4rt3/null12.txt</link>
-      <description>A blog post</description>
-      <pubDate>Mon, 15 Aug 2016 00:00:00 </pubDate>
-    </item>
-    <item>
       <title>Null 13</title>
       <link>https://lude.rs///4rt3/null13.txt</link>
       <description>A blog post</description>
       <pubDate>Mon, 15 Aug 2016 00:00:00 </pubDate>
     </item>
     <item>
-      <title>Null 14</title>
-      <link>https://lude.rs///4rt3/null14.concreto.txt</link>
+      <title>Null 12</title>
+      <link>https://lude.rs///4rt3/null12.txt</link>
       <description>A blog post</description>
-      <pubDate>Thu, 11 Aug 2016 00:00:00 </pubDate>
+      <pubDate>Mon, 15 Aug 2016 00:00:00 </pubDate>
     </item>
     <item>
       <title>Null 15</title>
       <link>https://lude.rs///4rt3/null15.concreto.txt</link>
+      <description>A blog post</description>
+      <pubDate>Thu, 11 Aug 2016 00:00:00 </pubDate>
+    </item>
+    <item>
+      <title>Null 14</title>
+      <link>https://lude.rs///4rt3/null14.concreto.txt</link>
       <description>A blog post</description>
       <pubDate>Thu, 11 Aug 2016 00:00:00 </pubDate>
     </item>
@@ -503,6 +599,12 @@
       <pubDate>Thu, 04 Aug 2016 00:00:00 </pubDate>
     </item>
     <item>
+      <title>Memórias escassas sobre minhas passadas</title>
+      <link>https://lude.rs///4rt3/Memorias_escassas_sobre_minhas_vidas_passadas.txt</link>
+      <description>A blog post</description>
+      <pubDate>Wed, 27 Jul 2016 00:00:00 </pubDate>
+    </item>
+    <item>
       <title>Null 18</title>
       <link>https://lude.rs///4rt3/null18.txt</link>
       <description>A blog post</description>
@@ -511,12 +613,6 @@
     <item>
       <title>Null 19</title>
       <link>https://lude.rs///4rt3/null19.txt</link>
-      <description>A blog post</description>
-      <pubDate>Wed, 27 Jul 2016 00:00:00 </pubDate>
-    </item>
-    <item>
-      <title>Memórias escassas sobre minhas passadas</title>
-      <link>https://lude.rs///4rt3/Memorias_escassas_sobre_minhas_vidas_passadas.txt</link>
       <description>A blog post</description>
       <pubDate>Wed, 27 Jul 2016 00:00:00 </pubDate>
     </item>
@@ -539,14 +635,14 @@
       <pubDate>Tue, 19 Jul 2016 00:00:00 </pubDate>
     </item>
     <item>
-      <title>Null 21</title>
-      <link>https://lude.rs///4rt3/null21.txt</link>
+      <title>Esperança mortificada</title>
+      <link>https://lude.rs///4rt3/Esperança_mortificada.txt</link>
       <description>A blog post</description>
       <pubDate>Mon, 18 Jul 2016 00:00:00 </pubDate>
     </item>
     <item>
-      <title>Esperança mortificada</title>
-      <link>https://lude.rs///4rt3/Esperança_mortificada.txt</link>
+      <title>Null 21</title>
+      <link>https://lude.rs///4rt3/null21.txt</link>
       <description>A blog post</description>
       <pubDate>Mon, 18 Jul 2016 00:00:00 </pubDate>
     </item>
@@ -557,14 +653,14 @@
       <pubDate>Thu, 30 Jun 2016 00:00:00 </pubDate>
     </item>
     <item>
-      <title>Dos pilares</title>
-      <link>https://lude.rs///4rt3/Dos_pilares.txt</link>
+      <title>Hum4n1d4d3 l1qu1d4</title>
+      <link>https://lude.rs///4rt3/Hum4n1d4d3_l1qu1d4.txt</link>
       <description>A blog post</description>
       <pubDate>Wed, 15 Jun 2016 00:00:00 </pubDate>
     </item>
     <item>
-      <title>Hum4n1d4d3 l1qu1d4</title>
-      <link>https://lude.rs///4rt3/Hum4n1d4d3_l1qu1d4.txt</link>
+      <title>Dos pilares</title>
+      <link>https://lude.rs///4rt3/Dos_pilares.txt</link>
       <description>A blog post</description>
       <pubDate>Wed, 15 Jun 2016 00:00:00 </pubDate>
     </item>
@@ -611,8 +707,20 @@
       <pubDate>Sat, 13 Feb 2016 00:00:00 </pubDate>
     </item>
     <item>
+      <title>Null 27</title>
+      <link>https://lude.rs///4rt3/null27.txt</link>
+      <description>A blog post</description>
+      <pubDate>Tue, 01 Dec 2015 00:00:00 </pubDate>
+    </item>
+    <item>
       <title>Cavo</title>
       <link>https://lude.rs///4rt3/Cavo.txt</link>
+      <description>A blog post</description>
+      <pubDate>Tue, 01 Dec 2015 00:00:00 </pubDate>
+    </item>
+    <item>
+      <title>Null 29</title>
+      <link>https://lude.rs///4rt3/null29.txt</link>
       <description>A blog post</description>
       <pubDate>Tue, 01 Dec 2015 00:00:00 </pubDate>
     </item>
@@ -635,8 +743,8 @@
       <pubDate>Tue, 01 Dec 2015 00:00:00 </pubDate>
     </item>
     <item>
-      <title>Null 27</title>
-      <link>https://lude.rs///4rt3/null27.txt</link>
+      <title>Null 28</title>
+      <link>https://lude.rs///4rt3/null28.txt</link>
       <description>A blog post</description>
       <pubDate>Tue, 01 Dec 2015 00:00:00 </pubDate>
     </item>
@@ -651,114 +759,6 @@
       <link>https://lude.rs///4rt3/Caio.txt</link>
       <description>A blog post</description>
       <pubDate>Tue, 01 Dec 2015 00:00:00 </pubDate>
-    </item>
-    <item>
-      <title>Null 28</title>
-      <link>https://lude.rs///4rt3/null28.txt</link>
-      <description>A blog post</description>
-      <pubDate>Tue, 01 Dec 2015 00:00:00 </pubDate>
-    </item>
-    <item>
-      <title>Null 29</title>
-      <link>https://lude.rs///4rt3/null29.txt</link>
-      <description>A blog post</description>
-      <pubDate>Tue, 01 Dec 2015 00:00:00 </pubDate>
-    </item>
-    <item>
-      <title># Binary Golf Grand Prix 5 (BGGP5) Writeup</title>
-      <link>https://lude.rs//bggp5.html</link>
-      <description>A blog post</description>
-      <pubDate>Tue, 24 Dec 2024 02:56:06 </pubDate>
-    </item>
-    <item>
-      <title># draw.io CVEs</title>
-      <link>https://lude.rs//draw.io_cves.html</link>
-      <description>A blog post</description>
-      <pubDate>Fri, 24 Feb 2023 13:38:14 </pubDate>
-    </item>
-    <item>
-      <title># XSS 2 RCE on Flipper Zero</title>
-      <link>https://lude.rs//XSS_2_RCE_on_Flipper.html</link>
-      <description>A blog post</description>
-      <pubDate>Wed, 07 Dec 2022 23:06:01 </pubDate>
-    </item>
-    <item>
-      <title>#Live Helper Chat CVEs</title>
-      <link>https://lude.rs//lhc.html</link>
-      <description>A blog post</description>
-      <pubDate>Tue, 12 Apr 2022 01:19:12 </pubDate>
-    </item>
-    <item>
-      <title># Messing Nuclei up</title>
-      <link>https://lude.rs//messing_nuclei_up.html</link>
-      <description>A blog post</description>
-      <pubDate>Tue, 28 Sep 2021 10:01:32 </pubDate>
-    </item>
-    <item>
-      <title># Pequenas ligações, grandes vulnerabilidades: Uma breve introdução a deep links Android.</title>
-      <link>https://lude.rs//ligacao_profunda.html</link>
-      <description>A blog post</description>
-      <pubDate>Wed, 07 Jul 2021 18:56:33 </pubDate>
-    </item>
-    <item>
-      <title># Tales from Pwn2win 2021: Dots Exposed and Ruthless Monster writeups</title>
-      <link>https://lude.rs//Tales_from_Pwn2win_2021.html</link>
-      <description>A blog post</description>
-      <pubDate>Wed, 16 Jun 2021 23:58:29 </pubDate>
-    </item>
-    <item>
-      <title># Rootless Sniffing</title>
-      <link>https://lude.rs//rootless_sniffing.html</link>
-      <description>A blog post</description>
-      <pubDate>Tue, 06 Apr 2021 16:12:36 </pubDate>
-    </item>
-    <item>
-      <title># Codei um editor de poemas chamado SAPE</title>
-      <link>https://lude.rs//Eu_fiz_um_editor_de_poemas_chamado_SAPE.html</link>
-      <description>A blog post</description>
-      <pubDate>Thu, 11 Mar 2021 02:06:58 </pubDate>
-    </item>
-    <item>
-      <title># P3ss04 — Utilizando Cadeias de Markov e Algoritmo Genético para a geração de poemas generativos</title>
-      <link>https://lude.rs//p3ss04.html</link>
-      <description>A blog post</description>
-      <pubDate>Fri, 14 Jun 2019 21:00:00 </pubDate>
-    </item>
-    <item>
-      <title># Bypassando NX e Canary em x86</title>
-      <link>https://lude.rs//bypassando_nx_e_canary_em_x86.html</link>
-      <description>A blog post</description>
-      <pubDate>Thu, 12 Apr 2018 21:00:00 </pubDate>
-    </item>
-    <item>
-      <title># Roteador TC7337 : DNS Poisoning através de XSS</title>
-      <link>https://lude.rs//roteador_TC7337.html</link>
-      <description>A blog post</description>
-      <pubDate>Tue, 01 Aug 2017 21:00:00 </pubDate>
-    </item>
-    <item>
-      <title># Six files that are also a valid PHP</title>
-      <link>https://lude.rs//six_files_that_are_also_a_valid_PHP.html</link>
-      <description>A blog post</description>
-      <pubDate>Thu, 08 Jun 2017 21:00:00 </pubDate>
-    </item>
-    <item>
-      <title># NET\_2GXXXX default password</title>
-      <link>https://lude.rs//NET_2GXXXX_default_password.html</link>
-      <description>A blog post</description>
-      <pubDate>Wed, 30 Nov 2016 21:00:00 </pubDate>
-    </item>
-    <item>
-      <title># A n3wb13 trying to cheat on games</title>
-      <link>https://lude.rs//A_n3wb13_trying_to_cheat_on_games.html</link>
-      <description>A blog post</description>
-      <pubDate>Tue, 15 Nov 2016 21:00:00 </pubDate>
-    </item>
-    <item>
-      <title># Opening doors</title>
-      <link>https://lude.rs//Opening_doors.html</link>
-      <description>A blog post</description>
-      <pubDate>Sun, 10 Jul 2016 21:00:00 </pubDate>
     </item>
   </channel>
 </rss>

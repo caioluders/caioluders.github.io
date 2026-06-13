@@ -11,23 +11,26 @@
 			max-width: 50em;
 			margin: 0 auto;
 			color: white;
+			background-color: rgb(0,0,0,0.7);
 			line-height: calc(1ex / 0.32);
 			margin-top: 3em;
+			overflow-wrap: break-word;
 		}
 		pre {
 			font-family: 'gohu', monospace;
 			white-space: pre-wrap;
+			overflow-wrap: anywhere;
 			line-height: 125%;
       		background-color: #111;
     	  	padding: 1em;
-		}
-		.bg_black {
-			background-color: rgb(0,0,0,0.7);
 		}
 		@media only screen and (max-width:768px) {
 			body {
 				max-width:100%;
 			}
+		}
+		td {
+			vertical-align: top;
 		}
 		a:link {
 			color: #0a0 ;
@@ -83,7 +86,7 @@
   <meta charset="UTF-8">
 </head>
 
-<body><div class="bg_black"><h1>Binary Golf Grand Prix 5 (BGGP5) Writeup</h1>
+<body><h1>Binary Golf Grand Prix 5 (BGGP5) Writeup</h1>
 <p>1735019766</p>
 <h2>Introduction</h2>
 <p>(i was very lazy and made a llm write this)
@@ -100,7 +103,7 @@ I recently participated in the Binary Golf Grand Prix 5 (BGGP5), a competition t
 <h2>My Submissions</h2>
 <h3>1. Python with Requests (64 bytes)</h3>
 <p><strong>File size:</strong> 64 bytes</p>
-<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">requests</span> <span class="kn">import</span> <span class="o">*</span><span class="p">;</span><span class="nb">print</span><span class="p">(</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;http://binary.golf/5/5&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">requests</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span><span class="p">;</span><span class="nb">print</span><span class="p">(</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;http://binary.golf/5/5&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
 </code></pre></div>
 
 <p>This was my first submission - a straightforward approach using Python's requests library to download and print the content. Nothing fancy, just a baseline solution to get started with the challenge. Really not optimal and was beaten by a lot.</p>
@@ -182,4 +185,4 @@ I recently participated in the Binary Golf Grand Prix 5 (BGGP5), a competition t
 <li>Add a new Location header pointing to https://binary.golf/5/5</li>
 <li>Change the content type to text/html</li>
 </ol>
-<p>When a user browses any website through the Burp Suite proxy configured with this file, they'll be redirected to the target URL, displaying its contents. This method doesn't rely on any code execution exploits, just clever use of Burp's legitimate traffic manipulation features.</p></body><hr>by <a href='https://twitter.com/caioluders'>@caioluders</a></div></html>
+<p>When a user browses any website through the Burp Suite proxy configured with this file, they'll be redirected to the target URL, displaying its contents. This method doesn't rely on any code execution exploits, just clever use of Burp's legitimate traffic manipulation features.</p></body><hr>by <a href='https://twitter.com/caioluders'>@caioluders</a></html>

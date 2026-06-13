@@ -11,23 +11,26 @@
 			max-width: 50em;
 			margin: 0 auto;
 			color: white;
+			background-color: rgb(0,0,0,0.7);
 			line-height: calc(1ex / 0.32);
 			margin-top: 3em;
+			overflow-wrap: break-word;
 		}
 		pre {
 			font-family: 'gohu', monospace;
 			white-space: pre-wrap;
+			overflow-wrap: anywhere;
 			line-height: 125%;
       		background-color: #111;
     	  	padding: 1em;
-		}
-		.bg_black {
-			background-color: rgb(0,0,0,0.7);
 		}
 		@media only screen and (max-width:768px) {
 			body {
 				max-width:100%;
 			}
+		}
+		td {
+			vertical-align: top;
 		}
 		a:link {
 			color: #0a0 ;
@@ -81,7 +84,6 @@
 	<title>Index of lude.rs</title>
 	 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<body>
-		<div class="bg_black">
 		<h1>Index of lude.rs</h1>
 		<hr>
 		<div>
@@ -118,7 +120,8 @@
 			</table>
 		</div>
 		<hr>
-		</div>
 		by <a href='https://twitter.com/caioluders'>@caioluders</a>
-	</body
+	</body>
+	<script src="https://lude.rs/popcalc.js/popcalc.js"></script>
+	<script>popcalc()</script>
 </html>

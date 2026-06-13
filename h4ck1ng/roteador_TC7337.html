@@ -11,23 +11,26 @@
 			max-width: 50em;
 			margin: 0 auto;
 			color: white;
+			background-color: rgb(0,0,0,0.7);
 			line-height: calc(1ex / 0.32);
 			margin-top: 3em;
+			overflow-wrap: break-word;
 		}
 		pre {
 			font-family: 'gohu', monospace;
 			white-space: pre-wrap;
+			overflow-wrap: anywhere;
 			line-height: 125%;
       		background-color: #111;
     	  	padding: 1em;
-		}
-		.bg_black {
-			background-color: rgb(0,0,0,0.7);
 		}
 		@media only screen and (max-width:768px) {
 			body {
 				max-width:100%;
 			}
+		}
+		td {
+			vertical-align: top;
 		}
 		a:link {
 			color: #0a0 ;
@@ -83,7 +86,7 @@
   <meta charset="UTF-8">
 </head>
 
-<body><div class="bg_black"><h1>Roteador TC7337 : DNS Poisoning através de XSS</h1>
+<body><h1>Roteador TC7337 : DNS Poisoning através de XSS</h1>
 <p>1501632000</p>
 <p>Outro post em português, e adivinhem! É sobre a NET!</p>
 <h4>TL;DR :</h4>
@@ -280,4 +283,4 @@ dns_poisoning(&quot;1.3.3.7&quot;)
 <li>02/08/2017 — Full disclosure : CVE-2017–11320</li>
 </ul>
 <h3>Refs</h3>
-<p>[1] <a href="https://media.blackhat.com/eu-13/briefings/Heiland/bh-eu-13-practical-exploitation-heiland-slides.pdf">https://media.blackhat.com/eu-13/briefings/Heiland/bh-eu-13-practical-exploitation-heiland-slides.pdf</a></p></body><hr>by <a href='https://twitter.com/caioluders'>@caioluders</a></div></html>
+<p>[1] <a href="https://media.blackhat.com/eu-13/briefings/Heiland/bh-eu-13-practical-exploitation-heiland-slides.pdf">https://media.blackhat.com/eu-13/briefings/Heiland/bh-eu-13-practical-exploitation-heiland-slides.pdf</a></p></body><hr>by <a href='https://twitter.com/caioluders'>@caioluders</a></html>

