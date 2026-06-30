@@ -32,6 +32,18 @@
 		td {
 			vertical-align: top;
 		}
+		.index td {
+			padding: 0.15em 0.4em;
+		}
+		.index tr:nth-child(odd) {
+			background-color: rgba(0,0,0,0.55);
+		}
+		.index tr:nth-child(even) {
+			background-color: rgba(255,255,255,0.12);
+		}
+		.index tr:first-child {
+			background-color: transparent;
+		}
 		a:link {
 			color: #0a0 ;
 		}
@@ -87,7 +99,7 @@
 		<h1>Index of lude.rs</h1>
 		<hr>
 		<div>
-			<table style="width:100%">
+			<table class="index" style="width:100%">
 			<col width="40%">
 			<col width="50%">
 			<col width="10%">
