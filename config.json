@@ -21,6 +21,14 @@
             {"name": "SAPE", "url": "https://github.com/caioluders/SAPE", "title": "Software Assisted Poetry Editor"},
             {"name": "-body-builder", "url": "https://github.com/caioluders/-body-builder", "title": ""},
             {"name": "pocs", "url": "https://github.com/caioluders/pocs", "title": ""}
+        ],
+        "h4ck1ng": [
+            {"name": "https://tramoia.sh/trm1/Detectando_sanitizadores_HTML_geneticamente.html", "url": "https://tramoia.sh/trm1/Detectando_sanitizadores_HTML_geneticamente.html", "title": "Evolução Genética de Payloads para Detecção de Sanitizadores HTML", "date": "1733065200"},
+            {"name": "https://tramoia.sh/trm2/thumbor.html", "url": "https://tramoia.sh/trm2/thumbor.html", "title": "Imagens sao dificeis - Thumbor 0days", "date": "1772377200"},
+            {"name": "https://pagedout.institute/download/PagedOut_006.pdf", "url": "https://pagedout.institute/download/PagedOut_006.pdf#page=18", "title": "Bad apple but it's HTTP", "date": "1740841200"}
         ]
+    },
+    "hide_dirs": {
+        "h4ck1ng": ["img"]
     }
 }
