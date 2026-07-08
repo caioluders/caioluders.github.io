@@ -5,6 +5,12 @@
     <link>https://lude.rs/</link>
     <description>by &lt;a href='https://twitter.com/caioluders'&gt;@caioluders&lt;/a&gt;</description>
     <item>
+      <title>Null 56</title>
+      <link>https://lude.rs///4rt3/null56.txt</link>
+      <description>A blog post</description>
+      <pubDate>Wed, 08 Jul 2026 04:23:34 </pubDate>
+    </item>
+    <item>
       <title>XSS 2 RCE on Flipper Zero</title>
       <link>https://lude.rs//XSS_2_RCE_on_Flipper.html</link>
       <description>A blog post</description>
