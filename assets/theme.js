@@ -1,6 +1,8 @@
+import {installCharacterFrame} from './character-frame.js';
+import {brasilHour, sampleAt, paintPalette} from './time-palettes.js';
 (() => {
   'use strict';
-  // Final sizes chosen for P0T-NOoDLE headings and IBM VGA article text.
+  // Final sizes chosen for P0T-NOoDLE headings and IBM Plex Mono article text.
   const sizes = {heading: 32, body: 17, table: 16};
   let alignFrame;
   function alignGrid() {
@@ -15,7 +17,11 @@
       const cols = [...table.querySelectorAll('col')];
       if (cols.length === 3 && innerWidth > 640) {
         const gap = parseFloat(getComputedStyle(table).borderSpacing);
-        const available = table.getBoundingClientRect().width - gap * 4;
+        // Measure the container: old fixed column widths can keep the table
+        // wider than its parent after a desktop-to-tablet resize.
+        const style = getComputedStyle(body);
+        const available = body.getBoundingClientRect().width - parseFloat(style.paddingLeft)
+          - parseFloat(style.paddingRight) - gap * 4;
         const first = Math.floor(available * .36 * scale) / scale;
         const second = Math.floor(available * .48 * scale) / scale;
         [first, second, available - first - second].forEach((width, i) => { cols[i].style.width = width + 'px'; });
@@ -43,11 +49,11 @@
     const scale = devicePixelRatio || 1;
     const snap = size => Math.max(16, Math.round(size * scale / 16) * 16) / scale;
     const properties = {
-      '--device-pixel': 1 / scale, '--heading-grid': 16 / scale, '--body-grid': 16 / scale,
-      '--heading-size': snap(sizes.heading), '--body-size': snap(sizes.body),
-      '--table-size': snap(sizes.table), '--mobile-heading-size': snap(sizes.heading * .85),
-      '--mobile-body-size': snap(Math.max(14, sizes.body - 2)),
-      '--table-date-size': snap(Math.min(snap(sizes.table) * .875, 16)),
+      '--device-pixel': 1 / scale, '--heading-grid': 16 / scale, '--body-grid': 1 / scale,
+      '--heading-size': snap(sizes.heading), '--body-size': sizes.body,
+      '--table-size': sizes.table, '--mobile-heading-size': snap(sizes.heading * .85),
+      '--mobile-body-size': Math.max(14, sizes.body - 2),
+      '--table-date-size': Math.min(sizes.table * .875, 16),
     };
     for (const [key, value] of Object.entries(properties)) document.documentElement.style.setProperty(key, value + 'px');
     alignGrid();
@@ -57,7 +63,12 @@
       apply(); watchDisplayScale();
     }, {once: true});
   }
+  const updatePalette = () => paintPalette(sampleAt(brasilHour()));
+  updatePalette();
+  setInterval(() => { if (!document.hidden) updatePalette(); }, 1000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) updatePalette(); });
   apply(); watchDisplayScale();
+  installCharacterFrame();
   window.addEventListener('resize', apply);
   document.fonts.ready.then(alignGrid);
   document.fonts.addEventListener('loadingdone', alignGrid);

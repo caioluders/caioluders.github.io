@@ -6,6 +6,7 @@
   calculator.src = '/assets/popcalc-launcher.js';
   document.head.append(calculator);
   const theme = document.createElement('script');
+  theme.type = 'module';
   theme.src = '/assets/theme.js';
   document.body.append(theme);
   const stamp = heading.nextElementSibling;
