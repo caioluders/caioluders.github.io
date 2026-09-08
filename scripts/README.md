@@ -25,12 +25,14 @@ This build requires the configurable scripts/search integration in [body-builder
 
 The comparison UI is removed. The site uses the chosen settings directly, without reading browser tweak preferences:
 
-- Headings, filenames, and byline: **P0T-NOoDLE**, with 32px main headings.
-- Article text: **IBM VGA**, requested size 17px; table text: 16px.
-- Line spacing: 1.75; content width: 53rem; black background opacity: 60%.
-- Text `#e2e5ed`; links `#08b3e7`; visited links `#8b769e`; table stripe base `#59668b`.
+- Headings and byline: **P0T-NOoDLE**, with 32px main headings.
+- Article text, code, and filenames: **IBM Plex Mono**, including regular, bold, italic, and bold italic; body size 17px and table size 16px.
+- Line spacing: 1.75; content width: 60rem; black background opacity: 60%.
+- Five palettes blend smoothly through Brasília time (`America/Sao_Paulo`): midnight violet, rose dawn, cyan noon, amber sunset, and magenta evening. Text, headings, links, syntax colors, frame, and stars share these colors.
 
-The two selected fonts are served locally through `assets/fonts.css`, with upstream credits and notices in `assets/fonts/README.md`. Color/layout defaults are in `assets/enhancements.css`; font size and display-grid handling are in `assets/theme.js` and `assets/pixel-grid.css`. Legacy fonts snap to native 16-device-pixel steps, so the requested 17px article size renders at 16px at 100% scaling. Alignment is rechecked after font loading, resize, and display-scale changes. Font outlines and browser/OS rasterization can still affect appearance.
+The fonts are served locally through `assets/fonts.css`, with upstream credits and notices in `assets/fonts/README.md`. Layout defaults are in `assets/enhancements.css`; font size and display-grid handling are in `assets/theme.js` and `assets/pixel-grid.css`. P0T-NOoDLE snaps to native 16-device-pixel steps; Plex retains its chosen reading size. Alignment is rechecked after font loading, resize, and display-scale changes. Font outlines and browser/OS rasterization can still affect appearance.
+
+`assets/character-frame.js` draws an outer ASCII frame and bands around H2 headings using real P0T-NOoDLE text. Main titles and smaller headings have no extra ornament, and redundant directory/footer rules are hidden. Decorative text is hidden from accessibility and printing; headings remain selectable, semantic HTML. The template includes an HTML5 doctype so short directory pages fit their content instead of stretching to the viewport in quirks mode. New builds inherit this behavior.
 
 ## Navigation and search
 
@@ -40,13 +42,11 @@ Search appears only on directory pages, with the placeholder `Search...`. It is 
 
 ## Background
 
-- `assets/background.js` is the complete 42-line space background algorithm, including initialization, seeded randomness, text nebulae, perspective motion, recycling, fading, and textmode drawing.
-- `assets/background-loader.js` loads the pinned local textmode.js 0.18.0 UMD bundle, creates and mounts the canvas, and registers the algorithm with `t.draw()`. Frame deltas come from the library's `t.deltaTime()` in milliseconds, converted to seconds and capped at 0.15.
-- Font size is 8px, target frame rate 30 fps, density 1, with canvas resolution capped at 1920×1200. The built-in glyphs stay at their native 8px size: rendering them at 6px produced different pixel masks for the same `x` at different grid positions. Canvas scaling uses pixelated sampling.
-- Reduced motion and hidden tabs stop the loop; resizing and WebGL loss are handled separately from the algorithm. Missing WebGL2 or a failed library load leaves the static midnight background.
-- Stars retain seed 7319 and continuous outward perspective motion. The video-inspired field mixes blue, cyan, violet, pink, gold, mint, and icy-white colors, with the original asterisks, crosses, rings, and larger cross-shaped sparkles; only about 10% of stars are pinpricks. Distant stars are dimmer; nearby stars brighten toward white and are drawn over distant ones. Every star keeps its assigned ASCII character and orientation, including when recycled. Some nearby stars leave short, fading trails made from unrotated `-`, `|`, `/`, and `\` characters. Independent smooth pulses make them twinkle; up to 2,000 stars are drawn according to viewport pixel area, so a finer character grid does not increase star density. New stars fade in over two seconds. No shader or 2D canvas substitutes for textmode drawing: every star uses `char`, `charColor`, `translate`, and `point` on its grid.
-
-- Two faint cyan/violet nebulae use clustered `:;~=` characters. The clouds expand outward more slowly than the foreground stars and fade at cycle boundaries. Constellations have been removed. Cloud counts scale with viewport area (up to 1,200). All layers remain character drawing, with no SVG or image assets.
+- `assets/background.js` is the complete 41-line space algorithm, including seeded stars, perspective flight, depth fading, ASCII trails, and character drawing. Nebulae and constellations are removed.
+- `assets/background-loader.js` loads pinned local textmode.js 0.18.0, creates the canvas, and registers the algorithm with `t.draw()`. Stars initialize on the first draw, when the library's grid is available. Frame deltas come from `t.deltaTime()`, converted from milliseconds to seconds and capped at 0.15.
+- Font size is 8px, target frame rate 30 fps, density 1, with canvas resolution capped at 1920×1200. The built-in glyphs stay at their native size and use pixelated canvas scaling.
+- Constant forward speed and aspect-correct perspective make nearby stars move faster. Their center characters remain fixed; approaching stars grow through additional ASCII cells, up to 5×5, and some leave short velocity-based trails. Density scales with viewport area, capped at 1,800 stars. Every star is drawn with textmode's character APIs, without SVG or image glyphs.
+- `assets/time-palettes.js` supplies colors shared with the page and blends continuously across midnight. Reduced motion and hidden tabs stop movement; palette updates can recolor a paused frame. Missing WebGL2 or a failed library load leaves the static page background.
 
 ## Calculator
 

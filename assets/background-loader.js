@@ -15,6 +15,7 @@ import {starfield} from './background.js';
     skipDelta = true;
     if (paused()) { t.noLoop(); t.redraw(); } else t.loop();
   }
+  const recolor = () => { if (t && !disposed && paused()) t.redraw(); };
   function resize() {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
@@ -27,6 +28,7 @@ import {starfield} from './background.js';
     if (disposed) return;
     disposed = true;
     clearTimeout(resizeTimer);
+    window.removeEventListener('space-palette-change', recolor);
     reduced.removeEventListener('change', syncMotion);
     document.removeEventListener('visibilitychange', syncMotion);
     window.removeEventListener('resize', resize);
@@ -47,13 +49,14 @@ import {starfield} from './background.js';
       t.canvas.setAttribute('aria-hidden', 'true');
       t.canvas.tabIndex = -1;
     });
-    const draw = starfield(t);
+    const draw = starfield(t, () => window.ludeSpacePalette);
     t.draw(() => {
       const delta = paused() || skipDelta ? 0 : Math.min(t.deltaTime() / 1000, .15);
       skipDelta = false;
       draw(delta);
     });
     syncMotion();
+    window.addEventListener('space-palette-change', recolor);
     reduced.addEventListener('change', syncMotion);
     document.addEventListener('visibilitychange', syncMotion);
     window.addEventListener('resize', resize);

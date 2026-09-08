@@ -1,4 +1,6 @@
-# Locally served comparison fonts
+# Locally served fonts
+
+The active theme uses **P0T-NOoDLE** for headings and **IBM Plex Mono** for article text, code, and filenames. Plex includes real regular/bold and italic/bold-italic faces. The ASCII background uses textmode's embedded font. Other comparison files below are retained but not loaded by the theme.
 
 WOFF2 Latin and Latin Extended subsets from pinned Fontsource packages. The original four comparison families include regular (400) and bold (700):
 
