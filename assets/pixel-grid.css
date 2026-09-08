@@ -1,0 +1,42 @@
+/* Pixel-outline fonts need both native scales and whole-device-pixel placement. */
+html:root body {
+  position: relative;
+  width: round(down, min(var(--content-width), calc(100% - 1rem)), var(--device-pixel));
+  max-width: none;
+  padding: round(nearest, 16px, var(--device-pixel));
+  margin-top: round(nearest, calc(var(--body-size) * 3), var(--device-pixel));
+  line-height: round(nearest, calc(var(--body-size) * var(--body-leading)), var(--device-pixel));
+}
+html:root body > h1:first-of-type {
+  line-height: round(nearest, calc(var(--heading-size) * 1.25), var(--device-pixel));
+  margin-block: round(nearest, calc(var(--heading-size) * .67), var(--device-pixel));
+}
+body > h2, body > h3, body > h4, body > h5, body > h6 {
+  line-height: round(nearest, 1.5em, var(--device-pixel));
+  margin-block: round(nearest, 1em, var(--device-pixel));
+}
+body > h2 { font-size: max(var(--heading-grid), round(down, 1.5em, var(--heading-grid))); }
+body > h3 { font-size: max(var(--heading-grid), round(down, 1.17em, var(--heading-grid))); }
+body > h4 { font-size: max(var(--heading-grid), round(down, 1em, var(--heading-grid))); }
+body > h5 { font-size: max(var(--heading-grid), round(down, .83em, var(--heading-grid))); }
+body > h6 { font-size: max(var(--heading-grid), round(down, .67em, var(--heading-grid))); }
+body > p { margin-block: round(nearest, 1em, var(--device-pixel)); }
+body > hr { margin-block: round(nearest, .5em, var(--device-pixel)); border-width: var(--device-pixel); }
+body .index { border-spacing: round(nearest, 2px, var(--device-pixel)); line-height: var(--table-size); }
+body .index td, body .index th { padding: round(nearest, 6px, var(--device-pixel)); }
+body .index th { padding-block: round(nearest, 2px, var(--device-pixel)); }
+body .index .pixel-cell { position: relative; }
+body .blog-tools { font-size: round(nearest, 16px, var(--heading-grid)); margin-block: round(nearest, 16px, var(--device-pixel)); }
+body .site-byline { font-size: round(nearest, var(--body-size), var(--heading-grid)); line-height: round(nearest, 1.75em, var(--device-pixel)); }
+body .blog-tools input, body .blog-tools button { line-height: round(nearest, 24px, var(--device-pixel)); padding: round(nearest, 6px, var(--device-pixel)) round(nearest, 8px, var(--device-pixel)); border-width: var(--device-pixel); }
+html:root body pre { font-size: var(--body-size); line-height: round(nearest, calc(var(--body-size) * 1.5), var(--device-pixel)); padding: round(nearest, 1em, var(--device-pixel)); }
+@media (max-width: 768px) {
+  html:root body { margin-top: round(nearest, 16px, var(--device-pixel)); font-size: var(--mobile-body-size); }
+}
+@media (max-width: 640px) {
+  html:root body { padding: round(nearest, 12px, var(--device-pixel)); }
+  html:root body > h1:first-of-type { font-size: var(--mobile-heading-size); }
+  body table.index tr { padding: round(nearest, 10px, var(--device-pixel)) round(nearest, 6px, var(--device-pixel)); gap: round(nearest, 2px, var(--device-pixel)) round(nearest, 12px, var(--device-pixel)); }
+  body table.index td { padding: round(nearest, 2px, var(--device-pixel)) 0; line-height: round(nearest, calc(var(--table-size) * 1.5), var(--device-pixel)); }
+  body table.index td:nth-child(3) { font-size: var(--table-date-size); }
+}

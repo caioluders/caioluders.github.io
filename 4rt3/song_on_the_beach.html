@@ -1,54 +1,67 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Song on the beach</title>
 <style>
 
+		@import url("/assets/enhancements.css");
 		@font-face { font-family: "gohu"; src: url("/gohu.woff") format('woff'); }
 		html {
-			background: url('/4rt3/g3n3r4t1v3/sketch_5p4c3/out1.gif') no-repeat center/100% fixed;
+			background: #050711;
 		}
 		body {
-			font-family: 'gohu', monospace;
-			max-width: 50em;
+			font-family: var(--body-font);
+			max-width: var(--content-width);
+			font-size: var(--body-size);
+			padding: 1rem;
+			box-sizing: border-box;
 			margin: 0 auto;
-			color: white;
-			background-color: rgb(0,0,0,0.7);
-			line-height: calc(1ex / 0.32);
+			color: var(--text-color);
+			background-color: rgba(0,0,0,var(--content-opacity));
+			line-height: var(--body-leading);
 			margin-top: 3em;
 			overflow-wrap: break-word;
 		}
 		pre {
-			font-family: 'gohu', monospace;
-			white-space: pre-wrap;
-			overflow-wrap: anywhere;
-			line-height: 125%;
+			font-family: var(--body-font);
+			white-space: pre;
+			overflow-x: auto;
+			max-width: 100%;
+			box-sizing: border-box;
+			overflow-wrap: normal;
+			line-height: 1.5;
       		background-color: #111;
     	  	padding: 1em;
 		}
 		@media only screen and (max-width:768px) {
 			body {
-				max-width:100%;
+				max-width:calc(100% - 1rem);
+				margin-top: 1rem;
+				font-size: max(14px, calc(var(--body-size) - 2px));
 			}
 		}
 		td {
 			vertical-align: top;
 		}
 		.index td {
-			padding: 0.15em 0.4em;
+			padding: 0.35em 0.4em;
 		}
 		.index tr:nth-child(odd) {
-			background-color: rgba(0,0,0,0.55);
+			background-color: rgba(14,19,34,0.4);
 		}
 		.index tr:nth-child(even) {
-			background-color: rgba(255,255,255,0.12);
+			background-color: rgba(var(--stripe-rgb),0.18);
 		}
 		.index tr:first-child {
 			background-color: transparent;
 		}
 		a:link {
-			color: #0a0 ;
+			color: var(--link-color);
 		}
 		a:visited {
-			color: #004100 ;
+			color: var(--visited-color);
 		}
 		td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
 		span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
@@ -94,8 +107,6 @@
 		.codehilite .vm { color: #eedd82 } /* Name.Variable.Magic */
 	
 </style>
-<head>
-  <meta charset="UTF-8">
 </head>
 
 <body><h1>Song on the beach</h1>
@@ -109,4 +120,5 @@
 <h2>shell</h2>
 <iframe width="100%" height="500em" src="https://preview.p5js.org/caioluders/embed/BabTau5ic"></iframe>
 
-<script src="https://emgithub.com/embed.js?target=https%3A%2F%2Fgithub.com%2Fcaioluders%2Fcaioluders.github.io%2Fblob%2Fmaster%2F4rt3%2Fg3n3r4t1v3%2Fshell%2Fshell.js&style=github&showBorder=on&showLineNumbers=on&showFileMeta=on&showCopy=on"></script></body><hr>by <a href='https://twitter.com/caioluders'>@caioluders</a></html>
+<script src="https://emgithub.com/embed.js?target=https%3A%2F%2Fgithub.com%2Fcaioluders%2Fcaioluders.github.io%2Fblob%2Fmaster%2F4rt3%2Fg3n3r4t1v3%2Fshell%2Fshell.js&style=github&showBorder=on&showLineNumbers=on&showFileMeta=on&showCopy=on"></script><hr><footer class="site-byline">by <a href='https://twitter.com/caioluders'>@caioluders</a></footer><script defer src="/assets/enhancements.js"></script>
+</body></html>

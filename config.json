@@ -4,7 +4,10 @@
     "url": "https://lude.rs/",
     "footnote": "by <a href='https://twitter.com/caioluders'>@caioluders</a>",
     "rss": true,
-    "ignore": ["CNAME", "index.html", "config.json", "gohu.woff", "templates"],
+    "timezone": "America/Fortaleza",
+    "page_scripts": ["/assets/enhancements.js"],
+    "search_index": "assets/search-index.json",
+    "ignore": ["CNAME", "index.html", "config.json", "gohu.woff", "templates", "assets", "scripts"],
     "link_folders": {
         "r4nd0m": [
             {"name": "visualiza_isso_aqui", "url": "https://github.com/caioluders/visualiza_isso_aqui", "title": ""},
